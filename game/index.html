@@ -38,6 +38,7 @@
 </div>
 
 <script>
+/* ---------- Utils & Figuren ---------- */
 const TAU=Math.PI*2;
 const CHARACTERS=[
  {id:"sevban",name:"Sevban",age:20,draw:(c,x,y,r)=>{c.fillStyle="#f0c8a8";c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
@@ -55,33 +56,38 @@ const CHARACTERS=[
   c.fillStyle="#222";c.beginPath();c.arc(x-r*0.28,y-r*0.05,r*0.08,0,TAU);c.arc(x+r*0.28,y-r*0.05,r*0.08,0,TAU);c.fill();}}
 ];
 
+/* ---------- Menü-Auswahl ---------- */
 const pick=document.getElementById("pick");
 let choiceP1=CHARACTERS[0].id, choiceP2=CHARACTERS[1].id;
-function head(ch){const d=document.createElement("div");d.style.position="relative";d.style.padding="22px 12px 10px";
- const cn=document.createElement("canvas");cn.width=72;cn.height=72;ch.draw(cn.getContext("2d"),36,36,32);
- const tag=document.createElement("div");tag.className="tag";tag.textContent=ch.name;
- const w=document.createElement("div");w.className="head";w.title=ch.name;w.appendChild(cn);w.appendChild(tag);
- w.addEventListener("click",()=>{if(!choiceP1||choiceP2){choiceP1=ch.id;choiceP2=null;[...pick.querySelectorAll(".head")].forEach(e=>e.classList.remove("sel"));w.classList.add("sel");}
- else{choiceP2=ch.id;w.classList.add("sel");}}); d.appendChild(w); return d;}
+function head(ch){
+  const d=document.createElement("div"); d.style.position="relative"; d.style.padding="22px 12px 10px";
+  const cn=document.createElement("canvas"); cn.width=72; cn.height=72; ch.draw(cn.getContext("2d"),36,36,32);
+  const tag=document.createElement("div"); tag.className="tag"; tag.textContent=ch.name;
+  const w=document.createElement("div"); w.className="head"; w.title=ch.name; w.appendChild(cn); w.appendChild(tag);
+  w.addEventListener("click",()=>{
+    if(!choiceP1 || choiceP2){ choiceP1=ch.id; choiceP2=null; [...pick.querySelectorAll(".head")].forEach(e=>e.classList.remove("sel")); w.classList.add("sel"); }
+    else { choiceP2=ch.id; w.classList.add("sel"); }
+  });
+  d.appendChild(w); return d;
+}
 CHARACTERS.forEach(ch=>pick.appendChild(head(ch)));
 
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
-canvas.tabIndex=0;
-canvas.addEventListener("mousedown",()=>canvas.focus());
+/* ---------- Canvas & State ---------- */
+const canvas=document.getElementById("game"), ctx=canvas.getContext("2d");
+canvas.tabIndex=0; canvas.addEventListener("mousedown",()=>canvas.focus());
 
 const menu=document.getElementById("menu"), msg=document.getElementById("msg");
 let state="menu", mode="PvAI", P1,P2,BALL,SCORE;
-let goalLock=0;              // Sperrzeit (Sekunden) nach Tor
-let goalCounterL=0, goalCounterR=0; // Entprellung (mehrere Frames nötig)
-
+let goalLock=0;                           // Sperrzeit (Sekunden) nach Tor
+let goalCounterL=0, goalCounterR=0;       // Entprellung / Mehrfach-Frames
 const G=1500, DT=1/60, FLOOR=canvas.height-60, GOAL_W=40, GOAL_H=140;
 
+/* ---------- Spieler & Reset ---------- */
 function makePlayer(side,id){
   const x=side==="left"?200:canvas.width-200;
   return {id,side,x,y:FLOOR-36,r:36,vx:0,vy:0,onGround:true,left:false,right:false};
 }
-function findChar(id){return CHARACTERS.find(c=>c.id===id)||CHARACTERS[0];}
+function findChar(id){ return CHARACTERS.find(c=>c.id===id)||CHARACTERS[0]; }
 function reset(){
   SCORE={L:0,R:0,toWin:5};
   P1=makePlayer("left",choiceP1);
@@ -90,6 +96,7 @@ function reset(){
   goalLock=0; goalCounterL=0; goalCounterR=0; msg.textContent="";
 }
 
+/* ---------- Eingabe ---------- */
 const keys={};
 function handleDown(e){
   const k=(e.code||e.key||"").toLowerCase();
@@ -116,6 +123,7 @@ function input(){
   }
 }
 
+/* ---------- Physik ---------- */
 function stepP(p){
   const ACC=1400, MAXV=260, FRI=0.86;
   if(p.left)p.vx-=ACC*DT; if(p.right)p.vx+=ACC*DT; p.vx=Math.max(-MAXV,Math.min(MAXV,p.vx));
@@ -141,38 +149,61 @@ function rb(rx,ry,rw,rh){
   }
 }
 
+/* ---------- Ball-Step (mit robuster Torlogik) ---------- */
 function stepB(){
-  BALL.vy+=G*DT; BALL.x+=BALL.vx*DT; BALL.y+=BALL.vy*DT;
-  if(BALL.y+BALL.r>FLOOR){BALL.y=FLOOR-BALL.r;BALL.vy*=-0.6;BALL.vx*=0.99;}
-  if(BALL.x-BALL.r<0){BALL.x=BALL.r;BALL.vx*=-0.8;}
-  if(BALL.x+BALL.r>canvas.width){BALL.x=canvas.width-BALL.r;BALL.vx*=-0.8;}
+  // Integration
+  BALL.vy += G*DT;
+  BALL.x  += BALL.vx*DT;
+  BALL.y  += BALL.vy*DT;
 
-  const top=FLOOR-GOAL_H;
-  rb(0,top,GOAL_W,GOAL_H);
-  rb(canvas.width-GOAL_W,top,GOAL_W,GOAL_H);
-  collide(BALL,P1.x,P1.y,P1.r); collide(BALL,P2.x,P2.y,P2.r);
+  // Boden & Außenwände
+  if (BALL.y + BALL.r > FLOOR) { BALL.y = FLOOR - BALL.r; BALL.vy *= -0.6; BALL.vx *= 0.99; }
+  if (BALL.x - BALL.r < 0) { BALL.x = BALL.r; BALL.vx *= -0.8; }
+  if (BALL.x + BALL.r > canvas.width) { BALL.x = canvas.width - BALL.r; BALL.vx *= -0.8; }
 
-  if(goalLock>0) goalLock-=DT;
+  // Pfosten/Latte
+  const top = FLOOR - GOAL_H;
+  rb(0, top, GOAL_W, GOAL_H);
+  rb(canvas.width - GOAL_W, top, GOAL_W, GOAL_H);
 
-  // --- Tor nur zählen, wenn Ball im Torband ist UND mehrere Frames „klar hinter Linie“ bleibt
-  const inGoalBand = (BALL.y+BALL.r>top+10) && (BALL.y-BALL.r<FLOOR);
-  if(goalLock<=0 && inGoalBand){
-    // links: Ball komplett links der Innenkante und nach links unterwegs
-    if (BALL.x + BALL.r <= GOAL_W-2 && BALL.vx < 0) { goalCounterR++; } else { goalCounterR=0; }
-    // rechts: Ball komplett rechts der Innenkante und nach rechts unterwegs
-    if (BALL.x - BALL.r >= canvas.width - (GOAL_W-2) && BALL.vx > 0) { goalCounterL++; } else { goalCounterL=0; }
+  // Köpfe
+  collide(BALL, P1.x, P1.y, P1.r);
+  collide(BALL, P2.x, P2.y, P2.r);
 
-    // nach ~0.1 s stabil hinter Linie werten (6 Frames bei 60 Hz)
-    if (goalCounterR > 6) { goal("R"); goalLock=1.0; goalCounterL=goalCounterR=0; return; }
-    if (goalCounterL > 6) { goal("L"); goalLock=1.0; goalCounterL=goalCounterR=0; return; }
+  // Lock nach Tor
+  if (goalLock > 0) goalLock -= DT;
+
+  // Tor-Erkennung (Entprellt & nicht an Außenwand)
+  const inBand = (BALL.y + BALL.r > top + 10) && (BALL.y - BALL.r < FLOOR);
+  const inner = 2, outer = 2;
+
+  const insideLeft =
+    inBand &&
+    (BALL.x + BALL.r <= GOAL_W - inner) &&
+    (BALL.x - BALL.r >= 0 + outer) &&
+    (BALL.vx < 0);
+
+  const insideRight =
+    inBand &&
+    (BALL.x - BALL.r >= canvas.width - GOAL_W + inner) &&
+    (BALL.x + BALL.r <= canvas.width - outer) &&
+    (BALL.vx > 0);
+
+  if (goalLock <= 0) {
+    if (insideLeft)  goalCounterR++; else goalCounterR = 0;
+    if (insideRight) goalCounterL++; else goalCounterL = 0;
+
+    if (goalCounterR > 6) { goal("R"); goalLock = 1.0; goalCounterL = goalCounterR = 0; return; }
+    if (goalCounterL > 6) { goal("L"); goalLock = 1.0; goalCounterL = goalCounterR = 0; return; }
   }
 }
 
+/* ---------- Tor, Zeichnen, Loop ---------- */
 function goal(side){
   if(side==="L")SCORE.L++; else if(side==="R")SCORE.R++;
   BALL.x=canvas.width/2; BALL.y=180; BALL.vx=(Math.random()<.5?220:-220); BALL.vy=-200;
   P1.x=200; P2.x=canvas.width-200; P1.vx=P1.vy=0; P2.vx=P2.vy=0; P1.onGround=P2.onGround=true;
-  goalCounterL=goalCounterR=0; // Entprellung zurücksetzen
+  goalCounterL=goalCounterR=0;
 
   if(SCORE.L>=SCORE.toWin || SCORE.R>=SCORE.toWin){
     msg.textContent=`Spielende – ${SCORE.L>SCORE.R?"Links":"Rechts"} gewinnt! R = Neustart`;
@@ -209,9 +240,11 @@ function loop(t){
   renderFrame(); requestAnimationFrame(loop);
 }
 
+/* ---------- Start-Buttons ---------- */
 document.getElementById("startPvAI").addEventListener("click",()=>{mode="PvAI";reset();menu.style.display="none";state="play";canvas.focus();});
 document.getElementById("startPvP").addEventListener("click",()=>{mode="PvP"; reset();menu.style.display="none";state="play";canvas.focus();});
 
+/* ---------- Los ---------- */
 reset(); requestAnimationFrame(loop);
 </script>
 </body>
