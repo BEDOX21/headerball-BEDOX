@@ -33,7 +33,6 @@
     </div>
   </div>
 
-  <!-- WICHTIG: Wir lassen die im HTML gesetzte Canvasgröße (960×540) -->
   <canvas id="game" width="960" height="540"></canvas>
   <div class="bar small">Ort: Frankfurt – Skyline im Hintergrund. <span id="msg"></span></div>
 </div>
@@ -73,7 +72,8 @@ canvas.addEventListener("mousedown",()=>canvas.focus());
 
 const menu=document.getElementById("menu"), msg=document.getElementById("msg");
 let state="menu", mode="PvAI", P1,P2,BALL,SCORE;
-let goalLock=0; // Sekunden
+let goalLock=0;              // Sperrzeit (Sekunden) nach Tor
+let goalCounterL=0, goalCounterR=0; // Entprellung (mehrere Frames nötig)
 
 const G=1500, DT=1/60, FLOOR=canvas.height-60, GOAL_W=40, GOAL_H=140;
 
@@ -87,7 +87,7 @@ function reset(){
   P1=makePlayer("left",choiceP1);
   P2=makePlayer("right",choiceP2||CHARACTERS[1].id);
   BALL={x:canvas.width/2,y:canvas.height/2-80,vx:(Math.random()<.5?220:-220),vy:-300,r:16};
-  goalLock=0; msg.textContent="";
+  goalLock=0; goalCounterL=0; goalCounterR=0; msg.textContent="";
 }
 
 const keys={};
@@ -154,11 +154,17 @@ function stepB(){
 
   if(goalLock>0) goalLock-=DT;
 
-  // Tor nur werten, wenn Ball in der „Torhöhe“ UND klar im Torraum (Komplett links/rechts hinter Pfosten)
+  // --- Tor nur zählen, wenn Ball im Torband ist UND mehrere Frames „klar hinter Linie“ bleibt
   const inGoalBand = (BALL.y+BALL.r>top+10) && (BALL.y-BALL.r<FLOOR);
   if(goalLock<=0 && inGoalBand){
-    if(BALL.x + BALL.r <= GOAL_W){ goal("R"); goalLock=1.2; return; }
-    if(BALL.x - BALL.r >= canvas.width - GOAL_W){ goal("L"); goalLock=1.2; return; }
+    // links: Ball komplett links der Innenkante und nach links unterwegs
+    if (BALL.x + BALL.r <= GOAL_W-2 && BALL.vx < 0) { goalCounterR++; } else { goalCounterR=0; }
+    // rechts: Ball komplett rechts der Innenkante und nach rechts unterwegs
+    if (BALL.x - BALL.r >= canvas.width - (GOAL_W-2) && BALL.vx > 0) { goalCounterL++; } else { goalCounterL=0; }
+
+    // nach ~0.1 s stabil hinter Linie werten (6 Frames bei 60 Hz)
+    if (goalCounterR > 6) { goal("R"); goalLock=1.0; goalCounterL=goalCounterR=0; return; }
+    if (goalCounterL > 6) { goal("L"); goalLock=1.0; goalCounterL=goalCounterR=0; return; }
   }
 }
 
@@ -166,6 +172,7 @@ function goal(side){
   if(side==="L")SCORE.L++; else if(side==="R")SCORE.R++;
   BALL.x=canvas.width/2; BALL.y=180; BALL.vx=(Math.random()<.5?220:-220); BALL.vy=-200;
   P1.x=200; P2.x=canvas.width-200; P1.vx=P1.vy=0; P2.vx=P2.vy=0; P1.onGround=P2.onGround=true;
+  goalCounterL=goalCounterR=0; // Entprellung zurücksetzen
 
   if(SCORE.L>=SCORE.toWin || SCORE.R>=SCORE.toWin){
     msg.textContent=`Spielende – ${SCORE.L>SCORE.R?"Links":"Rechts"} gewinnt! R = Neustart`;
