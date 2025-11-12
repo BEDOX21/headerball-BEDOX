@@ -22,7 +22,7 @@
 <body>
 <div id="wrap">
   <h2>Headerball – Frankfurt 1v1</h2>
-  <div class="bar small">Steuerung: Spieler 1 (A/D = links/rechts, W = springen) · Spieler 2 (←/→ = links/rechts, ↑ = springen) · P = Pause · R = Neustart</div>
+  <div class="bar small">Steuerung: Spieler 1 (A/D = links/rechts, W oder Leertaste = springen) · Spieler 2 (←/→ = links/rechts, ↑ = springen) · P = Pause · R = Neustart</div>
 
   <div id="menu" class="card">
     <h3 style="margin-top:0">Wähle deine Köpfe</h3>
@@ -80,30 +80,63 @@ canvas.addEventListener("mousedown", ()=>canvas.focus());
 /* ---------- Game State ---------- */
 const menu=document.getElementById("menu"), msg=document.getElementById("msg");
 let state="menu", mode="PvAI", P1,P2,BALL,SCORE;
+let goalLock = 0;  // kurzer Sperr-Timer nach einem Tor (Sekunden)
 const G=1500, DT=1/60, FLOOR=canvas.height-60, GOAL_W=40, GOAL_H=140;
 
 function makePlayer(side,id){const x=side==="left"?200:canvas.width-200;return{id,side,x,y:FLOOR-36,r:36,vx:0,vy:0,onGround:true,left:false,right:false};}
 function findChar(id){return CHARACTERS.find(c=>c.id===id)||CHARACTERS[0];}
-function reset(){SCORE={L:0,R:0,toWin:5};P1=makePlayer("left",choiceP1);P2=makePlayer("right",choiceP2||CHARACTERS[1].id);
-  BALL={x:canvas.width/2,y:canvas.height/2-80,vx:220*(Math.random()<.5?1:-1),vy:-300,r:16};msg.textContent="";}
+function reset(){
+  SCORE={L:0,R:0,toWin:5};
+  P1=makePlayer("left",choiceP1);
+  P2=makePlayer("right",choiceP2||CHARACTERS[1].id);
+  BALL={x:canvas.width/2,y:canvas.height/2-80,vx:220*(Math.random()<.5?1:-1),vy:-300,r:16};
+  goalLock = 0;
+  msg.textContent="";
+}
 
 /* ---------- Input ---------- */
 const keys={};
-addEventListener("keydown",e=>{keys[e.code]=true;
-  if(e.code==="KeyP"){ state=state==="pause"?"play":"pause"; acc=0; last=null; }  // Pause-Fix
-  if(e.code==="KeyR"){ reset(); acc=0; last=null; }
-});
-addEventListener("keyup",e=>keys[e.code]=false);
-/* bei Fokus-Verlust Tasten zurücksetzen */
+
+function handleDown(e){
+  const k=(e.code||e.key||"").toLowerCase();
+  if(["arrowup","arrowleft","arrowright"," "].includes(k)) e.preventDefault();
+
+  if(k==="keyp"||k==="p"){ state = (state==="pause"?"play":"pause"); acc=0; last=null; return; }
+  if(k==="keyr"||k==="r"){ reset(); state="play"; acc=0; last=null; return; }
+
+  keys[k]=true;
+}
+function handleUp(e){
+  const k=(e.code||e.key||"").toLowerCase();
+  keys[k]=false;
+}
+
+addEventListener("keydown",handleDown,{passive:false});
+addEventListener("keyup",handleUp,{passive:false});
 addEventListener("blur", ()=>{for(const k in keys) keys[k]=false;});
 
 function input(){
-  P1.left=!!keys["KeyA"]; P1.right=!!keys["KeyD"]; if(keys["KeyW"]&&P1.onGround){P1.vy=-600;P1.onGround=false;}
+  const a = keys["keya"]||keys["a"];
+  const d = keys["keyd"]||keys["d"];
+  const w = keys["keyw"]||keys["w"]||keys[" "];
+  P1.left  = !!a;
+  P1.right = !!d;
+  if(w && P1.onGround){ P1.vy=-600; P1.onGround=false; }
+
   if(mode==="PvP"){
-    P2.left=!!keys["ArrowLeft"]; P2.right=!!keys["ArrowRight"]; if(keys["ArrowUp"]&&P2.onGround){P2.vy=-600;P2.onGround=false;}
-  }else{ // KI
-    const t=BALL.x; P2.left=P2.x>t+10; P2.right=P2.x<t-10;
-    if(BALL.vy>0&&Math.abs(BALL.x-P2.x)<50&&P2.onGround&&BALL.y<P2.y-40){P2.vy=-600;P2.onGround=false;}
+    const left  = keys["arrowleft"];
+    const right = keys["arrowright"];
+    const up    = keys["arrowup"];
+    P2.left  = !!left;
+    P2.right = !!right;
+    if(up && P2.onGround){ P2.vy=-600; P2.onGround=false; }
+  }else{
+    const t=BALL.x;
+    P2.left  = P2.x>t+10;
+    P2.right = P2.x<t-10;
+    if(BALL.vy>0 && Math.abs(BALL.x-P2.x)<50 && P2.onGround && BALL.y<P2.y-40){
+      P2.vy=-600; P2.onGround=false;
+    }
   }
 }
 
@@ -123,19 +156,47 @@ function rb(rx,ry,rw,rh){if(BALL.y>ry&&BALL.y<ry+rh){
   if(BALL.x+BALL.r>rx+rw&&BALL.vx>0){BALL.x=rx+rw-BALL.r;BALL.vx*=-0.8;}}
   if(BALL.x>rx&&BALL.x<rx+rw){
   if(BALL.y-BALL.r<ry&&BALL.vy<0){BALL.y=ry+BALL.r;BALL.vy*=-0.8;}}}
+
 function stepB(){
+  // Gravitation & Bewegung
   BALL.vy+=G*DT; BALL.x+=BALL.vx*DT; BALL.y+=BALL.vy*DT;
+
+  // Boden & Seiten
   if(BALL.y+BALL.r>FLOOR){BALL.y=FLOOR-BALL.r;BALL.vy*=-0.6;BALL.vx*=0.99;}
-  if(BALL.x-BALL.r<0){BALL.x=BALL.r;BALL.vx*=-0.8;} if(BALL.x+BALL.r>canvas.width){BALL.x=canvas.width-BALL.r;BALL.vx*=-0.8;}
-  const top=FLOOR-GOAL_H; rb(0,top,GOAL_W,GOAL_H); rb(canvas.width-GOAL_W,top,GOAL_W,GOAL_H);
-  collide(BALL,P1.x,P1.y,P1.r); collide(BALL,P2.x,P2.y,P2.r);
-  if(BALL.y+BALL.r>top+10){ if(BALL.x<GOAL_W-6)goal("R"); if(BALL.x>canvas.width-GOAL_W+6)goal("L");}
+  if(BALL.x-BALL.r<0){BALL.x=BALL.r;BALL.vx*=-0.8;}
+  if(BALL.x+BALL.r>canvas.width){BALL.x=canvas.width-BALL.r;BALL.vx*=-0.8;}
+
+  // Pfosten/Latte
+  const top=FLOOR-GOAL_H;
+  rb(0,top,GOAL_W,GOAL_H);
+  rb(canvas.width-GOAL_W,top,GOAL_W,GOAL_H);
+
+  // Spieler-Kollisionen
+  collide(BALL,P1.x,P1.y,P1.r);
+  collide(BALL,P2.x,P2.y,P2.r);
+
+  // Tor-Sperre herunterzählen
+  if (goalLock > 0) goalLock -= DT;
+
+  // Tor nur werten, wenn Ball sichtbar im Torbereich ist und Sperre abgelaufen
+  if (goalLock <= 0 && BALL.y+BALL.r > top + 10) {
+    if (BALL.x < GOAL_W - 6)  { goal("R"); goalLock = 1.2; }
+    if (BALL.x > canvas.width - GOAL_W + 6) { goal("L"); goalLock = 1.2; }
+  }
 }
-function goal(s){ if(s==="L")SCORE.L++; if(s==="R")SCORE.R++;
+
+function goal(s){
+  if(s==="L")SCORE.L++; else if(s==="R")SCORE.R++;
+  // Anstoßposition
   BALL.x=canvas.width/2; BALL.y=180; BALL.vx=(Math.random()<.5?220:-220); BALL.vy=-200;
   P1.x=200; P2.x=canvas.width-200; P1.vx=P1.vy=0; P2.vx=P2.vy=0; P1.onGround=P2.onGround=true;
-  if(SCORE.L>=5||SCORE.R>=5){ msg.textContent=`Spielende – ${SCORE.L>SCORE.R?"Links":"Rechts"} gewinnt! R = Neustart`; state="pause"; last=null; acc=0; }
-  else { msg.textContent=`Tor! L ${SCORE.L} : R ${SCORE.R}`; }
+
+  if(SCORE.L>=SCORE.toWin||SCORE.R>=SCORE.toWin){
+    msg.textContent=`Spielende – ${SCORE.L>SCORE.R?"Links":"Rechts"} gewinnt! R = Neustart`;
+    state="pause"; last=null; acc=0;
+  } else {
+    msg.textContent=`Tor! L ${SCORE.L} : R ${SCORE.R}`;
+  }
 }
 
 /* ---------- Zeichnen ---------- */
@@ -162,10 +223,11 @@ function renderFrame(){
   drawBG(); drawP(P1); drawP(P2); drawBall(); drawScore();
 }
 function loop(t){
-  if(last===null){ last=t; }           // beim ersten Frame initialisieren
+  if(last===null){ last=t; } // erstes Frame initialisieren
   const dt=Math.min(0.05,(t-last)/1000);
   last=t;
-  if(state!=="play"){                  // während Pause NICHT akkumulieren
+
+  if(state!=="play"){ // während Pause NICHT akkumulieren
     acc=0; renderFrame(); requestAnimationFrame(loop); return;
   }
   acc+=dt;
