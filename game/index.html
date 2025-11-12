@@ -41,7 +41,7 @@
   .btn{background:#143364;border:none;color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
   .btn:hover{background:#1a4486}
 
-  /* Right – Wettschein */
+  /* Right – Wettschein (Tipico-Style) */
   .slipHead{display:flex;align-items:center;justify-content:space-between}
   .slipList{margin-top:8px}
   .slipItem{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px;border:1px solid #26385d;background:#0d1730;border-radius:8px;margin-bottom:6px}
@@ -104,7 +104,7 @@
         <strong>Spiele heute</strong>
         <div class="row">
           <label class="small">Sim-Speed</label>
-          <input id="speed" type="range" min="0.25" max="1.5" step="0.25" value="1">
+          <input id="speed" type="range" min="0.5" max="2" step="0.25" value="1">
           <span id="spdLbl" class="pill">1.0×</span>
           <button id="pauseBtn" class="btn">Pause</button>
           <button id="resetBtn" class="btn">Reset</button>
@@ -222,13 +222,14 @@ function refreshOddSelections(){
   SLIP.forEach(s=>{
     const m=MATCHES.find(x=>x.id===s.mid);
     const idx={H:0,D:1,A:2}[s.market];
-    const container=[...matchList.querySelectorAll(".match")].find(el=>el.querySelector(".teams").textContent.includes(m.home));
+    const container=[...matchList.querySelectorAll(".match")]
+      .find(el=>el.querySelector(".teams").textContent.includes(m.home));
     if(container){ const buttons=container.querySelectorAll(".odd"); buttons[idx]?.classList.add("sel"); }
   });
 }
 function renderSlip(){
   slipEl.innerHTML="";
-  if(!SLIP.length){ slipEl.innerHTML='<div class="sub">Noch keine Auswahlen – klicke Quoten links.</div>'; }
+  if(!SLIP.length){ slipEl.innerHTML='<div class="sub">Noch keine Auswahlen – klicke Quoten in der Liste.</div>'; }
   SLIP.forEach(s=>{
     const m=MATCHES.find(x=>x.id===s.mid);
     const d=document.createElement("div"); d.className="slipItem";
@@ -284,8 +285,8 @@ let speed=1; speedEl.oninput=()=>{speed=parseFloat(speedEl.value); spdLbl.textCo
 let cur=null; // current match object
 let HOME=null, AWAY=null, BALL=null;
 let STATE="idle", prevAfterPause="first", simMinute=0, halfCD=0;
-const FIX_DT=1/60, MIN_PER_SEC=0.5;
-let last=null, acc=0, nudgeTimer=0;
+const FIX_DT=1/60, MIN_PER_SEC=1.0; // 90' -> 90 Sekunden (1,5 Min gesamt)
+let last=null, acc=0, nudgeTimer=0, stuckTimer=0;
 
 function tryStart(mid){
   const m=MATCHES.find(x=>x.id===mid);
@@ -297,7 +298,7 @@ function start(m){
   cur=m; initResult(m.id);
   HOME=mkTeam(m.home,"L"); AWAY=mkTeam(m.away,"R"); place(HOME); place(AWAY); kickoff(Math.random()<0.5?"L":"R");
   hudTeams.textContent=`${m.home} – ${m.away}`; ticker.textContent=`Anpfiff: ${m.home} vs ${m.away}\n`;
-  STATE="first"; simMinute=0; halfCD=0; nudgeTimer=0; hudState.textContent="1. Halbzeit";
+  STATE="first"; simMinute=0; halfCD=0; nudgeTimer=0; stuckTimer=0; hudState.textContent="1. Halbzeit";
 }
 function initResult(mid){ if(!RESULTS[mid]) RESULTS[mid]={status:"pre",scoreH:0,scoreA:0,htH:0,htA:0,scH:[],scA:[]}; }
 function forceEnd(){
@@ -312,10 +313,11 @@ document.addEventListener("keydown",e=>{const k=(e.code||e.key||"").toLowerCase(
 function step(dt){
   if(STATE==="idle"||STATE==="end"||STATE==="pause") return;
 
+  // sehr kurze Halbzeit 3s – trotzdem Gesamt ~90–93s
   if(STATE==="half"){ halfCD-=dt; hudState.textContent=`Halbzeit (${Math.ceil(halfCD)}s)`; if(halfCD<=0){STATE="second"; hudState.textContent="2. Halbzeit";} return; }
 
   simMinute += dt*MIN_PER_SEC*speed; hudClock.textContent=minStr(simMinute);
-  if(STATE==="first" && simMinute>=45){ const R=RESULTS[cur.id]; R.htH=HOME.score; R.htA=AWAY.score; STATE="half"; halfCD=10; ticker.textContent+=`Halbzeit ${HOME.score}:${AWAY.score}\n`; return; }
+  if(STATE==="first" && simMinute>=45){ const R=RESULTS[cur.id]; R.htH=HOME.score; R.htA=AWAY.score; STATE="half"; halfCD=3; ticker.textContent+=`Halbzeit ${HOME.score}:${AWAY.score}\n`; return; }
   if(STATE==="second" && simMinute>=90){ finalize(cur.id,false); settleTicketsFor(cur.id); summary(cur.id,"Abpfiff."); STATE="end"; return; }
 
   ai(HOME,AWAY,dt); ai(AWAY,HOME,dt); physics(dt);
@@ -325,7 +327,7 @@ function finalize(mid,forced){
   const R=RESULTS[mid]; R.status="ended"; R.scoreH=HOME.score; R.scoreA=AWAY.score;
   if(R.htH===undefined){R.htH=HOME.score;R.htA=AWAY.score;}
   R.scH=HOME.scorers.slice(); R.scA=AWAY.scorers.slice();
-  ticker.textContent+=`${forced?'':' '}Endstand ${HOME.name} ${HOME.score}:${AWAY.score} ${AWAY.name}\n`;
+  if(!forced) ticker.textContent+=`Endstand ${HOME.name} ${HOME.score}:${AWAY.score} ${AWAY.name}\n`;
 }
 function settleTicketsFor(mid){
   TICKETS.forEach(t=>{
@@ -338,7 +340,7 @@ function settleTicketsFor(mid){
   renderTickets();
 }
 function checkSel(s,R){
-  if(!R) return false; const sum=R.scoreH+R.scoreA;
+  if(!R) return false;
   switch(s.market){case"H":return R.scoreH>R.scoreA;case"D":return R.scoreH===R.scoreA;case"A":return R.scoreA>R.scoreH;default:return false;}
 }
 function summary(mid,headline){
@@ -356,7 +358,8 @@ function mkTeam(name,side){const c=color(name);const p=[];for(let i=0;i<11;i++)p
 function color(n){const m={"Real Madrid":"#ffffff","Manchester City":"#6cb6ff","Bayern München":"#c80a0a","Paris SG":"#1f3b6d","Barcelona":"#aa1e3f","Inter":"#1e2a78","Borussia Dortmund":"#f6d000","Atlético Madrid":"#b30d2f","RB Leipzig":"#d20f2a","Arsenal":"#d21e2e","Porto":"#1b3a8a","Juventus":"#e6e6e6","Leverkusen":"#e11d48","Liverpool":"#c8102e","Roma":"#8a1c1c","AC Milan":"#222"};return m[n]||"#60a5fa";}
 const FORM433=[[0.05,0.50],[0.20,0.20],[0.20,0.38],[0.20,0.62],[0.20,0.80],[0.45,0.30],[0.45,0.50],[0.45,0.70],[0.72,0.25],[0.72,0.50],[0.72,0.75]];
 function place(T){const f=T.side==="L"?FORM433:FORM433.map(([x,y])=>[1-x,y]);for(let i=0;i<T.players.length;i++){const[nx,ny]=f[i];const px=40+nx*(W-80),py=30+ny*(H-60);Object.assign(T.players[i],{x:px,y:py,vx:0,vy:0,has:false,homeX:px,homeY:py});}}
-function kickoff(side){BALL={x:MID.x,y:MID.y,vx:(side==="L"?90:-90),vy:r(-30,30),r:6,own:null};}
+function kickoff(side){BALL={x:MID.x,y:MID.y,vx:(side==="L"?110:-110),vy:r(-40,40),r:6,own:null};} // schneller Anstoß
+
 function ai(T,Opp,dt){
   const carrier=nearestToBall(T);
   for(const p of T.players){
@@ -366,53 +369,49 @@ function ai(T,Opp,dt){
         p.has=true; BALL.own=p;
         const gx=T.side==="L"?W-GOAL_W-4:GOAL_W+4, dir=norm(gx-p.x,(H/2)-p.y);
         const near=Math.abs(p.x-gx)<170, pr=nearest(p,Opp), pd=dist2(p.x,p.y,pr.x,pr.y);
-        if(near && Math.random()<0.02){ shoot(T,p,dir,260+p.sht*0.8); }
-        else if(pd<70 && Math.random()<0.04){ const m=mate(T,p); if(m) pass(p,m); }
+        if(near && Math.random()<0.025){ shoot(T,p,dir,280+p.sht*0.8); }
+        else if(pd<70 && Math.random()<0.045){ const m=mate(T,p); if(m) pass(p,m); }
         else { p.vx+=dir.x*900*dt; p.vy+=dir.y*900*dt; }
         BALL.x=p.x+dir.x*12; BALL.y=p.y+dir.y*12; BALL.vx*=0.92; BALL.vy*=0.92;
-      }else{ p.has=false; go(p,BALL.x,BALL.y,dt,1.2); }
+      }else{ p.has=false; go(p,BALL.x,BALL.y,dt,1.25); }
     }else{ p.has=false; go(p,tx,ty,dt,0.7); }
   }
 }
 function nearestToBall(T){let b=null,bd=1e9;for(const p of T.players){const d=dist2(BALL.x,BALL.y,p.x,p.y);if(d<bd){bd=d;b=p;}}return b;}
 function nearest(p,T){let b=null,bd=1e9;for(const o of T.players){const d=dist2(p.x,p.y,o.x,o.y);if(d<bd){bd=d;b=o;}}return b;}
 function mate(T,p){const f=T.side==="L"?1:-1;const cs=T.players.filter(m=>m!==p&&f*(m.x-p.x)>0);if(!cs.length)return null;cs.sort((a,b)=>Math.abs(a.y-p.y)-Math.abs(b.y-p.y));return cs[0];}
-function pass(from,to){const d=norm(to.x-from.x,to.y-from.y), P=180+from.pas*0.6;BALL.vx=d.x*P;BALL.vy=d.y*P;BALL.own=null;from.has=false;ticker.textContent+=`${mstr(simMinute)} Pass\n`;}
+function pass(from,to){const d=norm(to.x-from.x,to.y-from.y), P=190+from.pas*0.6;BALL.vx=d.x*P;BALL.vy=d.y*P;BALL.own=null;from.has=false;ticker.textContent+=`${mstr(simMinute)} Pass\n`;}
 function shoot(T,p,dir,P){BALL.vx=dir.x*P;BALL.vy=dir.y*P;BALL.own=null;p.has=false;ticker.textContent+=`${mstr(simMinute)} Schuss!\n`;}
-function go(p,tx,ty,dt,f=1){const dx=tx-p.x,dy=ty-p.y,len=Math.hypot(dx,dy)||1,a=900*f*dt;p.vx+=(dx/len)*a;p.vy+=(dy/len)*a;const vmax=150*(0.7+p.spd/200),vlen=Math.hypot(p.vx,p.vy);if(vlen>vmax){p.vx=p.vx/vlen*vmax;p.vy=p.vy/vlen*vmax;}p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.9;p.vy*=0.9;p.x=clamp(p.x,20,W-20);p.y=clamp(p.y,20,H-20);}
+function go(p,tx,ty,dt,f=1){const dx=tx-p.x,dy=ty-p.y,len=Math.hypot(dx,dy)||1,a=900*f*dt;p.vx+=(dx/len)*a;p.vy+=(dy/len)*a;const vmax=160*(0.7+p.spd/200),vlen=Math.hypot(p.vx,p.vy);if(vlen>vmax){p.vx=p.vx/vlen*vmax;p.vy=p.vy/vlen*vmax;}p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.9;p.vy*=0.9;p.x=clamp(p.x,20,W-20);p.y=clamp(p.y,20,H-20);}
 
-/* Physik mit Anti-Stuck */
+/* Physik mit Anti-Stuck (verstärkt) */
 function physics(dt){
-  // Spieler-Spieler Abstoß
   const all=[...HOME.players,...AWAY.players];
   for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){resolvePP(all[i],all[j]);}
 
-  // Ball
   if(BALL.own) return;
+
   BALL.vx*=0.985; BALL.vy*=0.985; BALL.x+=BALL.vx*dt; BALL.y+=BALL.vy*dt;
 
-  // Wände
-  if(BALL.y<10){BALL.y=10;BALL.vy*=-0.85;}
-  if(BALL.y>H-10){BALL.y=H-10;BALL.vy*=-0.85;}
+  // Wände/Gates
+  if(BALL.y<10){BALL.y=10;BALL.vy*=-0.86;}
+  if(BALL.y>H-10){BALL.y=H-10;BALL.vy*=-0.86;}
   if(BALL.x<4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("H");} else {BALL.x=4;BALL.vx*=-0.9;} }
   if(BALL.x>W-4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("A");} else {BALL.x=W-4;BALL.vx*=-0.9;} }
 
-  // Kollision Ball–Spieler
+  // Kollision Ball–Spieler (mit tangentialem Anteil)
   for(const p of all){ resolveBP(BALL,p); }
 
-  // Anti-Stuck: „Sandwich“
+  // Anti-Stuck: „Sandwich“ + Mindestenergie
   const near=all.filter(p=>dist2(BALL.x,BALL.y,p.x,p.y)<(p.r+BALL.r+6));
   const speed=Math.hypot(BALL.vx,BALL.vy);
-  if(near.length>=2 && speed<25){
-    // Impuls nach außen (Mittel der Spieler → Ball)
-    let nx=0,ny=0; near.forEach(p=>{nx+=BALL.x-p.x;ny+=BALL.y-p.y;}); const n=norm(nx,ny);
-    const k=220; BALL.vx=n.x*k; BALL.vy=n.y*k;
+  if(near.length>=2 && speed<28){ stuckTimer+=dt; } else stuckTimer=0;
+  if(stuckTimer>0.25){ // kurzer kräftiger Impuls raus
+    let nx=0,ny=0; near.forEach(p=>{nx+=BALL.x-p.x;ny+=BALL.y-p.y;}); const n=norm(nx,ny); const k=260;
+    BALL.vx=n.x*k; BALL.vy=n.y*k; stuckTimer=0;
   }
-  // Low-Energy-Nudge
   nudgeTimer+=dt;
-  if(speed<12 && nudgeTimer>1.5){
-    const n=norm(r(-1,1),r(-1,1)); BALL.vx+=n.x*160; BALL.vy+=n.y*160; nudgeTimer=0;
-  }
+  if(speed<16 && nudgeTimer>1.0){ const n=norm(r(-1,1),r(-1,1)); BALL.vx+=n.x*200; BALL.vy+=n.y*200; nudgeTimer=0; }
 }
 function resolvePP(a,b){
   const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy)||1, min=a.r+b.r+2;
@@ -423,26 +422,23 @@ function resolveBP(ball,p){
   if(d<min){
     const nx=dx/d, ny=dy/d, ov=min-d;
     ball.x+=nx*ov; ball.y+=ny*ov;
-    // elastischer + tangentialer Impuls
-    const v=ball.vx*nx+ball.vy*ny, tx=-ny, ty=nx;
-    const vt=ball.vx*tx+ball.vy*ty;
-    ball.vx -= 1.8*v*nx + 0.3*vt*tx;
-    ball.vy -= 1.8*v*ny + 0.3*vt*ty;
-    // kleiner Kick in Kollisionsnormale
-    ball.vx+=nx*50; ball.vy+=ny*50;
+    const v=ball.vx*nx+ball.vy*ny, tx=-ny, ty=nx, vt=ball.vx*tx+ball.vy*ty;
+    ball.vx -= 1.9*v*nx + 0.35*vt*tx;
+    ball.vy -= 1.9*v*ny + 0.35*vt*ty;
+    ball.vx+=nx*60; ball.vy+=ny*60;
   }
 }
 function goal(side){
   const m=Math.round(simMinute);
   if(side==="H"){HOME.score++; addScorer(HOME,m); ticker.textContent+=`${mstr(simMinute)} TOR ${HOME.name}!\n`;}
   else{AWAY.score++; addScorer(AWAY,m); ticker.textContent+=`${mstr(simMinute)} TOR ${AWAY.name}!\n`;}
+  // Sofortiger Wiederanstoß (ohne Unterbrechung)
   place(HOME); place(AWAY); kickoff(side==="H"?"A":"H");
 }
 function addScorer(T,m){const idx=Math.floor(Math.random()*10)+1; T.scorers.push({n:T.players[idx].name,m});}
 
 /* Zeichnen */
 function draw(){
-  // Rasen
   const grd=g.createLinearGradient(0,0,0,H); grd.addColorStop(0,"#092015"); grd.addColorStop(1,"#123a22");
   g.fillStyle=grd; g.fillRect(0,0,W,H);
   g.strokeStyle="rgba(255,255,255,.6)"; g.lineWidth=2; g.strokeRect(20,20,W-40,H-40);
@@ -458,7 +454,8 @@ function draw(){
 function drawTeam(T){ for(const p of T.players){ g.fillStyle=T.c; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill(); if(p.has){ g.strokeStyle="#fff"; g.lineWidth=2; g.beginPath(); g.arc(p.x,p.y,p.r+3,0,Math.PI*2); g.stroke(); } }}
 
 /* Loop */
-function loop(t){ if(last===null) last=t; const dt=Math.min(0.05,(t-last)/1000); last=t; acc+=dt; while(acc>=FIX_DT){ step(FIX_DT); acc-=FIX_DT; } hudState.textContent=label(); hudScore.textContent=(HOME&&AWAY)?`${HOME.score} : ${AWAY.score}`:"– : –"; draw(); requestAnimationFrame(loop); }
+let animLast=null, animAcc=0;
+function loop(t){ if(animLast===null) animLast=t; const dt=Math.min(0.05,(t-animLast)/1000); animLast=t; animAcc+=dt; while(animAcc>=FIX_DT){ step(FIX_DT); animAcc-=FIX_DT; } hudState.textContent=label(); hudScore.textContent=(HOME&&AWAY)?`${HOME.score} : ${AWAY.score}`:"– : –"; draw(); requestAnimationFrame(loop); }
 requestAnimationFrame(loop);
 
 /* Live helpers */
