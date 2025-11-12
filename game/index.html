@@ -13,24 +13,20 @@
     font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
   #wrap{max-width:1200px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px}
 
-  /* Header / Logo */
   .top{display:flex;align-items:center;justify-content:space-between}
   .logo{display:flex;align-items:center;gap:8px}
   .logo svg{height:36px}
   .logo b{font-weight:800;font-size:26px;letter-spacing:.4px}
   .sub{font-size:12px;color:var(--muted)}
 
-  /* Layout */
   .grid{display:grid;grid-template-columns:260px 1fr 320px;gap:12px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
   .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .pill{padding:2px 8px;border-radius:999px;border:1px solid #23334e;background:#0e1a33;color:#cfe}
 
-  /* Left – Filter */
   label.small{font-size:12px;color:var(--muted)}
   select{width:100%;background:#0c1530;color:#e6ecff;border:1px solid #304065;border-radius:8px;padding:8px}
 
-  /* Center – Matchliste */
   .match{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;border-radius:10px;background:#0e1830;border:1px solid #1e2c4d;margin-bottom:8px}
   .teams{font-weight:700}
   .kick{font-size:12px;color:var(--muted)}
@@ -41,7 +37,6 @@
   .btn{background:#143364;border:none;color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
   .btn:hover{background:#1a4486}
 
-  /* Right – Wettschein (Tipico-Style) */
   .slipHead{display:flex;align-items:center;justify-content:space-between}
   .slipList{margin-top:8px}
   .slipItem{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px;border:1px solid #26385d;background:#0d1730;border-radius:8px;margin-bottom:6px}
@@ -52,12 +47,10 @@
   .ticket{border:1px dashed #2b3c60;background:#0e1a33;border-radius:10px;padding:10px;margin-top:10px}
   .ok{color:var(--accent)} .bad{color:var(--bad)} .warn{color:var(--warn)}
 
-  /* Canvas */
   canvas{background:#07121e;border:1px solid #223;border-radius:12px;max-width:100%;height:auto}
   .hud{display:flex;align-items:center;justify-content:space-between;margin:6px 0}
   .ticker{font-size:12px;color:var(--muted);max-height:120px;overflow:auto;white-space:pre-wrap}
 
-  /* Modal */
   .modalBg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
   .modal{background:#0f172a;border:1px solid #2a3350;border-radius:12px;max-width:560px;width:90%;padding:16px}
 </style>
@@ -80,13 +73,11 @@
   </div>
 
   <div class="grid">
-    <!-- LEFT: Filter -->
+    <!-- LEFT -->
     <div class="card">
       <div class="row"><strong>Filter</strong></div>
       <label class="small">Wettart</label>
-      <select id="betKind">
-        <option value="1x2">1X2 (Sieg/Remis/Sieg)</option>
-      </select>
+      <select id="betKind"><option value="1x2">1X2 (Sieg/Remis/Sieg)</option></select>
       <div style="height:8px"></div>
       <label class="small">League</label>
       <select id="leagueSel">
@@ -98,7 +89,7 @@
       <div class="sub">Hinweis: Nur Spielgeld. Keine echten Einsätze.</div>
     </div>
 
-    <!-- CENTER: Matches + Canvas -->
+    <!-- CENTER -->
     <div class="card">
       <div class="row" style="justify-content:space-between">
         <strong>Spiele heute</strong>
@@ -125,7 +116,7 @@
       <div id="ticker" class="ticker" style="margin-top:6px"></div>
     </div>
 
-    <!-- RIGHT: Wettschein -->
+    <!-- RIGHT -->
     <div class="card">
       <div class="slipHead">
         <strong>Wettschein</strong>
@@ -146,8 +137,11 @@
       <button id="place" class="btn" style="width:100%">Wette abgeben (Spielgeld)</button>
 
       <div class="ticket">
-        <div class="row"><strong>Meine Tickets</strong></div>
-        <div id="tickets" class="sub"></div>
+        <div class="row" style="justify-content:space-between"><strong>Tickets</strong><span class="sub">getrennt nach Status</span></div>
+        <div class="sub" style="margin:8px 0 4px">Offen</div>
+        <div id="ticketsOpen" class="sub"></div>
+        <div class="sub" style="margin:10px 0 4px">Abgeschlossen</div>
+        <div id="ticketsClosed" class="sub"></div>
       </div>
     </div>
   </div>
@@ -165,7 +159,7 @@
 </div>
 
 <script>
-/* ============ Daten ============ */
+/* ------------ Daten ------------ */
 function id(){return Math.random().toString(36).slice(2)+Date.now().toString(36);}
 function M(league,home,away,kick,odds){return {id:id(),league,home,away,kick,odds};}
 const MATCHES=[
@@ -178,16 +172,16 @@ const MATCHES=[
   M("UEFA Europa League","Leverkusen","Liverpool","21:00",{H:2.60,D:3.60,A:2.55}),
   M("UEFA Europa League","Roma","AC Milan","21:00",{H:2.70,D:3.10,A:2.65}),
 ];
-const RESULTS={}; // id -> {status:'pre'|'running'|'ended', scoreH,scoreA,htH,htA,scH:[{n,m}],scA:[]}
+const RESULTS={};
 
-/* ============ Helpers ============ */
+/* ------------ Helpers ------------ */
 const $=q=>document.querySelector(q);
 const $$=q=>document.querySelectorAll(q);
 const fmt=x=>Number(x).toFixed(2);
 
-/* ============ Matchliste & Slip ============ */
+/* ------------ Liste & Wettschein ------------ */
 const leagueSel=$("#leagueSel"), matchList=$("#matchList");
-let SLIP=[]; // {mid,market,odd,label}
+let SLIP=[]; // {mid,market,odd}
 const slipEl=$("#slip"), stakeEl=$("#stake"), totEl=$("#totOdds"), payEl=$("#payout"), slipCount=$("#slipCount");
 
 function renderMatches(){
@@ -209,12 +203,19 @@ function renderMatches(){
 function oddBtn(m,key,lab){
   const b=document.createElement("button"); b.className="odd";
   b.innerHTML=`<div>${fmt(m.odds[key])}</div><div class="sub">${lab}</div>`;
-  b.onclick=()=>togglePick(m.id,key,m.odds[key],`${m.home}–${m.away} / ${lab}`);
+  b.onclick=()=>togglePick(m.id,key,m.odds[key]);
   return b;
 }
-function togglePick(mid,market,odd,label){
-  const i=SLIP.findIndex(s=>s.mid===mid && s.market===market);
-  if(i>=0) SLIP.splice(i,1); else SLIP.push({mid:mid,market,odd,label});
+// *** Nur 1 Auswahl pro Spiel ***
+function togglePick(mid,market,odd){
+  const current=SLIP.find(s=>s.mid===mid);
+  if(current && current.market===market){ // gleiches erneut -> entfernen
+    SLIP=SLIP.filter(s=>s.mid!==mid);
+  }else{
+    // ersetze evtl. vorhandene Auswahl dieses Spiels
+    SLIP=SLIP.filter(s=>s.mid!==mid);
+    SLIP.push({mid,market,odd});
+  }
   renderSlip(); refreshOddSelections();
 }
 function refreshOddSelections(){
@@ -233,9 +234,10 @@ function renderSlip(){
   SLIP.forEach(s=>{
     const m=MATCHES.find(x=>x.id===s.mid);
     const d=document.createElement("div"); d.className="slipItem";
-    d.innerHTML=`<div><div><b>${m.home}</b> – <b>${m.away}</b></div><div class="sub">${s.market==='H'?'1':s.market==='D'?'X':'2'} @ ${fmt(s.odd)}</div></div>
+    d.innerHTML=`<div><div><b>${m.home}</b> – <b>${m.away}</b></div>
+                 <div class="sub">${s.market==='H'?'1':s.market==='D'?'X':'2'} @ ${fmt(s.odd)}</div></div>
                  <button class="rm">x</button>`;
-    d.querySelector(".rm").onclick=()=>{ SLIP=SLIP.filter(x=>!(x.mid===s.mid && x.market===s.market)); renderSlip(); refreshOddSelections(); };
+    d.querySelector(".rm").onclick=()=>{ SLIP=SLIP.filter(x=>x.mid!==s.mid); renderSlip(); refreshOddSelections(); };
     slipEl.appendChild(d);
   });
   slipCount.textContent=`${SLIP.length} Ausw.`;
@@ -246,27 +248,29 @@ function renderSlip(){
 stakeEl.oninput=renderSlip;
 $$(".quick").forEach(b=>b.onclick=()=>{ stakeEl.value=b.dataset.amt; renderSlip(); });
 
-/* Tickets */
-const ticketsEl=$("#tickets"); let TICKETS=[];
+/* ------------ Tickets (getrennt) ------------ */
+const tOpen=$("#ticketsOpen"), tClosed=$("#ticketsClosed"); let TICKETS=[];
 function addTicket(type,selections,stake,tot){
   const t={id:id(),type,selections,stake,tot,payout:+(stake*tot).toFixed(2),status:"Offen"};
   TICKETS.unshift(t); renderTickets();
 }
 function renderTickets(){
-  ticketsEl.innerHTML=TICKETS.length?"":"<div class='sub'>Keine Tickets.</div>";
-  TICKETS.forEach(t=>{
-    const sym=t.status==="Gewonnen"?"✓":t.status==="Verloren"?"✗":"…";
-    const cls=t.status==="Gewonnen"?"ok":t.status==="Verloren"?"bad":"warn";
+  const open=TICKETS.filter(t=>t.status==="Offen");
+  const done=TICKETS.filter(t=>t.status!=="Offen");
+  const fmtTicket=t=>{
     const sels=t.selections.map(s=>{
       const m=MATCHES.find(x=>x.id===s.mid); const lab=s.market==='H'?'1':s.market==='D'?'X':'2';
       return `${m.home}–${m.away} ${lab} (${fmt(s.odd)})`;
     }).join(" · ");
-    const div=document.createElement("div");
-    div.className="sub"; div.style.marginTop="6px";
-    div.innerHTML=`<b>Ticket ${t.id.slice(-6)}</b> <span class="${cls}">${sym} ${t.status}</span><br>${sels}<br>
-                   Einsatz <b>${t.stake.toFixed(2)} €</b> · Quote <b>${fmt(t.tot)}</b> · Auszahlung <b>${t.payout.toFixed(2)} €</b>`;
-    ticketsEl.appendChild(div);
-  });
+    const sym=t.status==="Gewonnen"?"✓":t.status==="Verloren"?"✗":"…";
+    const cls=t.status==="Gewonnen"?"ok":t.status==="Verloren"?"bad":"warn";
+    return `<div style="margin:6px 0">
+      <b>Ticket ${t.id.slice(-6)}</b> <span class="${cls}">${sym} ${t.status}</span><br>
+      ${sels}<br> Einsatz <b>${t.stake.toFixed(2)} €</b> · Quote <b>${fmt(t.tot)}</b> · Auszahlung <b>${t.payout.toFixed(2)} €</b>
+    </div>`;
+  };
+  tOpen.innerHTML=open.length?open.map(fmtTicket).join(""):"<div class='sub'>–</div>";
+  tClosed.innerHTML=done.length?done.map(fmtTicket).join(""):"<div class='sub'>–</div>";
 }
 $("#place").onclick=()=>{
   if(!SLIP.length) return;
@@ -275,18 +279,17 @@ $("#place").onclick=()=>{
   SLIP=[]; renderSlip(); refreshOddSelections();
 };
 
-/* ============ Visualisierung ============ */
+/* ------------ Visualisierung ------------ */
 const W=960,H=540, GOAL_H=150, GOAL_W=10, MID={x:W/2,y:H/2};
 const g=$("#pitch").getContext("2d");
 const hudTeams=$("#hudTeams"), hudScore=$("#hudScore"), hudClock=$("#hudClock"), hudState=$("#hudState"), ticker=$("#ticker");
 const speedEl=$("#speed"), spdLbl=$("#spdLbl"), pauseBtn=$("#pauseBtn"), resetBtn=$("#resetBtn"), closeVis=$("#closeVis");
 let speed=1; speedEl.oninput=()=>{speed=parseFloat(speedEl.value); spdLbl.textContent=speed.toFixed(2)+"×";}; speedEl.oninput();
 
-let cur=null; // current match object
-let HOME=null, AWAY=null, BALL=null;
+let cur=null, HOME=null, AWAY=null, BALL=null;
 let STATE="idle", prevAfterPause="first", simMinute=0, halfCD=0;
-const FIX_DT=1/60, MIN_PER_SEC=1.0; // 90' -> 90 Sekunden (1,5 Min gesamt)
-let last=null, acc=0, nudgeTimer=0, stuckTimer=0;
+const FIX_DT=1/60, MIN_PER_SEC=1.0;   // 90' in ~90s  => ~1,5 Min mit kurzer Halbzeit
+let animLast=null, acc=0, nudgeTimer=0, stuckTimer=0;
 
 function tryStart(mid){
   const m=MATCHES.find(x=>x.id===mid);
@@ -301,9 +304,7 @@ function start(m){
   STATE="first"; simMinute=0; halfCD=0; nudgeTimer=0; stuckTimer=0; hudState.textContent="1. Halbzeit";
 }
 function initResult(mid){ if(!RESULTS[mid]) RESULTS[mid]={status:"pre",scoreH:0,scoreA:0,htH:0,htA:0,scH:[],scA:[]}; }
-function forceEnd(){
-  if(!cur) return; finalize(cur.id,true); settleTicketsFor(cur.id); summary(cur.id,"Match beendet."); clearEngine();
-}
+function forceEnd(){ if(!cur) return; finalize(cur.id,true); settleTicketsFor(cur.id); summary(cur.id,"Match beendet."); clearEngine(); }
 function clearEngine(){ STATE="idle"; cur=null; HOME=AWAY=BALL=null; simMinute=0; hudTeams.textContent="–"; hudScore.textContent="– : –"; hudClock.textContent="00:00"; hudState.textContent="Pre-Match"; ticker.textContent=""; }
 pauseBtn.onclick=()=>{ if(STATE==="pause"){STATE=prevAfterPause;hudState.textContent=label();} else{prevAfterPause=STATE;STATE="pause";hudState.textContent="Pause";} };
 resetBtn.onclick=()=>{ if(cur && STATE!=="idle" && STATE!=="end") confirmClose(()=>clearEngine()); else clearEngine(); };
@@ -313,14 +314,13 @@ document.addEventListener("keydown",e=>{const k=(e.code||e.key||"").toLowerCase(
 function step(dt){
   if(STATE==="idle"||STATE==="end"||STATE==="pause") return;
 
-  // sehr kurze Halbzeit 3s – trotzdem Gesamt ~90–93s
   if(STATE==="half"){ halfCD-=dt; hudState.textContent=`Halbzeit (${Math.ceil(halfCD)}s)`; if(halfCD<=0){STATE="second"; hudState.textContent="2. Halbzeit";} return; }
 
   simMinute += dt*MIN_PER_SEC*speed; hudClock.textContent=minStr(simMinute);
   if(STATE==="first" && simMinute>=45){ const R=RESULTS[cur.id]; R.htH=HOME.score; R.htA=AWAY.score; STATE="half"; halfCD=3; ticker.textContent+=`Halbzeit ${HOME.score}:${AWAY.score}\n`; return; }
   if(STATE==="second" && simMinute>=90){ finalize(cur.id,false); settleTicketsFor(cur.id); summary(cur.id,"Abpfiff."); STATE="end"; return; }
 
-  ai(HOME,AWAY,dt); ai(AWAY,HOME,dt); physics(dt);
+  aiChase(HOME,AWAY,dt); aiChase(AWAY,HOME,dt); physics(dt);
   hudScore.textContent=`${HOME.score} : ${AWAY.score}`;
 }
 function finalize(mid,forced){
@@ -353,65 +353,49 @@ function summary(mid,headline){
     <div class="pill" style="display:inline-block;margin-top:6px">Schützen ${m.away}: ${list(R.scA)}</div>`, ()=>closeModal());
 }
 
-/* Teams / KI */
-function mkTeam(name,side){const c=color(name);const p=[];for(let i=0;i<11;i++)p.push({name:i===0?"GK":"P"+i,spd:r(60,95),pas:r(60,95),sht:r(60,95),def:r(60,95),x:0,y:0,vx:0,vy:0,r:10,has:false,homeX:0,homeY:0,c});return {name,side,players:p,score:0,scorers:[]};}
+/* ------------ Teams & „Billiard“-KI ------------ */
+function mkTeam(name,side){const c=color(name);const p=[];for(let i=0;i<11;i++)p.push({name:i===0?"GK":"P"+i,x:0,y:0,vx:0,vy:0,r:10,spd:80+Math.random()*20,c});return {name,side,players:p,score:0,scorers:[]};}
 function color(n){const m={"Real Madrid":"#ffffff","Manchester City":"#6cb6ff","Bayern München":"#c80a0a","Paris SG":"#1f3b6d","Barcelona":"#aa1e3f","Inter":"#1e2a78","Borussia Dortmund":"#f6d000","Atlético Madrid":"#b30d2f","RB Leipzig":"#d20f2a","Arsenal":"#d21e2e","Porto":"#1b3a8a","Juventus":"#e6e6e6","Leverkusen":"#e11d48","Liverpool":"#c8102e","Roma":"#8a1c1c","AC Milan":"#222"};return m[n]||"#60a5fa";}
 const FORM433=[[0.05,0.50],[0.20,0.20],[0.20,0.38],[0.20,0.62],[0.20,0.80],[0.45,0.30],[0.45,0.50],[0.45,0.70],[0.72,0.25],[0.72,0.50],[0.72,0.75]];
-function place(T){const f=T.side==="L"?FORM433:FORM433.map(([x,y])=>[1-x,y]);for(let i=0;i<T.players.length;i++){const[nx,ny]=f[i];const px=40+nx*(W-80),py=30+ny*(H-60);Object.assign(T.players[i],{x:px,y:py,vx:0,vy:0,has:false,homeX:px,homeY:py});}}
-function kickoff(side){BALL={x:MID.x,y:MID.y,vx:(side==="L"?110:-110),vy:r(-40,40),r:6,own:null};} // schneller Anstoß
+function place(T){const f=T.side==="L"?FORM433:FORM433.map(([x,y])=>[1-x,y]);for(let i=0;i<T.players.length;i++){const[nx,ny]=f[i];const px=40+nx*(W-80),py=30+ny*(H-60);Object.assign(T.players[i],{x:px,y:py,vx:0,vy:0,homeX:px,homeY:py});}}
+function kickoff(side){BALL={x:MID.x,y:MID.y,vx:(side==="L"?120:-120),vy:(Math.random()*2-1)*50,r:6};}
 
-function ai(T,Opp,dt){
-  const carrier=nearestToBall(T);
+function aiChase(T,Opp,dt){
+  // 3 Nächste jagen den Ball
+  const sorted=[...T.players].sort((a,b)=>dist2(a.x,a.y,BALL.x,BALL.y)-dist2(b.x,b.y,BALL.x,BALL.y));
+  const chasers=new Set(sorted.slice(0,3));
   for(const p of T.players){
-    let tx=p.homeX, ty=p.homeY;
-    if(p===carrier){
-      if(dist2(BALL.x,BALL.y,p.x,p.y)<14){
-        p.has=true; BALL.own=p;
-        const gx=T.side==="L"?W-GOAL_W-4:GOAL_W+4, dir=norm(gx-p.x,(H/2)-p.y);
-        const near=Math.abs(p.x-gx)<170, pr=nearest(p,Opp), pd=dist2(p.x,p.y,pr.x,pr.y);
-        if(near && Math.random()<0.025){ shoot(T,p,dir,280+p.sht*0.8); }
-        else if(pd<70 && Math.random()<0.045){ const m=mate(T,p); if(m) pass(p,m); }
-        else { p.vx+=dir.x*900*dt; p.vy+=dir.y*900*dt; }
-        BALL.x=p.x+dir.x*12; BALL.y=p.y+dir.y*12; BALL.vx*=0.92; BALL.vy*=0.92;
-      }else{ p.has=false; go(p,BALL.x,BALL.y,dt,1.25); }
-    }else{ p.has=false; go(p,tx,ty,dt,0.7); }
+    const target=chasers.has(p)?{x:BALL.x,y:BALL.y}:{x:p.homeX,y:p.homeY};
+    const boost=chasers.has(p)?1.35:0.7;
+    go(p,target.x,target.y,dt,boost);
   }
 }
-function nearestToBall(T){let b=null,bd=1e9;for(const p of T.players){const d=dist2(BALL.x,BALL.y,p.x,p.y);if(d<bd){bd=d;b=p;}}return b;}
-function nearest(p,T){let b=null,bd=1e9;for(const o of T.players){const d=dist2(p.x,p.y,o.x,o.y);if(d<bd){bd=d;b=o;}}return b;}
-function mate(T,p){const f=T.side==="L"?1:-1;const cs=T.players.filter(m=>m!==p&&f*(m.x-p.x)>0);if(!cs.length)return null;cs.sort((a,b)=>Math.abs(a.y-p.y)-Math.abs(b.y-p.y));return cs[0];}
-function pass(from,to){const d=norm(to.x-from.x,to.y-from.y), P=190+from.pas*0.6;BALL.vx=d.x*P;BALL.vy=d.y*P;BALL.own=null;from.has=false;ticker.textContent+=`${mstr(simMinute)} Pass\n`;}
-function shoot(T,p,dir,P){BALL.vx=dir.x*P;BALL.vy=dir.y*P;BALL.own=null;p.has=false;ticker.textContent+=`${mstr(simMinute)} Schuss!\n`;}
-function go(p,tx,ty,dt,f=1){const dx=tx-p.x,dy=ty-p.y,len=Math.hypot(dx,dy)||1,a=900*f*dt;p.vx+=(dx/len)*a;p.vy+=(dy/len)*a;const vmax=160*(0.7+p.spd/200),vlen=Math.hypot(p.vx,p.vy);if(vlen>vmax){p.vx=p.vx/vlen*vmax;p.vy=p.vy/vlen*vmax;}p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.9;p.vy*=0.9;p.x=clamp(p.x,20,W-20);p.y=clamp(p.y,20,H-20);}
 
-/* Physik mit Anti-Stuck (verstärkt) */
+/* ------------ Physik (Anti-Stuck & Mindesttempo) ------------ */
 function physics(dt){
   const all=[...HOME.players,...AWAY.players];
-  for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){resolvePP(all[i],all[j]);}
 
-  if(BALL.own) return;
+  // Spieler ↔ Spieler Separation
+  for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)resolvePP(all[i],all[j]);
 
+  // Ball Bewegung
   BALL.vx*=0.985; BALL.vy*=0.985; BALL.x+=BALL.vx*dt; BALL.y+=BALL.vy*dt;
 
-  // Wände/Gates
-  if(BALL.y<10){BALL.y=10;BALL.vy*=-0.86;}
-  if(BALL.y>H-10){BALL.y=H-10;BALL.vy*=-0.86;}
-  if(BALL.x<4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("H");} else {BALL.x=4;BALL.vx*=-0.9;} }
-  if(BALL.x>W-4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("A");} else {BALL.x=W-4;BALL.vx*=-0.9;} }
+  // Spielfeld / Tore
+  if(BALL.y<10){BALL.y=10;BALL.vy*=-0.9;}
+  if(BALL.y>H-10){BALL.y=H-10;BALL.vy*=-0.9;}
+  if(BALL.x<4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("H");} else {BALL.x=4;BALL.vx*=-0.92;} }
+  if(BALL.x>W-4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("A");} else {BALL.x=W-4;BALL.vx*=-0.92;} }
 
-  // Kollision Ball–Spieler (mit tangentialem Anteil)
-  for(const p of all){ resolveBP(BALL,p); }
+  // Ball ↔ Spieler (billiard)
+  for(const p of all) resolveBP(BALL,p);
 
-  // Anti-Stuck: „Sandwich“ + Mindestenergie
+  // Sandwich-Check + Mindestenergie
   const near=all.filter(p=>dist2(BALL.x,BALL.y,p.x,p.y)<(p.r+BALL.r+6));
-  const speed=Math.hypot(BALL.vx,BALL.vy);
-  if(near.length>=2 && speed<28){ stuckTimer+=dt; } else stuckTimer=0;
-  if(stuckTimer>0.25){ // kurzer kräftiger Impuls raus
-    let nx=0,ny=0; near.forEach(p=>{nx+=BALL.x-p.x;ny+=BALL.y-p.y;}); const n=norm(nx,ny); const k=260;
-    BALL.vx=n.x*k; BALL.vy=n.y*k; stuckTimer=0;
-  }
-  nudgeTimer+=dt;
-  if(speed<16 && nudgeTimer>1.0){ const n=norm(r(-1,1),r(-1,1)); BALL.vx+=n.x*200; BALL.vy+=n.y*200; nudgeTimer=0; }
+  const sp=Math.hypot(BALL.vx,BALL.vy);
+  if(near.length>=2 && sp<30){ stuckTimer+=dt; } else stuckTimer=0;
+  if(stuckTimer>0.2){ let nx=0,ny=0; near.forEach(p=>{nx+=BALL.x-p.x;ny+=BALL.y-p.y;}); const n=norm(nx,ny); const k=300; BALL.vx=n.x*k; BALL.vy=n.y*k; stuckTimer=0; }
+  nudgeTimer+=dt; if(sp<18 && nudgeTimer>0.8){ const n=norm(Math.random()-0.5,Math.random()-0.5); BALL.vx+=n.x*220; BALL.vy+=n.y*220; nudgeTimer=0; }
 }
 function resolvePP(a,b){
   const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy)||1, min=a.r+b.r+2;
@@ -422,22 +406,23 @@ function resolveBP(ball,p){
   if(d<min){
     const nx=dx/d, ny=dy/d, ov=min-d;
     ball.x+=nx*ov; ball.y+=ny*ov;
-    const v=ball.vx*nx+ball.vy*ny, tx=-ny, ty=nx, vt=ball.vx*tx+ball.vy*ty;
-    ball.vx -= 1.9*v*nx + 0.35*vt*tx;
-    ball.vy -= 1.9*v*ny + 0.35*vt*ty;
-    ball.vx+=nx*60; ball.vy+=ny*60;
+    // elastischer + tangentialer Impuls, Mindesttempo
+    const vn=ball.vx*nx+ball.vy*ny, vt=ball.vx*(-ny)+ball.vy*(nx);
+    ball.vx -= 2.0*vn*nx + 0.4*vt*(-ny);
+    ball.vy -= 2.0*vn*ny + 0.4*vt*(nx);
+    const minSpeed=140; const sp=Math.hypot(ball.vx,ball.vy);
+    if(sp<minSpeed){ const s=minSpeed/sp; ball.vx*=s; ball.vy*=s; }
   }
 }
 function goal(side){
   const m=Math.round(simMinute);
-  if(side==="H"){HOME.score++; addScorer(HOME,m); ticker.textContent+=`${mstr(simMinute)} TOR ${HOME.name}!\n`;}
-  else{AWAY.score++; addScorer(AWAY,m); ticker.textContent+=`${mstr(simMinute)} TOR ${AWAY.name}!\n`;}
-  // Sofortiger Wiederanstoß (ohne Unterbrechung)
+  if(side==="H"){HOME.score++; HOME.scorers.push({n:"P"+(1+Math.floor(Math.random()*10)),m}); ticker.textContent+=`${minStr(simMinute)} TOR ${HOME.name}!\n`;}
+  else{AWAY.score++; AWAY.scorers.push({n:"P"+(1+Math.floor(Math.random()*10)),m}); ticker.textContent+=`${minStr(simMinute)} TOR ${AWAY.name}!\n`;}
+  // sofortiger Wiederanstoß
   place(HOME); place(AWAY); kickoff(side==="H"?"A":"H");
 }
-function addScorer(T,m){const idx=Math.floor(Math.random()*10)+1; T.scorers.push({n:T.players[idx].name,m});}
 
-/* Zeichnen */
+/* ------------ Zeichnen ------------ */
 function draw(){
   const grd=g.createLinearGradient(0,0,0,H); grd.addColorStop(0,"#092015"); grd.addColorStop(1,"#123a22");
   g.fillStyle=grd; g.fillRect(0,0,W,H);
@@ -451,34 +436,30 @@ function draw(){
     g.fillStyle="#fff"; g.font="700 18px system-ui"; g.textAlign="center"; g.fillText(`${HOME.name}  ${HOME.score} : ${AWAY.score}  ${AWAY.name}`, W/2, 28);
   }
 }
-function drawTeam(T){ for(const p of T.players){ g.fillStyle=T.c; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill(); if(p.has){ g.strokeStyle="#fff"; g.lineWidth=2; g.beginPath(); g.arc(p.x,p.y,p.r+3,0,Math.PI*2); g.stroke(); } }}
+function drawTeam(T){ for(const p of T.players){ g.fillStyle=T.c; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill(); }}
 
-/* Loop */
-let animLast=null, animAcc=0;
-function loop(t){ if(animLast===null) animLast=t; const dt=Math.min(0.05,(t-animLast)/1000); animLast=t; animAcc+=dt; while(animAcc>=FIX_DT){ step(FIX_DT); animAcc-=FIX_DT; } hudState.textContent=label(); hudScore.textContent=(HOME&&AWAY)?`${HOME.score} : ${AWAY.score}`:"– : –"; draw(); requestAnimationFrame(loop); }
+/* ------------ Loop ------------ */
+function loop(t){ if(animLast===null) animLast=t; const dt=Math.min(0.05,(t-animLast)/1000); animLast=t; acc+=dt; while(acc>=FIX_DT){ step(FIX_DT); acc-=FIX_DT; } hudState.textContent=label(); hudScore.textContent=(HOME&&AWAY)?`${HOME.score} : ${AWAY.score}`:"– : –"; draw(); requestAnimationFrame(loop); }
 requestAnimationFrame(loop);
 
-/* Live helpers */
+/* ------------ Utils ------------ */
 function label(){return STATE==="first"?"1. Halbzeit":STATE==="second"?"2. Halbzeit":STATE==="half"?"Halbzeit":STATE==="pause"?"Pause":STATE==="end"?"Ende":"Pre-Match";}
 function minStr(m){const M=Math.floor(m||0),S=Math.floor(((m||0)-M)*60);return `${String(M).padStart(2,"0")}:${String(S).padStart(2,"0")}`;}
-function mstr(m){return minStr(m);}
 function r(a,b){return Math.random()*(b-a)+a;}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function dist2(x1,y1,x2,y2){return Math.hypot(x1-x2,y1-y2);}
-function norm(x,y){const l=Math.hypot(x,y)||1;return {x:x/l,y:y/l};}
 
-/* Matches initial render */
+/* Render init */
 leagueSel.onchange=renderMatches; renderMatches(); renderSlip();
 
-/* ============ Modal ============ */
+/* ------------ Modal ------------ */
 const modalBg=$("#modalBg"), modalC=$("#modalContent"), mCancel=$("#mCancel"), mOk=$("#mOk"); let onOk=()=>{};
 mCancel.onclick=()=>modalBg.style.display="none"; mOk.onclick=()=>{onOk(); modalBg.style.display="none";};
 function openModal(html,cb){modalC.innerHTML=html;onOk=cb||(()=>{});modalBg.style.display="flex";}
 function closeModal(){modalBg.style.display="none";}
 function confirmClose(cb){
-  const R=cur?RESULTS[cur.id]:null; const info=R?`<div class="sub">Aktueller Stand: ${HOME.score}:${AWAY.score}</div>`:"";
   openModal(`<h3 style="margin:0 0 6px">Visualisierung schließen?</h3>
-             <div>Wenn du bestätigst, wird das laufende Spiel beendet, zusammengefasst und Tickets werden gewertet.</div>${info}`, cb);
+             <div>Wenn du bestätigst, wird das laufende Spiel beendet, zusammengefasst und Tickets werden gewertet.</div>`, cb);
 }
 </script>
 </body>
