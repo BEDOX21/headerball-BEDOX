@@ -22,7 +22,7 @@
 <body>
 <div id="wrap">
   <h2>Headerball – Frankfurt 1v1</h2>
-  <div class="bar small">Steuerung: Spieler 1 (A/D = links/rechts, W oder Leertaste = springen) · Spieler 2 (←/→ = links/rechts, ↑ = springen) · P = Pause · R = Neustart</div>
+  <div class="bar small">Steuerung: Spieler 1 (A/D = links/rechts, W/Leertaste = springen) · Spieler 2 (←/→ = links/rechts, ↑ = springen) · P = Pause · R = Neustart</div>
 
   <div id="menu" class="card">
     <h3 style="margin-top:0">Wähle deine Köpfe</h3>
@@ -33,15 +33,13 @@
     </div>
   </div>
 
+  <!-- WICHTIG: Wir lassen die im HTML gesetzte Canvasgröße (960×540) -->
   <canvas id="game" width="960" height="540"></canvas>
   <div class="bar small">Ort: Frankfurt – Skyline im Hintergrund. <span id="msg"></span></div>
 </div>
 
 <script>
-/* ---------- Utility ---------- */
-const TAU=Math.PI*2, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-
-/* ---------- Köpfe ---------- */
+const TAU=Math.PI*2;
 const CHARACTERS=[
  {id:"sevban",name:"Sevban",age:20,draw:(c,x,y,r)=>{c.fillStyle="#f0c8a8";c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
   c.fillStyle="#b37a38";for(let i=-3;i<=3;i++){c.beginPath();c.arc(x+i*8,y-r*0.6+Math.cos(i)*2,r*0.35,0,TAU);c.fill();}
@@ -58,8 +56,8 @@ const CHARACTERS=[
   c.fillStyle="#222";c.beginPath();c.arc(x-r*0.28,y-r*0.05,r*0.08,0,TAU);c.arc(x+r*0.28,y-r*0.05,r*0.08,0,TAU);c.fill();}}
 ];
 
-/* ---------- Auswahl ---------- */
-const pick=document.getElementById("pick"); let choiceP1=CHARACTERS[0].id, choiceP2=CHARACTERS[1].id;
+const pick=document.getElementById("pick");
+let choiceP1=CHARACTERS[0].id, choiceP2=CHARACTERS[1].id;
 function head(ch){const d=document.createElement("div");d.style.position="relative";d.style.padding="22px 12px 10px";
  const cn=document.createElement("canvas");cn.width=72;cn.height=72;ch.draw(cn.getContext("2d"),36,36,32);
  const tag=document.createElement("div");tag.className="tag";tag.textContent=ch.name;
@@ -68,139 +66,117 @@ function head(ch){const d=document.createElement("div");d.style.position="relati
  else{choiceP2=ch.id;w.classList.add("sel");}}); d.appendChild(w); return d;}
 CHARACTERS.forEach(ch=>pick.appendChild(head(ch)));
 
-/* ---------- Canvas/Context ---------- */
-const canvas=document.getElementById("game"), ctx=canvas.getContext("2d");
-/* Höhere „Qualität“: auf 1280×720 zeichnen */
-const DESIRED_W=1280, DESIRED_H=720;
-canvas.width=DESIRED_W; canvas.height=DESIRED_H;
-/* Tastatur-Fokus sicherstellen */
-canvas.tabIndex = 0;
-canvas.addEventListener("mousedown", ()=>canvas.focus());
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+canvas.tabIndex=0;
+canvas.addEventListener("mousedown",()=>canvas.focus());
 
-/* ---------- Game State ---------- */
 const menu=document.getElementById("menu"), msg=document.getElementById("msg");
 let state="menu", mode="PvAI", P1,P2,BALL,SCORE;
-let goalLock = 0;  // kurzer Sperr-Timer nach einem Tor (Sekunden)
+let goalLock=0; // Sekunden
+
 const G=1500, DT=1/60, FLOOR=canvas.height-60, GOAL_W=40, GOAL_H=140;
 
-function makePlayer(side,id){const x=side==="left"?200:canvas.width-200;return{id,side,x,y:FLOOR-36,r:36,vx:0,vy:0,onGround:true,left:false,right:false};}
+function makePlayer(side,id){
+  const x=side==="left"?200:canvas.width-200;
+  return {id,side,x,y:FLOOR-36,r:36,vx:0,vy:0,onGround:true,left:false,right:false};
+}
 function findChar(id){return CHARACTERS.find(c=>c.id===id)||CHARACTERS[0];}
 function reset(){
   SCORE={L:0,R:0,toWin:5};
   P1=makePlayer("left",choiceP1);
   P2=makePlayer("right",choiceP2||CHARACTERS[1].id);
-  BALL={x:canvas.width/2,y:canvas.height/2-80,vx:220*(Math.random()<.5?1:-1),vy:-300,r:16};
-  goalLock = 0;
-  msg.textContent="";
+  BALL={x:canvas.width/2,y:canvas.height/2-80,vx:(Math.random()<.5?220:-220),vy:-300,r:16};
+  goalLock=0; msg.textContent="";
 }
 
-/* ---------- Input ---------- */
 const keys={};
-
 function handleDown(e){
   const k=(e.code||e.key||"").toLowerCase();
   if(["arrowup","arrowleft","arrowright"," "].includes(k)) e.preventDefault();
-
-  if(k==="keyp"||k==="p"){ state = (state==="pause"?"play":"pause"); acc=0; last=null; return; }
+  if(k==="keyp"||k==="p"){ state=(state==="pause"?"play":"pause"); acc=0; last=null; return; }
   if(k==="keyr"||k==="r"){ reset(); state="play"; acc=0; last=null; return; }
-
   keys[k]=true;
 }
-function handleUp(e){
-  const k=(e.code||e.key||"").toLowerCase();
-  keys[k]=false;
-}
-
+function handleUp(e){ const k=(e.code||e.key||"").toLowerCase(); keys[k]=false; }
 addEventListener("keydown",handleDown,{passive:false});
 addEventListener("keyup",handleUp,{passive:false});
-addEventListener("blur", ()=>{for(const k in keys) keys[k]=false;});
+addEventListener("blur",()=>{for(const k in keys) keys[k]=false;});
 
 function input(){
-  const a = keys["keya"]||keys["a"];
-  const d = keys["keyd"]||keys["d"];
-  const w = keys["keyw"]||keys["w"]||keys[" "];
-  P1.left  = !!a;
-  P1.right = !!d;
-  if(w && P1.onGround){ P1.vy=-600; P1.onGround=false; }
-
+  const a=keys["keya"]||keys["a"], d=keys["keyd"]||keys["d"], w=keys["keyw"]||keys["w"]||keys[" "];
+  P1.left=!!a; P1.right=!!d; if(w&&P1.onGround){P1.vy=-600;P1.onGround=false;}
   if(mode==="PvP"){
-    const left  = keys["arrowleft"];
-    const right = keys["arrowright"];
-    const up    = keys["arrowup"];
-    P2.left  = !!left;
-    P2.right = !!right;
-    if(up && P2.onGround){ P2.vy=-600; P2.onGround=false; }
+    const L=keys["arrowleft"], R=keys["arrowright"], U=keys["arrowup"];
+    P2.left=!!L; P2.right=!!R; if(U&&P2.onGround){P2.vy=-600;P2.onGround=false;}
   }else{
     const t=BALL.x;
-    P2.left  = P2.x>t+10;
-    P2.right = P2.x<t-10;
-    if(BALL.vy>0 && Math.abs(BALL.x-P2.x)<50 && P2.onGround && BALL.y<P2.y-40){
-      P2.vy=-600; P2.onGround=false;
-    }
+    P2.left=P2.x>t+10; P2.right=P2.x<t-10;
+    if(BALL.vy>0 && Math.abs(BALL.x-P2.x)<50 && P2.onGround && BALL.y<P2.y-40){P2.vy=-600;P2.onGround=false;}
   }
 }
 
-/* ---------- Physik ---------- */
-function stepP(p){const ACC=1400,MAXV=260,FRI=0.86;
+function stepP(p){
+  const ACC=1400, MAXV=260, FRI=0.86;
   if(p.left)p.vx-=ACC*DT; if(p.right)p.vx+=ACC*DT; p.vx=Math.max(-MAXV,Math.min(MAXV,p.vx));
   p.vy+=G*DT; p.x+=p.vx*DT; p.y+=p.vy*DT;
   if(p.y+p.r>FLOOR){p.y=FLOOR-p.r;p.vy=0;p.onGround=true;p.vx*=FRI;}
   p.x=Math.max(p.r+GOAL_W+5,Math.min(canvas.width-p.r-GOAL_W-5,p.x));
 }
-function collide(b,cx,cy,cr){const dx=b.x-cx,dy=b.y-cy,dist=Math.hypot(dx,dy),min=b.r+cr;
-  if(dist<min){const nx=dx/(dist||1e-6),ny=dy/(dist||1e-6),ov=min-dist;
-    b.x+=nx*ov; b.y+=ny*ov; const v=b.vx*nx+b.vy*ny; b.vx-=1.9*v*nx; b.vy-=1.9*v*ny; b.vx+=nx*60; b.vy+=ny*60;}
+function collide(b,cx,cy,cr){
+  const dx=b.x-cx,dy=b.y-cy,dist=Math.hypot(dx,dy),min=b.r+cr;
+  if(dist<min){
+    const nx=dx/(dist||1e-6), ny=dy/(dist||1e-6), ov=min-dist;
+    b.x+=nx*ov; b.y+=ny*ov;
+    const v=b.vx*nx+b.vy*ny; b.vx-=1.9*v*nx; b.vy-=1.9*v*ny; b.vx+=nx*60; b.vy+=ny*60;
+  }
 }
-function rb(rx,ry,rw,rh){if(BALL.y>ry&&BALL.y<ry+rh){
-  if(BALL.x-BALL.r<rx&&BALL.vx<0){BALL.x=rx+BALL.r;BALL.vx*=-0.8;}
-  if(BALL.x+BALL.r>rx+rw&&BALL.vx>0){BALL.x=rx+rw-BALL.r;BALL.vx*=-0.8;}}
+function rb(rx,ry,rw,rh){
+  if(BALL.y>ry&&BALL.y<ry+rh){
+    if(BALL.x-BALL.r<rx&&BALL.vx<0){BALL.x=rx+BALL.r;BALL.vx*=-0.8;}
+    if(BALL.x+BALL.r>rx+rw&&BALL.vx>0){BALL.x=rx+rw-BALL.r;BALL.vx*=-0.8;}
+  }
   if(BALL.x>rx&&BALL.x<rx+rw){
-  if(BALL.y-BALL.r<ry&&BALL.vy<0){BALL.y=ry+BALL.r;BALL.vy*=-0.8;}}}
+    if(BALL.y-BALL.r<ry&&BALL.vy<0){BALL.y=ry+BALL.r;BALL.vy*=-0.8;}
+  }
+}
 
 function stepB(){
-  // Gravitation & Bewegung
   BALL.vy+=G*DT; BALL.x+=BALL.vx*DT; BALL.y+=BALL.vy*DT;
-
-  // Boden & Seiten
   if(BALL.y+BALL.r>FLOOR){BALL.y=FLOOR-BALL.r;BALL.vy*=-0.6;BALL.vx*=0.99;}
   if(BALL.x-BALL.r<0){BALL.x=BALL.r;BALL.vx*=-0.8;}
   if(BALL.x+BALL.r>canvas.width){BALL.x=canvas.width-BALL.r;BALL.vx*=-0.8;}
 
-  // Pfosten/Latte
   const top=FLOOR-GOAL_H;
   rb(0,top,GOAL_W,GOAL_H);
   rb(canvas.width-GOAL_W,top,GOAL_W,GOAL_H);
+  collide(BALL,P1.x,P1.y,P1.r); collide(BALL,P2.x,P2.y,P2.r);
 
-  // Spieler-Kollisionen
-  collide(BALL,P1.x,P1.y,P1.r);
-  collide(BALL,P2.x,P2.y,P2.r);
+  if(goalLock>0) goalLock-=DT;
 
-  // Tor-Sperre herunterzählen
-  if (goalLock > 0) goalLock -= DT;
-
-  // Tor nur werten, wenn Ball sichtbar im Torbereich ist und Sperre abgelaufen
-  if (goalLock <= 0 && BALL.y+BALL.r > top + 10) {
-    if (BALL.x < GOAL_W - 6)  { goal("R"); goalLock = 1.2; }
-    if (BALL.x > canvas.width - GOAL_W + 6) { goal("L"); goalLock = 1.2; }
+  // Tor nur werten, wenn Ball in der „Torhöhe“ UND klar im Torraum (Komplett links/rechts hinter Pfosten)
+  const inGoalBand = (BALL.y+BALL.r>top+10) && (BALL.y-BALL.r<FLOOR);
+  if(goalLock<=0 && inGoalBand){
+    if(BALL.x + BALL.r <= GOAL_W){ goal("R"); goalLock=1.2; return; }
+    if(BALL.x - BALL.r >= canvas.width - GOAL_W){ goal("L"); goalLock=1.2; return; }
   }
 }
 
-function goal(s){
-  if(s==="L")SCORE.L++; else if(s==="R")SCORE.R++;
-  // Anstoßposition
+function goal(side){
+  if(side==="L")SCORE.L++; else if(side==="R")SCORE.R++;
   BALL.x=canvas.width/2; BALL.y=180; BALL.vx=(Math.random()<.5?220:-220); BALL.vy=-200;
   P1.x=200; P2.x=canvas.width-200; P1.vx=P1.vy=0; P2.vx=P2.vy=0; P1.onGround=P2.onGround=true;
 
-  if(SCORE.L>=SCORE.toWin||SCORE.R>=SCORE.toWin){
+  if(SCORE.L>=SCORE.toWin || SCORE.R>=SCORE.toWin){
     msg.textContent=`Spielende – ${SCORE.L>SCORE.R?"Links":"Rechts"} gewinnt! R = Neustart`;
     state="pause"; last=null; acc=0;
-  } else {
+  }else{
     msg.textContent=`Tor! L ${SCORE.L} : R ${SCORE.R}`;
   }
 }
 
-/* ---------- Zeichnen ---------- */
-function drawBG(){const base=FLOOR,w=canvas.width,h=canvas.height,g=ctx;
+function drawBG(){
+  const base=FLOOR,w=canvas.width,h=canvas.height,g=ctx;
   g.fillStyle="#0a1529";g.beginPath();g.moveTo(0,base-20);
   const t=[[40,110],[100,70],[150,95],[210,60],[260,130],[320,85],[380,140],[450,75],[520,115],[580,65],[640,125],[700,90],[760,135],[820,70],[900,120]];
   let x=0;t.forEach(([w2,h2])=>{g.lineTo(x,base-20);g.lineTo(x,base-20-h2);g.lineTo(x+w2,base-20-h2);g.lineTo(x+w2,base-20);x+=w2+10;});
@@ -216,32 +192,20 @@ function drawBall(){ctx.fillStyle="#e8e8e8";ctx.beginPath();ctx.arc(BALL.x,BALL.
  ctx.beginPath();ctx.arc(BALL.x,BALL.y,BALL.r*0.6,0,TAU);ctx.stroke();}
 function drawScore(){ctx.fillStyle="#fff";ctx.font="bold 28px system-ui,sans-serif";ctx.textAlign="center";ctx.fillText(`${SCORE.L} : ${SCORE.R}`,canvas.width/2,40);}
 
-/* ---------- Game Loop (mit Pause-Fix) ---------- */
 let last=null, acc=0;
-function renderFrame(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  drawBG(); drawP(P1); drawP(P2); drawBall(); drawScore();
-}
+function renderFrame(){ctx.clearRect(0,0,canvas.width,canvas.height); drawBG(); drawP(P1); drawP(P2); drawBall(); drawScore();}
 function loop(t){
-  if(last===null){ last=t; } // erstes Frame initialisieren
-  const dt=Math.min(0.05,(t-last)/1000);
-  last=t;
-
-  if(state!=="play"){ // während Pause NICHT akkumulieren
-    acc=0; renderFrame(); requestAnimationFrame(loop); return;
-  }
-  acc+=dt;
-  while(acc>=DT){ input(); stepP(P1); stepP(P2); stepB(); acc-=DT; }
+  if(last===null) last=t;
+  const dt=Math.min(0.05,(t-last)/1000); last=t;
+  if(state!=="play"){ acc=0; renderFrame(); return requestAnimationFrame(loop); }
+  acc+=dt; while(acc>=DT){ input(); stepP(P1); stepP(P2); stepB(); acc-=DT; }
   renderFrame(); requestAnimationFrame(loop);
 }
 
-/* ---------- Start-Buttons ---------- */
 document.getElementById("startPvAI").addEventListener("click",()=>{mode="PvAI";reset();menu.style.display="none";state="play";canvas.focus();});
 document.getElementById("startPvP").addEventListener("click",()=>{mode="PvP"; reset();menu.style.display="none";state="play";canvas.focus();});
 
-/* ---------- GO ---------- */
 reset(); requestAnimationFrame(loop);
 </script>
-
 </body>
 </html>
