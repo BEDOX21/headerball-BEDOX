@@ -9,11 +9,15 @@
     --bg:#0b0f1a;--panel:#101725;--line:#223;--text:#eaeef7;
     --muted:#9fb3d6;--accent:#22c55e;--btn:#1f3159;--btnH:#2a4174;--warn:#f59e0b;--bad:#ef4444;
   }
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
   #wrap{max-width:1200px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-  h1{margin:6px 0 0;font-size:26px}
+  /* Logo */
+  .logo{display:flex;align-items:center;gap:8px}
+  .logo svg{height:36px}
+  .logo span{font-weight:800;font-size:26px;letter-spacing:.5px}
   .sub{font-size:12px;color:var(--muted)}
-  .grid{display:grid;grid-template-columns:290px 1fr 320px;gap:12px}
+  .grid{display:grid;grid-template-columns:320px 1fr 320px;gap:12px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
   .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .btn{background:var(--btn);color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
@@ -31,48 +35,45 @@
   .sep{height:1px;background:#1a2439;margin:8px 0}
   canvas{background:#071017;border:1px solid #223;border-radius:12px;max-width:100%;height:auto}
   .muted{color:var(--muted)}
-  .tag{font-size:11px;color:#cfe;background:#0e1a33;border:1px solid #234;border-radius:6px;padding:2px 6px}
   .ticket{border:1px dashed #2c3a59;border-radius:8px;padding:8px;margin-bottom:8px}
   .ok{color:var(--accent)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+  /* Modal */
+  .modalBg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
+  .modal{background:#0f172a;border:1px solid #2a3350;border-radius:12px;max-width:560px;width:90%;padding:16px}
 </style>
 </head>
 <body>
 <div id="wrap">
-  <h1>BET/DOX LIVE – Champions Lounge</h1>
-  <div class="sub">Wetten im Tipico-Stil (Spielgeld). Vor dem Spiel: Pre-Match; während des Spiels: Live-Wetten. P = Pause · R = Reset</div>
+
+  <!-- Logo BET⚽DOX -->
+  <div class="logo">
+    <span>BET</span>
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient></defs>
+      <circle cx="32" cy="32" r="30" fill="url(#g)" stroke="#94a3b8" stroke-width="2"/>
+      <path d="M32 6 22 20 10 24 12 38 22 44 32 58 42 44 52 38 54 24 42 20z" fill="none" stroke="#0f172a" stroke-width="3"/>
+      <circle cx="32" cy="32" r="9" fill="none" stroke="#0f172a" stroke-width="3"/>
+    </svg>
+    <span>DOX</span>
+  </div>
+  <div class="sub">Tipico-Style (Spielgeld): Pre-Match & Live-Wetten, Visualisierung je Spiel. P = Pause · R = Reset.</div>
 
   <div class="grid">
-    <!-- LEFT: Fixture & Team-Auswahl -->
+    <!-- LEFT: Match-Liste & Pre-Match Slip -->
     <div class="card">
-      <div class="row"><strong>Spiel auswählen</strong></div>
-      <div class="sep"></div>
-
-      <div class="row">
-        <label>Vorgegebene Partien</label>
-        <select id="fixtureSel" style="flex:1"></select>
-        <button id="pickFixture" class="btn">Übernehmen</button>
+      <div class="row" style="justify-content:space-between">
+        <strong>Spiele heute</strong>
+        <select id="leagueSel">
+          <option value="all">Alle</option>
+          <option>UEFA Champions League</option>
+          <option>UEFA Europa League</option>
+        </select>
       </div>
-
-      <div class="row small"><span class="muted">Oder eigene Teams wählen:</span></div>
-      <div class="row">
-        <select id="teamL"></select>
-        <span class="muted">vs</span>
-        <select id="teamR"></select>
-        <button id="useCustom" class="btn">Übernehmen</button>
-      </div>
+      <div id="matchList" class="list" style="margin-top:6px"></div>
 
       <div class="sep"></div>
-      <div class="row small">
-        <span>Gewählte Partie:</span>
-        <span id="chosen" class="pill">–</span>
-      </div>
-
-      <div class="sep"></div>
-      <div class="row"><strong>Pre-Match – 1X2</strong></div>
-      <div id="premOdds1x2" class="row"></div>
-      <div class="row"><strong>Pre-Match – O/U 2.5 · BTTS</strong></div>
-      <div id="premOddsExtras" class="row"></div>
-      <div class="sep"></div>
+      <div class="row"><strong>Pre-Match Wettschein</strong><span class="pill" id="premCount">0 Ausw.</span></div>
+      <div id="premSlip" class="muted small" style="min-height:22px"></div>
       <div class="row">
         <label for="premStake">Einsatz (€)</label>
         <input id="premStake" type="number" min="0" step="1" value="10" style="width:100px">
@@ -80,8 +81,8 @@
         <span>Auszahlung: <b id="premPay">– €</b></span>
       </div>
       <div class="row">
-        <button id="premPlace" class="btn">Pre-Match Ticket platzieren</button>
-        <button id="kickoff" class="btn">⚽ Spiel starten</button>
+        <button id="premPlace" class="btn">Ticket platzieren</button>
+        <button id="premClear" class="btn">Slip leeren</button>
       </div>
       <div id="premMsg" class="small muted" style="margin-top:6px"></div>
     </div>
@@ -90,6 +91,7 @@
     <div class="card">
       <div class="row" style="justify-content:space-between">
         <div class="row">
+          <span id="hudTeams" class="pill">–</span>
           <span id="hudScore" class="pill">– : –</span>
           <span id="hudClock" class="pill">00:00</span>
           <span id="hudState" class="pill">Pre-Match</span>
@@ -99,6 +101,7 @@
           <input id="speed" type="range" min="0.25" max="1.5" step="0.25" value="1">
           <span id="spdLbl" class="pill">1.0×</span>
           <button id="pauseBtn" class="btn">Pause</button>
+          <button id="endBtn" class="btn">Visualisierung schließen</button>
           <button id="resetBtn" class="btn">Reset</button>
         </div>
       </div>
@@ -108,7 +111,7 @@
 
     <!-- RIGHT: Live-Wetten & Tickets -->
     <div class="card">
-      <div class="row"><strong>Live-Wetten</strong><span class="tag">während des Spiels</span></div>
+      <div class="row"><strong>Live-Wetten</strong><span class="pill" id="liveMatchTag">kein Spiel</span></div>
       <div id="liveOdds" class="row" style="gap:6px;flex-wrap:wrap"></div>
       <div class="row">
         <label for="liveStake">Einsatz (€)</label>
@@ -126,224 +129,299 @@
   </div>
 </div>
 
-<script>
-/* =========================
-   Daten – Fixtures & Teams
-   ========================= */
-const TEAMS = ["Real Madrid","Manchester City","Bayern München","Paris SG","Barcelona","Inter",
-"Borussia Dortmund","Atlético Madrid","RB Leipzig","Arsenal","Porto","Juventus","Leverkusen",
-"Liverpool","Roma","AC Milan"];
+<!-- Modal: Wechsel/Abschluss -->
+<div class="modalBg" id="modalBg">
+  <div class="modal" id="modalBox">
+    <div id="modalContent"></div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end">
+      <button id="modalCancel" class="btn">Abbrechen</button>
+      <button id="modalOk" class="btn">OK</button>
+    </div>
+  </div>
+</div>
 
-const FIXTURES = [
-  F("UEFA Champions League","Real Madrid","Manchester City","20:00",{H:2.45,D:3.40,A:2.70,OUover:1.85,OUunder:2.00,BTTSy:1.75,BTTSn:2.05}),
-  F("UEFA Champions League","Bayern München","Paris SG","20:00",{H:2.20,D:3.60,A:3.00,OUover:1.80,OUunder:2.10,BTTSy:1.70,BTTSn:2.20}),
-  F("UEFA Champions League","Barcelona","Inter","20:00",{H:2.05,D:3.50,A:3.40,OUover:1.95,OUunder:1.90,BTTSy:1.80,BTTSn:2.00}),
-  F("UEFA Champions League","Borussia Dortmund","Atlético Madrid","20:00",{H:2.55,D:3.30,A:2.70,OUover:2.05,OUunder:1.85,BTTSy:1.90,BTTSn:1.95}),
-];
-function F(league,home,away,kick,odds){ return {id:id(),league,home,away,kick,odds}; }
+<script>
+/* =======================
+   Daten (Matches & Teams)
+   ======================= */
+function M(league,home,away,kick,odds){ return {id:id(),league,home,away,kick,odds}; }
 function id(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
 
-const fixtureSel = document.getElementById("fixtureSel");
-FIXTURES.forEach(f=>{ const o=document.createElement("option"); o.value=f.id; o.textContent=`${f.home} vs ${f.away} · ${f.league}`; fixtureSel.appendChild(o); });
+const MATCHES = [
+  M("UEFA Champions League","Real Madrid","Manchester City","20:00",{H:2.45,D:3.40,A:2.70,OUover:1.85,OUunder:2.00,BTTSy:1.75,BTTSn:2.05}),
+  M("UEFA Champions League","Bayern München","Paris SG","20:00",{H:2.20,D:3.60,A:3.00,OUover:1.80,OUunder:2.10,BTTSy:1.70,BTTSn:2.20}),
+  M("UEFA Champions League","Barcelona","Inter","20:00",{H:2.05,D:3.50,A:3.40,OUover:1.95,OUunder:1.90,BTTSy:1.80,BTTSn:2.00}),
+  M("UEFA Champions League","Borussia Dortmund","Atlético Madrid","20:00",{H:2.55,D:3.30,A:2.70,OUover:2.05,OUunder:1.85,BTTSy:1.90,BTTSn:1.95}),
+  M("UEFA Europa League","Leverkusen","Liverpool","21:00",{H:2.60,D:3.60,A:2.55,OUover:1.95,OUunder:1.92,BTTSy:1.85,BTTSn:1.95}),
+  M("UEFA Europa League","Roma","AC Milan","21:00",{H:2.70,D:3.10,A:2.65,OUover:2.00,OUunder:1.90,BTTSy:1.88,BTTSn:1.92}),
+];
 
-const teamL=document.getElementById("teamL"), teamR=document.getElementById("teamR");
-TEAMS.forEach(t=>{ const o=document.createElement("option"); o.value=t; o.textContent=t; teamL.appendChild(o.cloneNode(true)); teamR.appendChild(o.cloneNode(true)); });
-teamL.value="Bayern München"; teamR.value="Paris SG";
+const RESULTS = {}; // matchId -> {status:'pre'|'running'|'ended', scoreH, scoreA, htH, htA, scorersH:[{n,m}], scorersA:[]}
 
-/* =========================
-   Pre-Match: Auswahl/Quoten
-   ========================= */
-let chosen = null;  // {home,away,odds}
-const chosenEl = document.getElementById("chosen");
-const prem1x2El = document.getElementById("premOdds1x2");
-const premExEl  = document.getElementById("premOddsExtras");
-const premMsg   = document.getElementById("premMsg");
-const premStake = document.getElementById("premStake");
-const premTot   = document.getElementById("premTot");
-const premPay   = document.getElementById("premPay");
-let PREM_SLIP = []; // [{mkt, pick, odd, label}]
+/* =======================
+   UI: Matchliste & Slip
+   ======================= */
+const leagueSel = document.getElementById("leagueSel");
+const matchList = document.getElementById("matchList");
+const premSlipEl = document.getElementById("premSlip");
+const premStakeEl = document.getElementById("premStake");
+const premTotEl = document.getElementById("premTot");
+const premPayEl = document.getElementById("premPay");
+const premMsgEl = document.getElementById("premMsg");
+const premCountEl = document.getElementById("premCount");
 
-document.getElementById("pickFixture").onclick=()=>{
-  const f = FIXTURES.find(x=>x.id===fixtureSel.value);
-  setChosen(f.home,f.away,f.odds);
-};
-document.getElementById("useCustom").onclick=()=>{
-  // simple default odds für Custom
-  setChosen(teamL.value, teamR.value, mkDefaultOdds(teamL.value, teamR.value));
-};
+let SLIP = []; // [{matchId, market:'H'|'D'|'A'|'OUover'|'OUunder'|'BTTSy'|'BTTSn', odd, label}]
 
-function mkDefaultOdds(h,a){
-  // leichte Hausvorteil-Annahme
-  return {H:2.20,D:3.40,A:3.10,OUover:1.95,OUunder:1.90,BTTSy:1.85,BTTSn:1.95};
+function fmt(x){ return Number(x).toFixed(2); }
+function lbl(k){ return k==='H'?'1':k==='D'?'X':k==='A'?'2':k; }
+function renderMatches(){
+  const lg=leagueSel.value;
+  matchList.innerHTML="";
+  MATCHES.filter(m=>lg==='all'||m.league===lg).forEach(m=>{
+    const row=document.createElement("div");
+    const left=document.createElement("div");
+    left.innerHTML=`
+      <div class="team">${m.home} <span class="muted">vs</span> ${m.away}</div>
+      <div class="kick">${m.league} · ${m.kick}</div>`;
+    const right=document.createElement("div"); right.className="right";
+    right.innerHTML=`
+      <div class="odds">
+        <button class="odd" data-mid="${m.id}" data-k="H">${fmt(m.odds.H)}<div class="small muted">1</div></button>
+        <button class="odd" data-mid="${m.id}" data-k="D">${fmt(m.odds.D)}<div class="small muted">X</div></button>
+        <button class="odd" data-mid="${m.id}" data-k="A">${fmt(m.odds.A)}<div class="small muted">2</div></button>
+        <button class="btn" data-start="${m.id}">Start</button>
+      </div>`;
+    row.appendChild(left); row.appendChild(right); matchList.appendChild(row);
+  });
+  bindOdds(); bindStartButtons(); refreshSlipHighlights();
 }
+leagueSel.onchange=renderMatches;
 
-function setChosen(home,away,odds){
-  chosen={home,away,odds};
-  chosenEl.textContent=`${home} – ${away}`;
-  PREM_SLIP=[]; renderPremOdds(); renderPremSlip();
+function bindOdds(){
+  matchList.querySelectorAll(".odd").forEach(b=>{
+    b.onclick=()=>{
+      const mid=b.dataset.mid, key=b.dataset.k;
+      const m=MATCHES.find(x=>x.id===mid);
+      const odd=m.odds[key];
+      const label=`${m.home}–${m.away} / ${key==='H'?'1':key==='D'?'X':'2'}`;
+      const i=SLIP.findIndex(s=>s.matchId===mid && s.market===key);
+      if(i>=0){ SLIP.splice(i,1); } else { SLIP.push({matchId:mid,market:key,odd,label}); }
+      renderPremSlip(); refreshSlipHighlights();
+    };
+  });
 }
-
-function renderPremOdds(){
-  prem1x2El.innerHTML=""; premExEl.innerHTML="";
-  if(!chosen){ prem1x2El.innerHTML='<span class="muted">erst Partie wählen</span>'; return; }
-  prem1x2El.append(...["H","D","A"].map(k=>mkOddBtn(`1X2 ${lbl(k)}`, k, chosen.odds[k])));
-  premExEl.append(
-    mkOddBtn("Über 2.5", "OUover", chosen.odds.OUover),
-    mkOddBtn("Unter 2.5", "OUunder", chosen.odds.OUunder),
-    mkOddBtn("BTTS Ja", "BTTSy", chosen.odds.BTTSy),
-    mkOddBtn("BTTS Nein", "BTTSn", chosen.odds.BTTSn),
-  );
-}
-
-function mkOddBtn(label, key, odd){
-  const b=document.createElement("button"); b.className="odd"; b.textContent=odd.toFixed(2);
-  b.title=label; b.dataset.key=key; b.onclick=()=>togglePrem(key,label,odd,b);
-  return b;
-}
-function togglePrem(key,label,odd,btn){
-  const i=PREM_SLIP.findIndex(x=>x.mkt===key);
-  if(i>=0){ PREM_SLIP.splice(i,1); btn.classList.remove("sel"); }
-  else{ PREM_SLIP.push({mkt:key,pick:key,label,odd}); btn.classList.add("sel"); }
-  renderPremSlip();
+function refreshSlipHighlights(){
+  matchList.querySelectorAll(".odd").forEach(b=>b.classList.remove("sel"));
+  SLIP.forEach(s=>{
+    const btn=matchList.querySelector(`.odd[data-mid="${s.matchId}"][data-k="${s.market}"]`);
+    if(btn) btn.classList.add("sel");
+  });
 }
 function renderPremSlip(){
-  const tot = PREM_SLIP.reduce((a,b)=>a*b.odd,1);
-  const stake = +premStake.value||0;
-  premTot.textContent = PREM_SLIP.length? tot.toFixed(2) : "–";
-  premPay.textContent = PREM_SLIP.length? (stake*tot).toFixed(2)+" €" : "– €";
-  premMsg.textContent = "";
+  premSlipEl.innerHTML = SLIP.length? "" : '<span class="muted small">Noch keine Auswahlen. Klicke Quoten in der Liste.</span>';
+  SLIP.forEach(s=>{
+    const d=document.createElement("div");
+    d.className="row small";
+    d.innerHTML=`<span class="pill">${s.label}</span><span>Quote <b>${fmt(s.odd)}</b></span>
+      <button class="btn" data-rm="${s.matchId}|${s.market}" style="padding:4px 8px">x</button>`;
+    premSlipEl.appendChild(d);
+  });
+  premSlipEl.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{
+    const [mid,k]=b.dataset.rm.split("|"); SLIP=SLIP.filter(x=>!(x.matchId===mid && x.market===k));
+    renderPremSlip(); refreshSlipHighlights();
+  });
+  const tot=SLIP.reduce((a,b)=>a*b.odd,1);
+  premTotEl.textContent = SLIP.length? fmt(tot) : "–";
+  const stake=+premStakeEl.value||0;
+  premPayEl.textContent = SLIP.length? (stake*tot).toFixed(2)+" €" : "– €";
+  premCountEl.textContent = `${SLIP.length} Ausw.`;
 }
-premStake.oninput = renderPremSlip;
+premStakeEl.oninput=renderPremSlip;
 
 document.getElementById("premPlace").onclick=()=>{
-  if(!chosen) return premMsg.textContent="Bitte zuerst Partie wählen.";
-  if(!PREM_SLIP.length) return premMsg.textContent="Bitte Quoten anklicken (1X2 / O/U / BTTS).";
-  const stake=+premStake.value||0;
-  const tot=PREM_SLIP.reduce((a,b)=>a*b.odd,1);
-  addTicket("Pre-Match", PREM_SLIP.slice(), stake, tot);
-  premMsg.textContent="Ticket gespeichert. Du kannst weitere Tickets hinzufügen – Start erst mit „Spiel starten“.";
-  PREM_SLIP=[]; renderPremOdds(); renderPremSlip();
+  if(!SLIP.length){ premMsgEl.textContent="Bitte erst Quoten anklicken."; return; }
+  const stake=+premStakeEl.value||0;
+  const tot=SLIP.reduce((a,b)=>a*b.odd,1);
+  addTicket("Pre-Match", SLIP.slice(), stake, tot);
+  premMsgEl.textContent="Ticket gespeichert. (Wertung nach Spielende.)";
+  SLIP=[]; renderPremSlip(); refreshSlipHighlights();
 };
+document.getElementById("premClear").onclick=()=>{ SLIP=[]; renderPremSlip(); refreshSlipHighlights(); };
 
-/* =========================
+/* =======================
    Tickets
-   ========================= */
+   ======================= */
 const ticketsEl=document.getElementById("tickets");
-let TICKETS=[]; // {id,type,selections,stake,tot,payout,status}
-
+let TICKETS=[]; // {id,type,selections,stake,tot,payout,status:'Offen'|'Gewonnen'|'Verloren'}
 function addTicket(type, selections, stake, tot){
   const t={id:id(),type,selections,stake,tot,payout:+(stake*tot).toFixed(2),status:"Offen"};
   TICKETS.unshift(t); renderTickets();
 }
 function renderTickets(){
   ticketsEl.innerHTML="";
-  if(!TICKETS.length) ticketsEl.innerHTML='<div class="muted small">Noch keine Tickets.</div>';
+  if(!TICKETS.length){ ticketsEl.innerHTML='<div class="muted small">Noch keine Tickets.</div>'; return; }
   TICKETS.forEach(t=>{
     const div=document.createElement("div"); div.className="ticket small";
-    const sels=t.selections.map(s=>`${s.label} (${s.odd.toFixed(2)})`).join(" · ");
+    const sels=t.selections.map(s=>{
+      const m=MATCHES.find(x=>x.id===s.matchId);
+      const head=m?`${m.home}–${m.away}`:"Match";
+      const tag = (s.market==='H'?'1':s.market==='D'?'X':s.market==='A'?'2':s.market);
+      return `${head} / ${tag} (${fmt(s.odd)})`;
+    }).join(" · ");
+    const sym = t.status==="Gewonnen"?"✓":t.status==="Verloren"?"✗":"…";
+    const cls = t.status==="Gewonnen"?"ok":t.status==="Verloren"?"bad":"warn";
     div.innerHTML=`
-      <div><b>Ticket:</b> ${t.id.slice(-8)} <span class="pill">${t.type}</span></div>
+      <div><b>Ticket:</b> ${t.id.slice(-8)} <span class="pill">${t.type}</span> <b class="${cls}">${sym} ${t.status}</b></div>
       <div>${sels}</div>
-      <div>Einsatz: <b>${t.stake.toFixed(2)} €</b> · Quote: <b>${t.tot.toFixed(2)}</b> · Auszahlung: <b>${t.payout.toFixed(2)} €</b></div>
-      <div>Status: <b class="${t.status==='Gewonnen'?'ok':(t.status==='Verloren'?'bad':'warn')}">${t.status}</b></div>`;
+      <div>Einsatz: <b>${t.stake.toFixed(2)} €</b> · Quote: <b>${fmt(t.tot)}</b> · Auszahlung: <b>${t.payout.toFixed(2)} €</b></div>`;
     ticketsEl.appendChild(div);
   });
 }
+/* Auswertung pro Match-Ende */
+function settleTicketsForMatch(mid){
+  // Prüfe alle Tickets – nur entscheiden, wenn ALLE enthaltenen Matches beendet sind
+  TICKETS.forEach(t=>{
+    if(t.status!=="Offen") return;
+    const need = t.selections.map(s=>s.matchId);
+    const allDone = need.every(id=>RESULTS[id]?.status==="ended");
+    if(!allDone) return;
+    const ok = t.selections.every(s=>checkSelectionResult(s));
+    t.status = ok ? "Gewonnen" : "Verloren";
+  });
+  renderTickets();
+}
+function checkSelectionResult(sel){
+  const r=RESULTS[sel.matchId]; if(!r) return false;
+  const sum=r.scoreH+r.scoreA;
+  switch(sel.market){
+    case "H": return r.scoreH>r.scoreA;
+    case "D": return r.scoreH===r.scoreA;
+    case "A": return r.scoreA>r.scoreH;
+    case "OUover": return sum>2.5;
+    case "OUunder": return sum<2.5;
+    case "BTTSy": return r.scoreH>0 && r.scoreA>0;
+    case "BTTSn": return !(r.scoreH>0 && r.scoreA>0);
+    case "LH": return r.scoreH>r.scoreA;
+    case "LD": return r.scoreH===r.scoreA;
+    case "LA": return r.scoreA>r.scoreH;
+    case "LO": return sum>2.5;
+    case "LU": return sum<2.5;
+    case "LBY": return r.scoreH>0 && r.scoreA>0;
+    case "LBN": return !(r.scoreH>0 && r.scoreA>0);
+    default: return false;
+  }
+}
 
-/* =========================
+/* =======================
    Live-Wetten
-   ========================= */
+   ======================= */
 const liveOddsEl=document.getElementById("liveOdds");
 const liveStake=document.getElementById("liveStake");
 const liveTot=document.getElementById("liveTot");
 const livePay=document.getElementById("livePay");
+const liveMatchTag=document.getElementById("liveMatchTag");
 let LIVE_SLIP=[];
 function renderLiveOdds(){
   liveOddsEl.innerHTML="";
-  if(!matchRunning()){ liveOddsEl.innerHTML='<span class="muted small">Starten, um Live-Quoten zu sehen.</span>'; return; }
-  const o=calcLiveOdds();
+  if(!currentMatch){ liveMatchTag.textContent="kein Spiel"; liveTot.textContent="–"; livePay.textContent="– €"; return; }
+  liveMatchTag.textContent=`${currentMatch.home}–${currentMatch.away}`;
+  const o=calcLiveOdds(currentMatch.id);
   // 1X2
-  liveOddsEl.appendChild(lOdd("1 (Heim)", "LH", o.H));
-  liveOddsEl.appendChild(lOdd("X (Remis)", "LD", o.D));
-  liveOddsEl.appendChild(lOdd("2 (Auswärts)", "LA", o.A));
-  // OU 2.5
-  liveOddsEl.appendChild(lOdd("Über 2.5", "LO", o.OUover));
-  liveOddsEl.appendChild(lOdd("Unter 2.5", "LU", o.OUunder));
+  liveOddsEl.appendChild(lOdd("1 (Heim)","LH",o.H));
+  liveOddsEl.appendChild(lOdd("X","LD",o.D));
+  liveOddsEl.appendChild(lOdd("2 (Auswärts)","LA",o.A));
+  // OU
+  liveOddsEl.appendChild(lOdd("Über 2.5","LO",o.OUover));
+  liveOddsEl.appendChild(lOdd("Unter 2.5","LU",o.OUunder));
   // BTTS
-  liveOddsEl.appendChild(lOdd("BTTS Ja", "LBY", o.BTTSy));
-  liveOddsEl.appendChild(lOdd("BTTS Nein", "LBN", o.BTTSn));
+  liveOddsEl.appendChild(lOdd("BTTS Ja","LBY",o.BTTSy));
+  liveOddsEl.appendChild(lOdd("BTTS Nein","LBN",o.BTTSn));
 }
 function lOdd(label,key,odd){
-  const b=document.createElement("button"); b.className="odd"; b.textContent=odd.toFixed(2);
-  b.title=label; b.onclick=()=>{ toggleLive({mkt:key,label,odd}); b.classList.add("sel"); };
+  const b=document.createElement("button"); b.className="odd"; b.textContent=fmt(odd); b.title=label;
+  b.onclick=()=>{ toggleLive({matchId:currentMatch.id,mkt:key,label,odd}); b.classList.add("sel"); renderLiveSlip(); };
   return b;
 }
 function toggleLive(sel){
-  const i=LIVE_SLIP.findIndex(x=>x.mkt===sel.mkt);
+  const i=LIVE_SLIP.findIndex(x=>x.mkt===sel.mkt && x.matchId===sel.matchId);
   if(i>=0) LIVE_SLIP.splice(i,1);
   LIVE_SLIP.push(sel);
-  renderLiveSlip();
 }
 function renderLiveSlip(){
   const tot = LIVE_SLIP.reduce((a,b)=>a*b.odd,1);
   const stake=+liveStake.value||0;
-  liveTot.textContent = LIVE_SLIP.length? tot.toFixed(2) : "–";
+  liveTot.textContent = LIVE_SLIP.length? fmt(tot) : "–";
   livePay.textContent = LIVE_SLIP.length? (stake*tot).toFixed(2)+" €" : "– €";
 }
 liveStake.oninput=renderLiveSlip;
 document.getElementById("livePlace").onclick=()=>{
-  if(!matchRunning()) return;
-  if(!LIVE_SLIP.length) return;
+  if(!currentMatch || !LIVE_SLIP.length) return;
   const stake=+liveStake.value||0;
   const tot=LIVE_SLIP.reduce((a,b)=>a*b.odd,1);
-  addTicket("Live", LIVE_SLIP.slice(), stake, tot);
+  // Map Live-slip auf generisches Ticket-Format
+  addTicket("Live", LIVE_SLIP.map(s=>({matchId:s.matchId,market:s.mkt,odd:s.odd,label:s.label})), stake, tot);
   LIVE_SLIP=[]; renderLiveSlip(); renderLiveOdds();
 };
 
-/* =========================
-   Simulation (90′ in 180 s)
-   ========================= */
+/* =======================
+   Visualisierung / Engine
+   ======================= */
 const W=960,H=540, GOAL_H=150, GOAL_W=10, MID={x:W/2,y:H/2};
 const canvas=document.getElementById("pitch"), g=canvas.getContext("2d");
 const speedEl=document.getElementById("speed"), spdLbl=document.getElementById("spdLbl");
-const pauseBtn=document.getElementById("pauseBtn"), resetBtn=document.getElementById("resetBtn");
-const hudScore=document.getElementById("hudScore"), hudClock=document.getElementById("hudClock"), hudState=document.getElementById("hudState");
+const pauseBtn=document.getElementById("pauseBtn"), resetBtn=document.getElementById("resetBtn"), endBtn=document.getElementById("endBtn");
+const hudTeams=document.getElementById("hudTeams"), hudScore=document.getElementById("hudScore"), hudClock=document.getElementById("hudClock"), hudState=document.getElementById("hudState");
 const ticker=document.getElementById("ticker");
-
-let HOME=null, AWAY=null, BALL=null;
-let STATE="pre";          // pre, first, half, second, end, pause
-let simMinute=0, halftimeCountdown=0;
 let last=null, acc=0, speed=1;
-const FIX_DT=1/60;
-const MIN_PER_SEC_BASE = 0.5;  // 90' / 180s = 0.5 min per real sec
 
-document.getElementById("kickoff").onclick=()=>{
-  if(!chosen){ premMsg.textContent="Bitte zuerst Partie wählen."; return; }
-  startMatch();
-};
+let currentMatch=null; // Objekt aus MATCHES
+let HOME=null, AWAY=null, BALL=null;
+let STATE="idle";   // idle, first, half, second, pause, end
+let simMinute=0, halftimeCountdown=0;
+const FIX_DT=1/60, MIN_PER_SEC_BASE=0.5; // 90' in 180s
 
-function startMatch(){
-  resetCore();
-  HOME=mkTeam(chosen.home,"L");
-  AWAY=mkTeam(chosen.away,"R");
-  placeTeam(HOME); placeTeam(AWAY);
-  kickoff(Math.random()<0.5?"L":"R");
-  STATE="first"; simMinute=0; halftimeCountdown=0;
-  hudState.textContent="1. Halbzeit";
-  log(`Anpfiff: ${HOME.name} vs. ${AWAY.name}`);
+function bindStartButtons(){
+  matchList.querySelectorAll("[data-start]").forEach(b=>{
+    b.onclick=()=>{ const mid=b.dataset.start; onStartClicked(mid); };
+  });
+}
+function onStartClicked(mid){
+  const m=MATCHES.find(x=>x.id===mid);
+  if(currentMatch && currentMatch.id!==mid && STATE!=="idle" && STATE!=="end"){
+    // confirm switch
+    showConfirmToClose(()=>{
+      forceEndCurrent(); // beendet + wertet
+      startVis(m);
+    });
+  }else{
+    startVis(m);
+  }
+}
+function startVis(m){
+  currentMatch=m;
+  hudTeams.textContent=`${m.home}–${m.away}`;
+  initResultIfNeeded(m.id);
+  startMatchEngine(m);
   renderLiveOdds();
 }
-
-function resetCore(){
-  STATE="pre"; ticker.textContent=""; hudState.textContent="Pre-Match";
-  hudScore.textContent="– : –"; hudClock.textContent="00:00";
-  HOME=AWAY=BALL=null; simMinute=0; halftimeCountdown=0;
+function initResultIfNeeded(mid){
+  if(!RESULTS[mid]) RESULTS[mid]={status:"pre",scoreH:0,scoreA:0,htH:0,htA:0,scorersH:[],scorersA:[]};
+}
+function forceEndCurrent(){
+  if(!currentMatch) return;
+  // Setze Endstand aus laufendem State
+  finalizeResult(currentMatch.id,true);
+  settleTicketsForMatch(currentMatch.id);
+  showSummary(currentMatch.id,"Match beendet.");
+  clearEngine();
 }
 
 pauseBtn.onclick=()=>{ if(STATE==="pause"){ STATE=prevAfterPause; hudState.textContent=stateLabel(); } else { prevAfterPause=STATE; STATE="pause"; hudState.textContent="Pause"; } };
 let prevAfterPause="first";
-resetBtn.onclick=()=>{ resetCore(); renderLiveOdds(); };
-
+resetBtn.onclick=()=>{ if(currentMatch && STATE!=="idle" && STATE!=="end"){ showConfirmToClose(()=>{ clearEngine(); }); } else { clearEngine(); } };
+endBtn.onclick = ()=>{ if(!currentMatch || STATE==="idle" || STATE==="end") return;
+  showConfirmToClose(()=>{ forceEndCurrent(); });
+};
 document.addEventListener("keydown",e=>{
   const k=(e.code||e.key||"").toLowerCase();
   if(k==="keyp"||k==="p") pauseBtn.click();
@@ -352,11 +430,27 @@ document.addEventListener("keydown",e=>{
 speedEl.oninput=()=>{ speed=parseFloat(speedEl.value); spdLbl.textContent=speed.toFixed(2)+"×"; };
 speedEl.oninput();
 
-/* Teams */
+function clearEngine(){
+  STATE="idle"; currentMatch=null; HOME=AWAY=BALL=null; simMinute=0; halftimeCountdown=0;
+  hudTeams.textContent="–"; hudScore.textContent="– : –"; hudClock.textContent="00:00"; hudState.textContent="Pre-Match";
+  ticker.textContent=""; renderLiveOdds(); draw(); 
+}
+
+function startMatchEngine(m){
+  initResultIfNeeded(m.id);
+  const R=RESULTS[m.id]; R.status="running";
+  HOME=mkTeam(m.home,"L"); AWAY=mkTeam(m.away,"R");
+  placeTeam(HOME); placeTeam(AWAY);
+  kickoff(Math.random()<0.5?"L":"R");
+  STATE="first"; simMinute=0; halftimeCountdown=0;
+  hudState.textContent="1. Halbzeit";
+  ticker.textContent=`Anpfiff: ${m.home} vs. ${m.away}\n`;
+}
+
 function mkTeam(name,side){
   const color=teamColor(name);
   const p=[]; for(let i=0;i<11;i++) p.push({name:i===0?"GK":"P"+i,spd:r(60,95),pas:r(60,95),sht:r(60,95),def:r(60,95),x:0,y:0,vx:0,vy:0,r:10,hasBall:false,homeX:0,homeY:0,color});
-  return {name,side,players:p,score:0};
+  return {name,side,players:p,score:0,scorers:[]};
 }
 function teamColor(n){ const map={
   "Real Madrid":"#ffffff","Manchester City":"#6cb6ff","Bayern München":"#c80a0a","Paris SG":"#1f3b6d",
@@ -368,62 +462,72 @@ const FORM433=[[0.05,0.50],[0.20,0.20],[0.20,0.38],[0.20,0.62],[0.20,0.80],[0.45
 function placeTeam(T){ const f=(T.side==="L")?FORM433:FORM433.map(([x,y])=>[1-x,y]); for(let i=0;i<T.players.length;i++){ const [nx,ny]=f[i]; const px=40+nx*(W-80), py=30+ny*(H-60); Object.assign(T.players[i],{x:px,y:py,vx:0,vy:0,hasBall:false,homeX:px,homeY:py}); } }
 function kickoff(side){ BALL={x:MID.x,y:MID.y,vx:(side==="L"?90:-90),vy:r(-30,30),r:6,owner:null}; }
 
-/* KI & Physik */
 function step(dt){
-  if(STATE==="pre"||STATE==="end"||STATE==="pause") return;
-  if(STATE==="half"){
-    halftimeCountdown -= dt;
-    hudState.textContent=`Halbzeit (${Math.ceil(halftimeCountdown)}s)`;
-    if(halftimeCountdown<=0){ STATE="second"; hudState.textContent="2. Halbzeit"; }
-    return;
-  }
-  // Uhr
+  if(STATE==="idle"||STATE==="end"||STATE==="pause") return;
+  if(STATE==="half"){ halftimeCountdown-=dt; hudState.textContent=`Halbzeit (${Math.ceil(halftimeCountdown)}s)`; if(halftimeCountdown<=0){ STATE="second"; hudState.textContent="2. Halbzeit"; } return; }
   simMinute += dt * MIN_PER_SEC_BASE * speed;
   hudClock.textContent = minStr(simMinute);
   if(STATE==="first" && simMinute>=45){
-    STATE="half"; halftimeCountdown=10; log("Halbzeit. Spielstand: "+HOME.score+" : "+AWAY.score); return;
+    const R=RESULTS[currentMatch.id]; R.htH=HOME.score; R.htA=AWAY.score;
+    STATE="half"; halftimeCountdown=10; ticker.textContent+=`Halbzeit. Spielstand: ${HOME.score} : ${AWAY.score}\n`; return;
   }
   if(STATE==="second" && simMinute>=90){
-    STATE="end"; hudState.textContent="Spielende"; log("Abpfiff. Endstand: "+HOME.name+" "+HOME.score+" : "+AWAY.score+" "+AWAY.name);
-    settleTickets(); return;
+    finalizeResult(currentMatch.id,false);
+    settleTicketsForMatch(currentMatch.id);
+    showSummary(currentMatch.id,"Abpfiff.");
+    STATE="end"; return;
   }
-
-  // KI
-  aiTeam(HOME, AWAY, dt); aiTeam(AWAY, HOME, dt);
-  stepBall(dt);
-
-  hudScore.textContent = `${HOME.score} : ${AWAY.score}`;
-  renderLiveOdds(); // aktualisiert Quoten leicht
+  aiTeam(HOME,AWAY,dt); aiTeam(AWAY,HOME,dt); stepBall(dt);
+  hudScore.textContent=`${HOME.score} : ${AWAY.score}`;
 }
+function finalizeResult(mid,forced){
+  const R=RESULTS[mid]; if(!R) return;
+  R.status="ended"; R.scoreH=HOME.score; R.scoreA=AWAY.score;
+  if(R.htH===undefined){ R.htH=HOME.score; R.htA=AWAY.score; }
+  R.scorersH = HOME.scorers.slice(); R.scorersA = AWAY.scorers.slice();
+  ticker.textContent+=`${forced?"Match beendet. ":""}Endstand: ${HOME.name} ${HOME.score} : ${AWAY.score} ${AWAY.name}\n`;
+}
+function showSummary(mid,headline){
+  const R=RESULTS[mid], m=MATCHES.find(x=>x.id===mid);
+  const list=(arr)=>arr.length?arr.map(s=>`${s.m}' ${s.n}`).join(", "):"–";
+  openModal(`<h3 style="margin:0 0 6px"> ${headline}</h3>
+    <div><b>${m.home}</b> ${R.scoreH} : ${R.scoreA} <b>${m.away}</b></div>
+    <div class="muted small">Halbzeit: ${R.htH}:${R.htA}</div>
+    <div class="sep"></div>
+    <div class="small"><b>Schützen ${m.home}:</b> ${list(R.scorersH)}</div>
+    <div class="small"><b>Schützen ${m.away}:</b> ${list(R.scorersA)}</div>
+  `, ()=>closeModal());
+}
+
 function aiTeam(T,Opp,dt){
   const carrier = nearestToBall(T);
   for(const p of T.players){
     let tx=p.homeX, ty=p.homeY;
     if(p===carrier){
-      if(dist2p(BALL,p)<14){ // Ball am Fuß
+      if(dist2p(BALL,p)<14){
         p.hasBall=true; BALL.owner=p;
-        const gx = T.side==="L"?W-GOAL_W-4:GOAL_W+4;
-        const dir = norm(gx-p.x,(H/2)-p.y);
-        const near = Math.abs(p.x-gx)<170;
-        const pr = nearest(p,Opp); const pd=dist2p(p,pr);
-        if(near && Math.random()<0.02){ shoot(p,dir,260+p.sht*0.8); }
+        const gx=T.side==="L"?W-GOAL_W-4:GOAL_W+4;
+        const dir=norm(gx-p.x,(H/2)-p.y);
+        const near=Math.abs(p.x-gx)<170;
+        const pr=nearest(p,Opp), pd=dist2p(p,pr);
+        if(near && Math.random()<0.02){ shoot(T,p,dir,260+p.sht*0.8); }
         else if(pd<70 && Math.random()<0.04){ const m=mate(T,p); if(m) passTo(p,m); }
         else { p.vx+=dir.x*900*dt; p.vy+=dir.y*900*dt; }
         BALL.x=p.x+dir.x*12; BALL.y=p.y+dir.y*12; BALL.vx*=0.92; BALL.vy*=0.92;
-      }else{
-        p.hasBall=false; moveTo(p,BALL.x,BALL.y,dt,1.2);
-      }
-    }else{
-      p.hasBall=false; moveTo(p,tx,ty,dt,0.7);
-    }
+      }else{ p.hasBall=false; moveTo(p,BALL.x,BALL.y,dt,1.2); }
+    }else{ p.hasBall=false; moveTo(p,tx,ty,dt,0.7); }
   }
 }
 function nearestToBall(T){ let b=null,bd=1e9; for(const p of T.players){ const d=dist(BALL.x,BALL.y,p.x,p.y); if(d<bd){bd=d;b=p;} } return b; }
 function nearest(p,T){ let b=null,bd=1e9; for(const o of T.players){ const d=dist2p(p,o); if(d<bd){bd=d;b=o;} } return b; }
 function mate(T,p){ const f=T.side==="L"?1:-1; const cs=T.players.filter(m=>m!==p && f*(m.x-p.x)>0); if(!cs.length)return null; cs.sort((a,b)=>Math.abs(a.y-p.y)-Math.abs(b.y-p.y)); return cs[0]; }
-function passTo(from,to){ const d=norm(to.x-from.x,to.y-from.y), power=180+from.pas*0.6; BALL.vx=d.x*power; BALL.vy=d.y*power; BALL.owner=null; from.hasBall=false; log(minStr(simMinute)+" Pass von "+from.name); }
-function shoot(p,dir,power){ BALL.vx=dir.x*power; BALL.vy=dir.y*power; BALL.owner=null; p.hasBall=false; log(minStr(simMinute)+" Schuss!"); }
+function passTo(from,to){ const d=norm(to.x-from.x,to.y-from.y), power=180+from.pas*0.6; BALL.vx=d.x*power; BALL.vy=d.y*power; BALL.owner=null; from.hasBall=false; ticker.textContent+=`${minStr(simMinute)} Pass\n`; }
+function shoot(T,p,dir,power){
+  BALL.vx=dir.x*power; BALL.vy=dir.y*power; BALL.owner=null; p.hasBall=false;
+  ticker.textContent+=`${minStr(simMinute)} Schuss!\n`;
+}
 function moveTo(p,tx,ty,dt,f=1){ const dx=tx-p.x,dy=ty-p.y,len=Math.hypot(dx,dy)||1,a=900*f*dt; p.vx+=(dx/len)*a; p.vy+=(dy/len)*a; const vmax=150*(0.7+p.spd/200),vlen=Math.hypot(p.vx,p.vy); if(vlen>vmax){p.vx=p.vx/vlen*vmax;p.vy=p.vy/vlen*vmax;} p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.9;p.vy*=0.9;p.x=clamp(p.x,20,W-20);p.y=clamp(p.y,20,H-20); }
+
 function stepBall(dt){
   if(BALL.owner) return;
   BALL.vx*=0.98; BALL.vy*=0.98; BALL.x+=BALL.vx*dt; BALL.y+=BALL.vy*dt;
@@ -433,103 +537,89 @@ function stepBall(dt){
   for(const p of [...HOME.players,...AWAY.players]){ const d=dist(BALL.x,BALL.y,p.x,p.y); if(d<p.r+6){ const dir=norm(BALL.x-p.x,BALL.y-p.y); BALL.x=p.x+dir.x*(p.r+6); BALL.y=p.y+dir.y*(p.r+6); BALL.vx+=dir.x*40+p.vx*0.5; BALL.vy+=dir.y*40+p.vy*0.5; } }
 }
 function score(side){
-  if(side==="H"){ HOME.score++; log(minStr(simMinute)+" TOR "+HOME.name+"!"); }
-  else{ AWAY.score++; log(minStr(simMinute)+" TOR "+AWAY.name+"!"); }
+  const minute=Math.round(simMinute);
+  if(side==="H"){ HOME.score++; const shooter=pseudoScorer(HOME); HOME.scorers.push({n:shooter,m:minute}); ticker.textContent+=`${minStr(simMinute)} TOR ${HOME.name}! (${shooter})\n`; }
+  else{ AWAY.score++; const shooter=pseudoScorer(AWAY); AWAY.scorers.push({n:shooter,m:minute}); ticker.textContent+=`${minStr(simMinute)} TOR ${AWAY.name}! (${shooter})\n`; }
   placeTeam(HOME); placeTeam(AWAY); kickoff(side==="H"?"A":"H");
 }
+function pseudoScorer(T){ // wähle Feldspieler P1..P10
+  const idx = Math.floor(Math.random()*10)+1;
+  return T.players[idx]?.name || "P"+idx;
+}
+
 function draw(){
-  // Rasen
   const grd=g.createLinearGradient(0,0,0,H); grd.addColorStop(0,"#092015"); grd.addColorStop(1,"#123a22");
   g.fillStyle=grd; g.fillRect(0,0,W,H);
   g.strokeStyle="rgba(255,255,255,.6)"; g.lineWidth=2; g.strokeRect(20,20,W-40,H-40);
   g.beginPath(); g.moveTo(W/2,20); g.lineTo(W/2,H-20); g.stroke();
   g.beginPath(); g.arc(W/2,H/2,60,0,Math.PI*2); g.stroke();
-  // Tore
   g.fillStyle="#d7e6ff";
   g.fillRect(0,H/2-GOAL_H/2,GOAL_W,4); g.fillRect(0,H/2+GOAL_H/2-4,GOAL_W,4);
   g.fillRect(W-GOAL_W,H/2-GOAL_H/2,GOAL_W,4); g.fillRect(W-GOAL_W,H/2+GOAL_H/2-4,GOAL_W,4);
-  if(HOME&&AWAY){ drawTeam(HOME); drawTeam(AWAY); drawBall();
+  if(HOME&&AWAY){
+    drawTeam(HOME); drawTeam(AWAY); if(BALL) drawBall();
     g.fillStyle="#fff"; g.font="700 18px system-ui"; g.textAlign="center";
     g.fillText(`${HOME.name}  ${HOME.score} : ${AWAY.score}  ${AWAY.name}`, W/2, 28);
   }
 }
 function drawTeam(T){ for(const p of T.players){ g.fillStyle=T.color; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill(); if(p.hasBall){ g.strokeStyle="#fff"; g.lineWidth=2; g.beginPath(); g.arc(p.x,p.y,p.r+3,0,Math.PI*2); g.stroke(); } } }
-function drawBall(){ if(!BALL)return; g.fillStyle="#eee"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r,0,Math.PI*2); g.fill(); g.strokeStyle="#bbb"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r*0.6,0,Math.PI*2); g.stroke(); }
+function drawBall(){ g.fillStyle="#eee"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r,0,Math.PI*2); g.fill(); g.strokeStyle="#bbb"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r*0.6,0,Math.PI*2); g.stroke(); }
 
-function loop(t){ if(last===null) last=t; const dt=Math.min(0.05,(t-last)/1000); last=t; acc+=dt; while(acc>=FIX_DT){ step(FIX_DT); acc-=FIX_DT; } draw(); requestAnimationFrame(loop); }
+function loop(t){ if(last===null) last=t; const dt=Math.min(0.05,(t-last)/1000); last=t; acc+=dt; while(acc>=FIX_DT){ step(FIX_DT); acc-=FIX_DT; } hudState.textContent=stateLabel(); hudScore.textContent=(HOME&&AWAY)?`${HOME.score} : ${AWAY.score}`:"– : –"; draw(); requestAnimationFrame(loop); }
 requestAnimationFrame(loop);
 
-/* =========================
-   Auswertung & Live-Quoten
-   ========================= */
-function settleTickets(){
-  const res = {home:HOME.score, away:AWAY.score};
-  TICKETS.forEach(t=>{
-    if(t.status!=="Offen") return;
-    const ok = t.selections.every(s=>resolveSel(s,res));
-    t.status = ok ? "Gewonnen" : "Verloren";
-  });
-  renderTickets();
-}
-function resolveSel(s,res){
-  switch(s.mkt){
-    case "H": return res.home>res.away;
-    case "D": return res.home===res.away;
-    case "A": return res.away>res.home;
-    case "OUover": return (res.home+res.away)>2.5;
-    case "OUunder": return (res.home+res.away)<2.5;
-    case "BTTSy": return res.home>0 && res.away>0;
-    case "BTTSn": return !(res.home>0 && res.away>0);
-    // Live keys:
-    case "LH": return res.home>res.away;
-    case "LD": return res.home===res.away;
-    case "LA": return res.away>res.home;
-    case "LO": return (res.home+res.away)>2.5;
-    case "LU": return (res.home+res.away)<2.5;
-    case "LBY": return res.home>0 && res.away>0;
-    case "LBN": return !(res.home>0 && res.away>0);
-  }
-  return false;
-}
-function calcLiveOdds(){
-  // simple Heuristik: aus Pre-Match mit Anpassung an Zeit & Spielstand
-  const pm = chosen? chosen.odds : mkDefaultOdds("",""); 
-  const m = simMinute, t = Math.min(90,Math.max(0,m));
-  const diff = (HOME?.score||0)-(AWAY?.score||0);
-  const timeFactor = 1 + (t/90)*0.6; // späte Tore seltener -> 1/X/2 steigen leicht
-  function adj(base, winBias){
-    // diff>0: Heim führt -> Heim-Quote runter, Auswärts hoch
-    const bias = (diff*winBias);
-    return Math.max(1.05, (base*timeFactor) * (1 - bias));
-  }
-  const H = adj(pm.H, 0.18);
-  const A = adj(pm.A, -0.18);
-  const D = Math.max(1.05, pm.D*(1+Math.abs(diff)*0.25)* (1 + (t/90)*0.3));
-  const goals = (HOME?.score||0)+(AWAY?.score||0);
-  const OUover = Math.max(1.05, pm.OUover * (1 + (goals*0.35) + (t/90)*0.2)); // wenn schon viele Tore, Over teurer
-  const OUunder= Math.max(1.05, pm.OUunder* (1 + ((t/90)*0.2) - (goals*0.25)));
-  const BTTSy = Math.max(1.05, pm.BTTSy * (1 + (goals>0?0.15:0) + (t/90)*0.15));
-  const BTTSn = Math.max(1.05, pm.BTTSn * (1 - (goals>0?0.08:0) + (t/90)*0.1));
-  return {H,D,A,OUover,OUunder,BTTSy,BTTSn};
-}
-
-/* =========================
-   Helper & Anzeige
-   ========================= */
-function matchRunning(){ return STATE==="first"||STATE==="second"; }
-function stateLabel(){ return STATE==="first"?"1. Halbzeit":STATE==="second"?"2. Halbzeit":STATE==="half"?"Halbzeit":"Pre-Match"; }
+function stateLabel(){ return STATE==="first"?"1. Halbzeit":STATE==="second"?"2. Halbzeit":STATE==="half"?"Halbzeit":STATE==="pause"?"Pause":STATE==="end"?"Ende":"Pre-Match"; }
 function minStr(m){ const M=Math.floor(m||0), S=Math.floor(((m||0)-M)*60); return `${String(M).padStart(2,"0")}:${String(S).padStart(2,"0")}`; }
-function log(t){ ticker.textContent+=t+"\n"; ticker.scrollTop=ticker.scrollHeight; }
 function r(a,b){ return Math.random()*(b-a)+a; }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function dist(x1,y1,x2,y2){ return Math.hypot(x1-x2,y1-y2); }
 function dist2p(a,b){ return Math.hypot(a.x-b.x,a.y-b.y); }
 function norm(x,y){ const l=Math.hypot(x,y)||1; return {x:x/l,y:y/l}; }
 
-function lbl(k){ return k==="H"?"1":k==="D"?"X":"2"; }
+/* =======================
+   Live-Quoten
+   ======================= */
+function calcLiveOdds(mid){
+  const m=MATCHES.find(x=>x.id===mid);
+  const R=RESULTS[mid]||{scoreH:0,scoreA:0};
+  const pre=m.odds;
+  const t=Math.min(90,Math.max(0,simMinute));
+  const diff=R.scoreH-R.scoreA;
+  const timeFactor=1+(t/90)*0.6;
+  function adj(base,winBias){ const bias=(diff*winBias); return Math.max(1.05,(base*timeFactor)*(1-bias)); }
+  const H=adj(pre.H,0.18), A=adj(pre.A,-0.18), D=Math.max(1.05, pre.D*(1+Math.abs(diff)*0.25)*(1+(t/90)*0.3));
+  const goals=R.scoreH+R.scoreA;
+  const OUover=Math.max(1.05, pre.OUover*(1+(goals*0.35)+(t/90)*0.2));
+  const OUunder=Math.max(1.05, pre.OUunder*(1+((t/90)*0.2)-(goals*0.25)));
+  const BTTSy=Math.max(1.05, pre.BTTSy*(1+(goals>0?0.15:0)+(t/90)*0.15));
+  const BTTSn=Math.max(1.05, pre.BTTSn*(1-(goals>0?0.08:0)+(t/90)*0.1));
+  return {H,D,A,OUover,OUunder,BTTSy,BTTSn};
+}
 
-/* Boot: sinnvolle Default-Partie */
-setChosen("Bayern München","Paris SG", mkDefaultOdds("Bayern München","Paris SG"));
+/* =======================
+   Modal (Bestätigungen)
+   ======================= */
+const modalBg=document.getElementById("modalBg");
+const modalBox=document.getElementById("modalBox");
+const modalContent=document.getElementById("modalContent");
+const modalCancel=document.getElementById("modalCancel");
+const modalOk=document.getElementById("modalOk");
+let modalOkCb=()=>{};
+modalCancel.onclick=closeModal; modalOk.onclick=()=>{ modalOkCb(); closeModal(); };
+function openModal(html, ok){ modalContent.innerHTML=html; modalOkCb=ok||(()=>{}); modalBg.style.display="flex"; }
+function closeModal(){ modalBg.style.display="none"; }
+function showConfirmToClose(onOk){
+  const R=currentMatch?RESULTS[currentMatch.id]:null;
+  const partial = R ? `<div class="small muted">Aktueller Stand: ${HOME.score}:${AWAY.score} – Wechsle nur, wenn du sicher bist.</div>` : "";
+  openModal(`<h3 style="margin:0 0 6px">Visualisierung schließen?</h3>
+    <div>Wenn du bestätigst, wird das Spiel beendet, eine Zusammenfassung angezeigt und Tickets werden gewertet.</div>
+    ${partial}`, onOk);
+}
+
+/* =======================
+   Startup
+   ======================= */
+renderMatches(); renderPremSlip(); clearEngine();
 </script>
 </body>
 </html>
