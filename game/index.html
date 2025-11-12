@@ -6,87 +6,62 @@
 <title>BET/DOX LIVE – Champions Lounge</title>
 <style>
   :root{
-    --bg:#0b1020;--panel:#0f172a;--line:#1f2a44;--soft:#13213a;--text:#eaf0ff;
-    --muted:#9bb2da;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#3b82f6;
+    --bg:#0b1020;--panel:#0f172a;--line:#1f2a44;--text:#eaf0ff;--muted:#9bb2da;
+    --accent:#22c55e;--bad:#ef4444;--blue:#3b82f6;
   }
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
   #wrap{max-width:1200px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-
   .top{display:flex;align-items:center;justify-content:space-between}
   .logo{display:flex;align-items:center;gap:8px}
   .logo svg{height:36px}
-  .logo b{font-weight:800;font-size:26px;letter-spacing:.4px}
+  .logo b{font-weight:800;font-size:26px}
   .sub{font-size:12px;color:var(--muted)}
-
   .grid{display:grid;grid-template-columns:260px 1fr 320px;gap:12px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
   .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .pill{padding:2px 8px;border-radius:999px;border:1px solid #23334e;background:#0e1a33;color:#cfe}
-
-  label.small{font-size:12px;color:var(--muted)}
+  .pill{padding:2px 8px;border-radius:999px;border:1px solid #22334f;background:#0d1934}
   select{width:100%;background:#0c1530;color:#e6ecff;border:1px solid #304065;border-radius:8px;padding:8px}
-
   .match{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;border-radius:10px;background:#0e1830;border:1px solid #1e2c4d;margin-bottom:8px}
-  .teams{font-weight:700}
-  .kick{font-size:12px;color:var(--muted)}
+  .teams{font-weight:700}.kick{font-size:12px;color:var(--muted)}
   .odds{display:flex;gap:8px;align-items:center}
   .odd{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;padding:6px 8px;border-radius:10px;border:1px solid #2a3a5a;background:#0f1d3a;cursor:pointer}
-  .odd:hover{outline:2px solid var(--blue)}
-  .odd.sel{background:#12321d;border-color:#195a2a;outline:2px solid var(--accent)}
+  .odd:hover{outline:2px solid var(--blue)} .odd.sel{background:#12321d;border-color:#195a2a;outline:2px solid var(--accent)}
   .btn{background:#143364;border:none;color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
   .btn:hover{background:#1a4486}
-
-  .slipHead{display:flex;align-items:center;justify-content:space-between}
-  .slipList{margin-top:8px}
   .slipItem{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px;border:1px solid #26385d;background:#0d1730;border-radius:8px;margin-bottom:6px}
   .rm{background:#2a3a5a;border:none;color:#fff;border-radius:6px;padding:2px 8px;cursor:pointer}
-  .nums{display:flex;gap:8px;flex-wrap:wrap}
-  .quick{background:#13274c;border:1px solid #2a3c66;border-radius:8px;color:#e7efff;padding:6px 10px;cursor:pointer}
-  .quick:hover{outline:2px solid #3b82f680}
   .ticket{border:1px dashed #2b3c60;background:#0e1a33;border-radius:10px;padding:10px;margin-top:10px}
-  .ok{color:var(--accent)} .bad{color:var(--bad)} .warn{color:var(--warn)}
-
+  .ok{color:var(--accent)} .bad{color:var(--bad)}
   canvas{background:#07121e;border:1px solid #223;border-radius:12px;max-width:100%;height:auto}
   .hud{display:flex;align-items:center;justify-content:space-between;margin:6px 0}
   .ticker{font-size:12px;color:var(--muted);max-height:120px;overflow:auto;white-space:pre-wrap}
-
   .modalBg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
   .modal{background:#0f172a;border:1px solid #2a3350;border-radius:12px;max-width:560px;width:90%;padding:16px}
 </style>
 </head>
 <body>
 <div id="wrap">
-
   <div class="top">
     <div class="logo">
       <b>BET</b>
-      <svg viewBox="0 0 64 64" aria-hidden="true">
-        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient></defs>
-        <circle cx="32" cy="32" r="30" fill="url(#g)" stroke="#94a3b8" stroke-width="2"/>
-        <path d="M32 6 22 20 10 24 12 38 22 44 32 58 42 44 52 38 54 24 42 20z" fill="none" stroke="#0f172a" stroke-width="3"/>
-        <circle cx="32" cy="32" r="9" fill="none" stroke="#0f172a" stroke-width="3"/>
-      </svg>
+      <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#fff" stroke="#94a3b8" stroke-width="2"/><circle cx="32" cy="32" r="9" fill="none" stroke="#0f172a" stroke-width="3"/></svg>
       <b>DOX</b>
     </div>
-    <div class="sub">Nur Spielgeld. Keine echten Einsätze. P = Pause · R = Reset</div>
+    <div class="sub">Nur Spielgeld. P = Pause · R = Reset</div>
   </div>
 
   <div class="grid">
-    <!-- LEFT -->
+    <!-- FILTER -->
     <div class="card">
-      <div class="row"><strong>Filter</strong></div>
-      <label class="small">Wettart</label>
+      <strong>Filter</strong>
+      <div style="height:8px"></div>
+      <div class="sub">Wettart</div>
       <select id="betKind"><option value="1x2">1X2 (Sieg/Remis/Sieg)</option></select>
       <div style="height:8px"></div>
-      <label class="small">League</label>
+      <div class="sub">League</div>
       <select id="leagueSel">
-        <option value="all">Alle</option>
-        <option>UEFA Champions League</option>
-        <option>UEFA Europa League</option>
+        <option value="all">Alle</option><option>UEFA Champions League</option><option>UEFA Europa League</option>
       </select>
-      <div style="height:8px"></div>
-      <div class="sub">Hinweis: Nur Spielgeld. Keine echten Einsätze.</div>
     </div>
 
     <!-- CENTER -->
@@ -94,11 +69,9 @@
       <div class="row" style="justify-content:space-between">
         <strong>Spiele heute</strong>
         <div class="row">
-          <label class="small">Sim-Speed</label>
-          <input id="speed" type="range" min="0.5" max="2" step="0.25" value="1">
-          <span id="spdLbl" class="pill">1.0×</span>
-          <button id="pauseBtn" class="btn">Pause</button>
-          <button id="resetBtn" class="btn">Reset</button>
+          <div class="sub">Sim-Speed</div>
+          <input id="speed" type="range" min="0.5" max="2" step="0.25" value="1"><span id="spdLbl" class="pill">1.0×</span>
+          <button id="pauseBtn" class="btn">Pause</button><button id="resetBtn" class="btn">Reset</button>
         </div>
       </div>
       <div id="matchList"></div>
@@ -113,34 +86,24 @@
         <button id="closeVis" class="btn">Visualisierung schließen</button>
       </div>
       <canvas id="pitch" width="960" height="540"></canvas>
-      <div id="ticker" class="ticker" style="margin-top:6px"></div>
+      <div id="ticker" class="ticker"></div>
     </div>
 
-    <!-- RIGHT -->
+    <!-- SLIP -->
     <div class="card">
-      <div class="slipHead">
-        <strong>Wettschein</strong>
-        <span id="slipCount" class="pill">0 Ausw.</span>
-      </div>
-      <div id="slip" class="slipList"></div>
-      <div class="nums">
-        <button class="quick" data-amt="10">10 €</button>
-        <button class="quick" data-amt="20">20 €</button>
-        <button class="quick" data-amt="50">50 €</button>
-        <button class="quick" data-amt="100">100 €</button>
-      </div>
+      <div class="row" style="justify-content:space-between"><strong>Wettschein</strong><span id="slipCount" class="pill">0 Ausw.</span></div>
+      <div id="slip"></div>
       <div class="row" style="margin-top:6px">
-        <label class="small">Einsatz</label>
+        <div class="sub">Einsatz</div>
         <input id="stake" type="number" min="0" step="1" value="10" style="width:120px;background:#0c1530;color:#e6ecff;border:1px solid #304065;border-radius:8px;padding:8px">
       </div>
-      <div class="row"><span>Gesamtquote: <b id="totOdds">–</b></span> <span>Gewinn: <b id="payout">– €</b></span></div>
+      <div class="row"><span>Gesamtquote: <b id="totOdds">–</b></span><span>Gewinn: <b id="payout">– €</b></span></div>
       <button id="place" class="btn" style="width:100%">Wette abgeben (Spielgeld)</button>
 
       <div class="ticket">
-        <div class="row" style="justify-content:space-between"><strong>Tickets</strong><span class="sub">getrennt nach Status</span></div>
-        <div class="sub" style="margin:8px 0 4px">Offen</div>
+        <div class="row" style="justify-content:space-between"><strong>Tickets</strong><span class="sub">Offen</span></div>
         <div id="ticketsOpen" class="sub"></div>
-        <div class="sub" style="margin:10px 0 4px">Abgeschlossen</div>
+        <div class="row" style="justify-content:space-between;margin-top:8px"><span></span><span class="sub">Abgeschlossen</span></div>
         <div id="ticketsClosed" class="sub"></div>
       </div>
     </div>
@@ -151,7 +114,7 @@
 <div class="modalBg" id="modalBg">
   <div class="modal">
     <div id="modalContent"></div>
-    <div class="row" style="margin-top:12px;justify-content:flex-end">
+    <div class="row" style="justify-content:flex-end;margin-top:12px">
       <button id="mCancel" class="btn">Abbrechen</button>
       <button id="mOk" class="btn">OK</button>
     </div>
@@ -159,9 +122,9 @@
 </div>
 
 <script>
-/* ------------ Daten ------------ */
-function id(){return Math.random().toString(36).slice(2)+Date.now().toString(36);}
-function M(league,home,away,kick,odds){return {id:id(),league,home,away,kick,odds};}
+/* ========= Daten ========= */
+const id=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+const M=(league,home,away,kick,odds)=>({id:id(),league,home,away,kick,odds});
 const MATCHES=[
   M("UEFA Champions League","Real Madrid","Manchester City","20:00",{H:2.45,D:3.40,A:2.70}),
   M("UEFA Champions League","Bayern München","Paris SG","20:00",{H:2.20,D:3.60,A:3.00}),
@@ -173,13 +136,10 @@ const MATCHES=[
   M("UEFA Europa League","Roma","AC Milan","21:00",{H:2.70,D:3.10,A:2.65}),
 ];
 const RESULTS={};
-
-/* ------------ Helpers ------------ */
-const $=q=>document.querySelector(q);
-const $$=q=>document.querySelectorAll(q);
+const $=q=>document.querySelector(q); const $$=q=>document.querySelectorAll(q);
 const fmt=x=>Number(x).toFixed(2);
 
-/* ------------ Liste & Wettschein ------------ */
+/* ========= Liste + Slip ========= */
 const leagueSel=$("#leagueSel"), matchList=$("#matchList");
 let SLIP=[]; // {mid,market,odd}
 const slipEl=$("#slip"), stakeEl=$("#stake"), totEl=$("#totOdds"), payEl=$("#payout"), slipCount=$("#slipCount");
@@ -190,8 +150,7 @@ function renderMatches(){
   MATCHES.filter(m=>lg==='all'||m.league===lg).forEach(m=>{
     const row=document.createElement("div"); row.className="match";
     const left=document.createElement("div");
-    left.innerHTML=`<div class="teams">${m.home} <span class="sub">vs</span> ${m.away}</div>
-                    <div class="kick">${m.league} · ${m.kick}</div>`;
+    left.innerHTML=`<div class="teams">${m.home} <span class="sub">vs</span> ${m.away}</div><div class="kick">${m.league} · ${m.kick}</div>`;
     const right=document.createElement("div"); right.className="odds";
     const b1=oddBtn(m,"H","1"), bX=oddBtn(m,"D","X"), b2=oddBtn(m,"A","2");
     const start=document.createElement("button"); start.className="btn"; start.textContent="Beobachten"; start.onclick=()=>tryStart(m.id);
@@ -206,16 +165,11 @@ function oddBtn(m,key,lab){
   b.onclick=()=>togglePick(m.id,key,m.odds[key]);
   return b;
 }
-// *** Nur 1 Auswahl pro Spiel ***
+/* Nur 1 Auswahl pro Spiel */
 function togglePick(mid,market,odd){
-  const current=SLIP.find(s=>s.mid===mid);
-  if(current && current.market===market){ // gleiches erneut -> entfernen
-    SLIP=SLIP.filter(s=>s.mid!==mid);
-  }else{
-    // ersetze evtl. vorhandene Auswahl dieses Spiels
-    SLIP=SLIP.filter(s=>s.mid!==mid);
-    SLIP.push({mid,market,odd});
-  }
+  const existing=SLIP.find(s=>s.mid===mid);
+  if(existing && existing.market===market){ SLIP=SLIP.filter(s=>s.mid!==mid); }
+  else { SLIP=SLIP.filter(s=>s.mid!==mid); SLIP.push({mid,market,odd}); }
   renderSlip(); refreshOddSelections();
 }
 function refreshOddSelections(){
@@ -223,92 +177,86 @@ function refreshOddSelections(){
   SLIP.forEach(s=>{
     const m=MATCHES.find(x=>x.id===s.mid);
     const idx={H:0,D:1,A:2}[s.market];
-    const container=[...matchList.querySelectorAll(".match")]
-      .find(el=>el.querySelector(".teams").textContent.includes(m.home));
+    const container=[...matchList.querySelectorAll(".match")].find(el=>el.querySelector(".teams").textContent.includes(m.home));
     if(container){ const buttons=container.querySelectorAll(".odd"); buttons[idx]?.classList.add("sel"); }
   });
 }
 function renderSlip(){
   slipEl.innerHTML="";
-  if(!SLIP.length){ slipEl.innerHTML='<div class="sub">Noch keine Auswahlen – klicke Quoten in der Liste.</div>'; }
+  if(!SLIP.length) slipEl.innerHTML='<div class="sub">Noch keine Auswahlen – klicke Quoten.</div>';
   SLIP.forEach(s=>{
     const m=MATCHES.find(x=>x.id===s.mid);
     const d=document.createElement("div"); d.className="slipItem";
-    d.innerHTML=`<div><div><b>${m.home}</b> – <b>${m.away}</b></div>
-                 <div class="sub">${s.market==='H'?'1':s.market==='D'?'X':'2'} @ ${fmt(s.odd)}</div></div>
-                 <button class="rm">x</button>`;
+    d.innerHTML=`<div><div><b>${m.home}</b> – <b>${m.away}</b></div><div class="sub">${s.market==='H'?'1':s.market==='D'?'X':'2'} @ ${fmt(s.odd)}</div></div><button class="rm">x</button>`;
     d.querySelector(".rm").onclick=()=>{ SLIP=SLIP.filter(x=>x.mid!==s.mid); renderSlip(); refreshOddSelections(); };
     slipEl.appendChild(d);
   });
   slipCount.textContent=`${SLIP.length} Ausw.`;
-  const tot=SLIP.reduce((a,b)=>a*b.odd,1);
-  totEl.textContent=SLIP.length?fmt(tot):"–";
+  const tot=SLIP.reduce((a,b)=>a*b.odd,1); totEl.textContent=SLIP.length?fmt(tot):"–";
   const stake=+stakeEl.value||0; payEl.textContent=SLIP.length?(stake*tot).toFixed(2)+" €":"– €";
 }
 stakeEl.oninput=renderSlip;
-$$(".quick").forEach(b=>b.onclick=()=>{ stakeEl.value=b.dataset.amt; renderSlip(); });
 
-/* ------------ Tickets (getrennt) ------------ */
+/* ========= Tickets (getrennt) ========= */
 const tOpen=$("#ticketsOpen"), tClosed=$("#ticketsClosed"); let TICKETS=[];
-function addTicket(type,selections,stake,tot){
-  const t={id:id(),type,selections,stake,tot,payout:+(stake*tot).toFixed(2),status:"Offen"};
+function addTicket(selections,stake,tot){
+  const t={id:id(),selections,stake,tot,payout:+(stake*tot).toFixed(2),status:"Offen"};
   TICKETS.unshift(t); renderTickets();
 }
 function renderTickets(){
-  const open=TICKETS.filter(t=>t.status==="Offen");
-  const done=TICKETS.filter(t=>t.status!=="Offen");
-  const fmtTicket=t=>{
+  const mk=t=>{
     const sels=t.selections.map(s=>{
       const m=MATCHES.find(x=>x.id===s.mid); const lab=s.market==='H'?'1':s.market==='D'?'X':'2';
       return `${m.home}–${m.away} ${lab} (${fmt(s.odd)})`;
     }).join(" · ");
     const sym=t.status==="Gewonnen"?"✓":t.status==="Verloren"?"✗":"…";
-    const cls=t.status==="Gewonnen"?"ok":t.status==="Verloren"?"bad":"warn";
+    const cls=t.status==="Gewonnen"?"ok":t.status==="Verloren"?"bad":"";
     return `<div style="margin:6px 0">
       <b>Ticket ${t.id.slice(-6)}</b> <span class="${cls}">${sym} ${t.status}</span><br>
-      ${sels}<br> Einsatz <b>${t.stake.toFixed(2)} €</b> · Quote <b>${fmt(t.tot)}</b> · Auszahlung <b>${t.payout.toFixed(2)} €</b>
+      ${sels}<br>Einsatz <b>${t.stake.toFixed(2)} €</b> · Quote <b>${fmt(t.tot)}</b> · Auszahlung <b>${t.payout.toFixed(2)} €</b>
     </div>`;
   };
-  tOpen.innerHTML=open.length?open.map(fmtTicket).join(""):"<div class='sub'>–</div>";
-  tClosed.innerHTML=done.length?done.map(fmtTicket).join(""):"<div class='sub'>–</div>";
+  const open=TICKETS.filter(t=>t.status==="Offen"), done=TICKETS.filter(t=>t.status!=="Offen");
+  tOpen.innerHTML=open.length?open.map(mk).join(""):"<div class='sub'>–</div>";
+  tClosed.innerHTML=done.length?done.map(mk).join(""):"<div class='sub'>–</div>";
 }
 $("#place").onclick=()=>{
   if(!SLIP.length) return;
   const stake=+stakeEl.value||0; const tot=SLIP.reduce((a,b)=>a*b.odd,1);
-  addTicket("Pre-Match", SLIP.map(s=>({mid:s.mid,market:s.market,odd:s.odd})), stake, tot);
+  addTicket(SLIP.map(s=>({mid:s.mid,market:s.market,odd:s.odd})), stake, tot);
   SLIP=[]; renderSlip(); refreshOddSelections();
 };
 
-/* ------------ Visualisierung ------------ */
+/* ========= Visualisierung ========= */
 const W=960,H=540, GOAL_H=150, GOAL_W=10, MID={x:W/2,y:H/2};
-const g=$("#pitch").getContext("2d");
+const ctx=$("#pitch").getContext("2d");
 const hudTeams=$("#hudTeams"), hudScore=$("#hudScore"), hudClock=$("#hudClock"), hudState=$("#hudState"), ticker=$("#ticker");
 const speedEl=$("#speed"), spdLbl=$("#spdLbl"), pauseBtn=$("#pauseBtn"), resetBtn=$("#resetBtn"), closeVis=$("#closeVis");
-let speed=1; speedEl.oninput=()=>{speed=parseFloat(speedEl.value); spdLbl.textContent=speed.toFixed(2)+"×";}; speedEl.oninput();
+speedEl.oninput=()=>{spdLbl.textContent=parseFloat(speedEl.value).toFixed(2)+"×";}; speedEl.oninput();
 
 let cur=null, HOME=null, AWAY=null, BALL=null;
 let STATE="idle", prevAfterPause="first", simMinute=0, halfCD=0;
-const FIX_DT=1/60, MIN_PER_SEC=1.0;   // 90' in ~90s  => ~1,5 Min mit kurzer Halbzeit
-let animLast=null, acc=0, nudgeTimer=0, stuckTimer=0;
+const FIX_DT=1/60, MIN_PER_SEC=1.0;  // 90 Sekunden gesamt
+let rafLast=null, acc=0, nudgeTimer=0, stuckTimer=0;
 
 function tryStart(mid){
   const m=MATCHES.find(x=>x.id===mid);
-  if(cur && cur.id!==mid && STATE!=="idle" && STATE!=="end"){
-    confirmClose(()=>{ forceEnd(); start(m); });
-  }else start(m);
+  if(cur && cur.id!==mid && STATE!=="idle" && STATE!=="end") confirmClose(()=>{ forceEnd(); start(m); });
+  else start(m);
 }
 function start(m){
-  cur=m; initResult(m.id);
-  HOME=mkTeam(m.home,"L"); AWAY=mkTeam(m.away,"R"); place(HOME); place(AWAY); kickoff(Math.random()<0.5?"L":"R");
+  cur=m; ensureResult(m.id);
+  HOME=newTeam(m.home,"L"); AWAY=newTeam(m.away,"R"); placeTeam(HOME); placeTeam(AWAY);
+  kickoff(Math.random()<0.5?"L":"R");
+  STATE="first"; simMinute=0; nudgeTimer=0; stuckTimer=0; halfCD=0;
   hudTeams.textContent=`${m.home} – ${m.away}`; ticker.textContent=`Anpfiff: ${m.home} vs ${m.away}\n`;
-  STATE="first"; simMinute=0; halfCD=0; nudgeTimer=0; stuckTimer=0; hudState.textContent="1. Halbzeit";
 }
-function initResult(mid){ if(!RESULTS[mid]) RESULTS[mid]={status:"pre",scoreH:0,scoreA:0,htH:0,htA:0,scH:[],scA:[]}; }
-function forceEnd(){ if(!cur) return; finalize(cur.id,true); settleTicketsFor(cur.id); summary(cur.id,"Match beendet."); clearEngine(); }
-function clearEngine(){ STATE="idle"; cur=null; HOME=AWAY=BALL=null; simMinute=0; hudTeams.textContent="–"; hudScore.textContent="– : –"; hudClock.textContent="00:00"; hudState.textContent="Pre-Match"; ticker.textContent=""; }
-pauseBtn.onclick=()=>{ if(STATE==="pause"){STATE=prevAfterPause;hudState.textContent=label();} else{prevAfterPause=STATE;STATE="pause";hudState.textContent="Pause";} };
-resetBtn.onclick=()=>{ if(cur && STATE!=="idle" && STATE!=="end") confirmClose(()=>clearEngine()); else clearEngine(); };
-closeVis.onclick=()=>{ if(!cur || STATE==="idle"||STATE==="end") return; confirmClose(()=>{ forceEnd(); }); };
+function ensureResult(mid){ if(!RESULTS[mid]) RESULTS[mid]={status:"pre",scoreH:0,scoreA:0,htH:0,htA:0,scH:[],scA:[]}; }
+function forceEnd(){ if(!cur) return; finalize(cur.id,true); settleTickets(cur.id); showSummary(cur.id,"Match beendet."); clearSim(); }
+function clearSim(){ STATE="idle"; cur=null; HOME=AWAY=BALL=null; hudTeams.textContent="–"; hudScore.textContent="– : –"; hudClock.textContent="00:00"; hudState.textContent="Pre-Match"; ticker.textContent=""; }
+pauseBtn.onclick=()=>{ if(STATE==="pause"){STATE=prevAfterPause;hudState.textContent=stateLabel();} else{prevAfterPause=STATE;STATE="pause";hudState.textContent="Pause";} };
+resetBtn.onclick=()=>{ if(cur && STATE!=="idle" && STATE!=="end") confirmClose(()=>clearSim()); else clearSim(); };
+closeVis.onclick=()=>{ if(!cur || STATE==="idle"||STATE==="end") return; confirmClose(()=>forceEnd()); };
 document.addEventListener("keydown",e=>{const k=(e.code||e.key||"").toLowerCase(); if(k==="keyp"||k==="p") pauseBtn.click(); if(k==="keyr"||k==="r") resetBtn.click();});
 
 function step(dt){
@@ -316,11 +264,13 @@ function step(dt){
 
   if(STATE==="half"){ halfCD-=dt; hudState.textContent=`Halbzeit (${Math.ceil(halfCD)}s)`; if(halfCD<=0){STATE="second"; hudState.textContent="2. Halbzeit";} return; }
 
-  simMinute += dt*MIN_PER_SEC*speed; hudClock.textContent=minStr(simMinute);
-  if(STATE==="first" && simMinute>=45){ const R=RESULTS[cur.id]; R.htH=HOME.score; R.htA=AWAY.score; STATE="half"; halfCD=3; ticker.textContent+=`Halbzeit ${HOME.score}:${AWAY.score}\n`; return; }
-  if(STATE==="second" && simMinute>=90){ finalize(cur.id,false); settleTicketsFor(cur.id); summary(cur.id,"Abpfiff."); STATE="end"; return; }
+  simMinute += dt*MIN_PER_SEC*parseFloat(speedEl.value);
+  hudClock.textContent=minStr(simMinute);
 
-  aiChase(HOME,AWAY,dt); aiChase(AWAY,HOME,dt); physics(dt);
+  if(STATE==="first" && simMinute>=45){ const R=RESULTS[cur.id]; R.htH=HOME.score; R.htA=AWAY.score; STATE="half"; halfCD=3; ticker.textContent+=`Halbzeit ${HOME.score}:${AWAY.score}\n`; return; }
+  if(STATE==="second" && simMinute>=90){ finalize(cur.id,false); settleTickets(cur.id); showSummary(cur.id,"Abpfiff."); STATE="end"; return; }
+
+  ai(HOME,AWAY,dt); ai(AWAY,HOME,dt); physics(dt);
   hudScore.textContent=`${HOME.score} : ${AWAY.score}`;
 }
 function finalize(mid,forced){
@@ -329,102 +279,129 @@ function finalize(mid,forced){
   R.scH=HOME.scorers.slice(); R.scA=AWAY.scorers.slice();
   if(!forced) ticker.textContent+=`Endstand ${HOME.name} ${HOME.score}:${AWAY.score} ${AWAY.name}\n`;
 }
-function settleTicketsFor(mid){
+function settleTickets(mid){
   TICKETS.forEach(t=>{
     if(t.status!=="Offen") return;
     const need=t.selections.map(s=>s.mid);
-    const allDone=need.every(x=>RESULTS[x]?.status==="ended"); if(!allDone) return;
-    const ok=t.selections.every(s=>checkSel(s,RESULTS[s.mid]));
+    if(!need.every(x=>RESULTS[x]?.status==="ended")) return;
+    const ok=t.selections.every(s=>{
+      const R=RESULTS[s.mid]; if(!R) return false;
+      return s.market==="H"?R.scoreH>R.scoreA: s.market==="D"?R.scoreH===R.scoreA: R.scoreA>R.scoreH;
+    });
     t.status=ok?"Gewonnen":"Verloren";
   });
   renderTickets();
 }
-function checkSel(s,R){
-  if(!R) return false;
-  switch(s.market){case"H":return R.scoreH>R.scoreA;case"D":return R.scoreH===R.scoreA;case"A":return R.scoreA>R.scoreH;default:return false;}
-}
-function summary(mid,headline){
-  const R=RESULTS[mid], m=MATCHES.find(x=>x.id===mid);
+function showSummary(mid,headline){
+  const m=MATCHES.find(x=>x.id===mid), R=RESULTS[mid];
   const list=a=>a.length?a.map(x=>`${x.m}' ${x.n}`).join(", "):"–";
   openModal(`<h3 style="margin:0 0 6px">${headline}</h3>
     <div><b>${m.home}</b> ${R.scoreH} : ${R.scoreA} <b>${m.away}</b></div>
     <div class="sub">Halbzeit: ${R.htH}:${R.htA}</div>
     <div class="pill" style="display:inline-block;margin-top:6px">Schützen ${m.home}: ${list(R.scH)}</div>
-    <div class="pill" style="display:inline-block;margin-top:6px">Schützen ${m.away}: ${list(R.scA)}</div>`, ()=>closeModal());
+    <div class="pill" style="display:inline-block;margin-top:6px">Schützen ${m.away}: ${list(R.scA)}</div>`);
 }
 
-/* ------------ Teams & „Billiard“-KI ------------ */
-function mkTeam(name,side){const c=color(name);const p=[];for(let i=0;i<11;i++)p.push({name:i===0?"GK":"P"+i,x:0,y:0,vx:0,vy:0,r:10,spd:80+Math.random()*20,c});return {name,side,players:p,score:0,scorers:[]};}
+/* ===== Teams & frühere (gute) Logik – aber sicherer ===== */
+function newTeam(name,side){const c=color(name);const p=[];for(let i=0;i<11;i++)p.push({name:i===0?"GK":"P"+i,spd:70+Math.random()*30,pas:70+Math.random()*30,sht:70+Math.random()*30,x:0,y:0,vx:0,vy:0,r:10,homeX:0,homeY:0});return {name,side,players:p,score:0,scorers:[],c};}
 function color(n){const m={"Real Madrid":"#ffffff","Manchester City":"#6cb6ff","Bayern München":"#c80a0a","Paris SG":"#1f3b6d","Barcelona":"#aa1e3f","Inter":"#1e2a78","Borussia Dortmund":"#f6d000","Atlético Madrid":"#b30d2f","RB Leipzig":"#d20f2a","Arsenal":"#d21e2e","Porto":"#1b3a8a","Juventus":"#e6e6e6","Leverkusen":"#e11d48","Liverpool":"#c8102e","Roma":"#8a1c1c","AC Milan":"#222"};return m[n]||"#60a5fa";}
-const FORM433=[[0.05,0.50],[0.20,0.20],[0.20,0.38],[0.20,0.62],[0.20,0.80],[0.45,0.30],[0.45,0.50],[0.45,0.70],[0.72,0.25],[0.72,0.50],[0.72,0.75]];
-function place(T){const f=T.side==="L"?FORM433:FORM433.map(([x,y])=>[1-x,y]);for(let i=0;i<T.players.length;i++){const[nx,ny]=f[i];const px=40+nx*(W-80),py=30+ny*(H-60);Object.assign(T.players[i],{x:px,y:py,vx:0,vy:0,homeX:px,homeY:py});}}
-function kickoff(side){BALL={x:MID.x,y:MID.y,vx:(side==="L"?120:-120),vy:(Math.random()*2-1)*50,r:6};}
+const F433=[[0.05,0.50],[0.20,0.20],[0.20,0.38],[0.20,0.62],[0.20,0.80],[0.45,0.30],[0.45,0.50],[0.45,0.70],[0.72,0.25],[0.72,0.50],[0.72,0.75]];
+function placeTeam(T){const f=T.side==="L"?F433:F433.map(([x,y])=>[1-x,y]);for(let i=0;i<T.players.length;i++){const[nx,ny]=f[i];const px=40+nx*(W-80),py=30+ny*(H-60);Object.assign(T.players[i],{x:px,y:py,vx:0,vy:0,homeX:px,homeY:py});}}
+function kickoff(side){BALL={x:MID.x,y:MID.y,vx:(side==="L"?110:-110),vy:(Math.random()*2-1)*40,r:6,own:null};}
 
-function aiChase(T,Opp,dt){
-  // 3 Nächste jagen den Ball
-  const sorted=[...T.players].sort((a,b)=>dist2(a.x,a.y,BALL.x,BALL.y)-dist2(b.x,b.y,BALL.x,BALL.y));
-  const chasers=new Set(sorted.slice(0,3));
+function ai(T,Opp,dt){
+  // Mindestens 3 Jäger + eventueller Besitzer
+  const nearest=[...T.players].sort((a,b)=>dist(a,BALL)-dist(b,BALL)).slice(0,3);
+  const carrier = getCarrier(T);
   for(const p of T.players){
-    const target=chasers.has(p)?{x:BALL.x,y:BALL.y}:{x:p.homeX,y:p.homeY};
-    const boost=chasers.has(p)?1.35:0.7;
-    go(p,target.x,target.y,dt,boost);
+    if(carrier===p){
+      // kurzer „Carry“, aber nie kleben lassen
+      const goalX=T.side==="L"?W-20:20, dir=norm(goalX-p.x,(H/2)-p.y);
+      BALL.own=p; BALL.x=p.x+dir.x*12; BALL.y=p.y+dir.y*12; BALL.vx=dir.x*180; BALL.vy=dir.y*180;
+      // Abschluss/Pass
+      const nearGoal=Math.abs(goalX-p.x)<180;
+      const pressure=dist(p,nearestOpp(p,Opp));
+      if(nearGoal && Math.random()<0.03){ shoot(T,p,dir,300+p.sht*0.7); }
+      else if(pressure<70 && Math.random()<0.06){ const m=mateAhead(T,p); if(m) pass(p,m); }
+      moveTo(p,p.x+dir.x*60,p.y+dir.y*40,dt,1.2);
+      // nach max 0.7s Carry freigeben
+      if(!p._carry){p._carry=0;} p._carry+=dt; if(p._carry>0.7){BALL.own=null;p._carry=0;}
+    }else{
+      const chase = nearest.includes(p);
+      const tx = chase?BALL.x:p.homeX, ty = chase?BALL.y:p.homeY;
+      moveTo(p,tx,ty,dt,chase?1.3:0.7);
+    }
   }
 }
+function getCarrier(T){ // Besitzer = Spieler, der dem Ball sehr nahe ist und frontal steht
+  let best=null,bd=16;
+  for(const p of T.players){const d=dist(p,BALL); if(d<bd){bd=d; best=p;}}
+  return best && bd<12 ? best : null;
+}
+function nearestOpp(p,Opp){return [...Opp.players].sort((a,b)=>dist(p,a)-dist(p,b))[0];}
+function mateAhead(T,p){const f=T.side==="L"?1:-1;const cs=T.players.filter(m=>m!==p&&f*(m.x-p.x)>0);if(!cs.length)return null;cs.sort((a,b)=>Math.abs(a.y-p.y)-Math.abs(b.y-p.y));return cs[0];}
+function pass(from,to){const d=norm(to.x-from.x,to.y-from.y), P=210+from.pas*0.6;BALL.vx=d.x*P;BALL.vy=d.y*P;BALL.own=null;from._carry=0;ticker.textContent+=`${mStr(simMinute)} Pass\n`;}
+function shoot(T,p,dir,P){BALL.vx=dir.x*P;BALL.vy=dir.y*P;BALL.own=null;p._carry=0;ticker.textContent+=`${mStr(simMinute)} Schuss!\n`;}
+function moveTo(p,tx,ty,dt,boost){
+  const dx=tx-p.x, dy=ty-p.y, len=Math.hypot(dx,dy)||1, a=900*boost*dt;
+  p.vx+=(dx/len)*a; p.vy+=(dy/len)*a;
+  const vmax=160*(0.7+p.spd/200), vlen=Math.hypot(p.vx,p.vy);
+  if(vlen>vmax){p.vx=p.vx/vlen*vmax;p.vy=p.vy/vlen*vmax;}
+  p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=0.9; p.vy*=0.9;
+  p.x=Math.max(20,Math.min(W-20,p.x)); p.y=Math.max(20,Math.min(H-20,p.y));
+}
 
-/* ------------ Physik (Anti-Stuck & Mindesttempo) ------------ */
+/* ===== Physik (Billiard + Anti-Stuck) ===== */
 function physics(dt){
+  // Spieler ↔ Spieler
   const all=[...HOME.players,...AWAY.players];
-
-  // Spieler ↔ Spieler Separation
-  for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)resolvePP(all[i],all[j]);
+  for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){sep(all[i],all[j]);}
 
   // Ball Bewegung
-  BALL.vx*=0.985; BALL.vy*=0.985; BALL.x+=BALL.vx*dt; BALL.y+=BALL.vy*dt;
+  if(!BALL.own){ BALL.vx*=0.985; BALL.vy*=0.985; BALL.x+=BALL.vx*dt; BALL.y+=BALL.vy*dt; }
 
-  // Spielfeld / Tore
+  // Feld/Tor
   if(BALL.y<10){BALL.y=10;BALL.vy*=-0.9;}
   if(BALL.y>H-10){BALL.y=H-10;BALL.vy*=-0.9;}
-  if(BALL.x<4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("H");} else {BALL.x=4;BALL.vx*=-0.92;} }
-  if(BALL.x>W-4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("A");} else {BALL.x=W-4;BALL.vx*=-0.92;} }
+  if(BALL.x<4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){score("H");} else {BALL.x=4;BALL.vx*=-0.92;BALL.own=null;} }
+  if(BALL.x>W-4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){score("A");} else {BALL.x=W-4;BALL.vx*=-0.92;BALL.own=null;} }
 
-  // Ball ↔ Spieler (billiard)
-  for(const p of all) resolveBP(BALL,p);
-
-  // Sandwich-Check + Mindestenergie
-  const near=all.filter(p=>dist2(BALL.x,BALL.y,p.x,p.y)<(p.r+BALL.r+6));
-  const sp=Math.hypot(BALL.vx,BALL.vy);
-  if(near.length>=2 && sp<30){ stuckTimer+=dt; } else stuckTimer=0;
-  if(stuckTimer>0.2){ let nx=0,ny=0; near.forEach(p=>{nx+=BALL.x-p.x;ny+=BALL.y-p.y;}); const n=norm(nx,ny); const k=300; BALL.vx=n.x*k; BALL.vy=n.y*k; stuckTimer=0; }
-  nudgeTimer+=dt; if(sp<18 && nudgeTimer>0.8){ const n=norm(Math.random()-0.5,Math.random()-0.5); BALL.vx+=n.x*220; BALL.vy+=n.y*220; nudgeTimer=0; }
-}
-function resolvePP(a,b){
-  const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy)||1, min=a.r+b.r+2;
-  if(d<min){ const nx=dx/d, ny=dy/d, ov=min-d; const push=ov*0.5; a.x-=nx*push; a.y-=ny*push; b.x+=nx*push; b.y+=ny*push; }
-}
-function resolveBP(ball,p){
-  const dx=ball.x-p.x, dy=ball.y-p.y, d=Math.hypot(dx,dy)||1, min=ball.r+p.r;
-  if(d<min){
-    const nx=dx/d, ny=dy/d, ov=min-d;
-    ball.x+=nx*ov; ball.y+=ny*ov;
-    // elastischer + tangentialer Impuls, Mindesttempo
-    const vn=ball.vx*nx+ball.vy*ny, vt=ball.vx*(-ny)+ball.vy*(nx);
-    ball.vx -= 2.0*vn*nx + 0.4*vt*(-ny);
-    ball.vy -= 2.0*vn*ny + 0.4*vt*(nx);
-    const minSpeed=140; const sp=Math.hypot(ball.vx,ball.vy);
-    if(sp<minSpeed){ const s=minSpeed/sp; ball.vx*=s; ball.vy*=s; }
+  // Ball ↔ Spieler: reiner Impuls, Mindesttempo
+  for(const p of all){
+    const dx=BALL.x-p.x, dy=BALL.y-p.y, d=Math.hypot(dx,dy)||1, min=BALL.r+p.r;
+    if(d<min){
+      const nx=dx/d, ny=dy/d, ov=min-d;
+      BALL.x+=nx*ov; BALL.y+=ny*ov;
+      const vn=BALL.vx*nx+BALL.vy*ny, vt=BALL.vx*(-ny)+BALL.vy*(nx);
+      BALL.vx -= 2.0*vn*nx + 0.4*vt*(-ny);
+      BALL.vy -= 2.0*vn*ny + 0.4*vt*(nx);
+      const minS=140, sp=Math.hypot(BALL.vx,BALL.vy); if(sp<minS){const s=minS/(sp||1); BALL.vx*=s; BALL.vy*=s;}
+      BALL.own=null; // nie kleben lassen
+    }
   }
+
+  // Anti-Sandwich + Nudge
+  const near=all.filter(p=>dist(p,BALL)<(p.r+BALL.r+7));
+  const sp=Math.hypot(BALL.vx,BALL.vy);
+  if(near.length>=2 && sp<28){ stuckTimer+=dt; } else { stuckTimer=0; }
+  if(stuckTimer>0.25){ let nx=0,ny=0; near.forEach(p=>{nx+=BALL.x-p.x;ny+=BALL.y-p.y;}); const n=norm(nx,ny); BALL.vx=n.x*300; BALL.vy=n.y*300; stuckTimer=0; }
+  nudgeTimer+=dt; if(sp<16 && nudgeTimer>0.8){ const n=norm(Math.random()-0.5,Math.random()-0.5); BALL.vx+=n.x*220; BALL.vy+=n.y*220; nudgeTimer=0; }
 }
-function goal(side){
+function sep(a,b){
+  const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy)||1, min=a.r+b.r+2;
+  if(d<min){ const nx=dx/d, ny=dy/d, ov=min-d; a.x-=nx*ov*0.5; a.y-=ny*ov*0.5; b.x+=nx*ov*0.5; b.y+=ny*ov*0.5; }
+}
+function score(side){
   const m=Math.round(simMinute);
-  if(side==="H"){HOME.score++; HOME.scorers.push({n:"P"+(1+Math.floor(Math.random()*10)),m}); ticker.textContent+=`${minStr(simMinute)} TOR ${HOME.name}!\n`;}
-  else{AWAY.score++; AWAY.scorers.push({n:"P"+(1+Math.floor(Math.random()*10)),m}); ticker.textContent+=`${minStr(simMinute)} TOR ${AWAY.name}!\n`;}
-  // sofortiger Wiederanstoß
-  place(HOME); place(AWAY); kickoff(side==="H"?"A":"H");
+  if(side==="H"){ HOME.score++; HOME.scorers.push({n:"P"+(1+Math.floor(Math.random()*10)),m}); ticker.textContent+=`${mStr(simMinute)} TOR ${HOME.name}!\n`; }
+  else { AWAY.score++; AWAY.scorers.push({n:"P"+(1+Math.floor(Math.random()*10)),m}); ticker.textContent+=`${mStr(simMinute)} TOR ${AWAY.name}!\n`; }
+  placeTeam(HOME); placeTeam(AWAY); kickoff(side==="H"?"A":"H"); // sofort weiter
 }
 
-/* ------------ Zeichnen ------------ */
+/* ===== Zeichnen & Loop ===== */
 function draw(){
-  const grd=g.createLinearGradient(0,0,0,H); grd.addColorStop(0,"#092015"); grd.addColorStop(1,"#123a22");
+  // Feld
+  const g=ctx; const grd=g.createLinearGradient(0,0,0,H); grd.addColorStop(0,"#092015"); grd.addColorStop(1,"#123a22");
   g.fillStyle=grd; g.fillRect(0,0,W,H);
   g.strokeStyle="rgba(255,255,255,.6)"; g.lineWidth=2; g.strokeRect(20,20,W-40,H-40);
   g.beginPath(); g.moveTo(W/2,20); g.lineTo(W/2,H-20); g.stroke(); g.beginPath(); g.arc(W/2,H/2,60,0,Math.PI*2); g.stroke();
@@ -432,35 +409,37 @@ function draw(){
   g.fillRect(W-GOAL_W,H/2-GOAL_H/2,GOAL_W,4); g.fillRect(W-GOAL_W,H/2+GOAL_H/2-4,GOAL_W,4);
   if(HOME&&AWAY){
     drawTeam(HOME); drawTeam(AWAY);
-    g.fillStyle="#eee"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r,0,Math.PI*2); g.fill(); g.strokeStyle="#bbb"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r*0.6,0,Math.PI*2); g.stroke();
+    g.fillStyle="#eee"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r,0,Math.PI*2); g.fill();
+    g.strokeStyle="#bbb"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r*0.6,0,Math.PI*2); g.stroke();
     g.fillStyle="#fff"; g.font="700 18px system-ui"; g.textAlign="center"; g.fillText(`${HOME.name}  ${HOME.score} : ${AWAY.score}  ${AWAY.name}`, W/2, 28);
   }
 }
-function drawTeam(T){ for(const p of T.players){ g.fillStyle=T.c; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill(); }}
+function drawTeam(T){const g=ctx; for(const p of T.players){g.fillStyle=T.c; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill();}}
 
-/* ------------ Loop ------------ */
-function loop(t){ if(animLast===null) animLast=t; const dt=Math.min(0.05,(t-animLast)/1000); animLast=t; acc+=dt; while(acc>=FIX_DT){ step(FIX_DT); acc-=FIX_DT; } hudState.textContent=label(); hudScore.textContent=(HOME&&AWAY)?`${HOME.score} : ${AWAY.score}`:"– : –"; draw(); requestAnimationFrame(loop); }
+function loop(t){
+  if(rafLast===null) rafLast=t;
+  const dt=Math.min(0.05,(t-rafLast)/1000); rafLast=t;
+  acc+=dt;
+  while(acc>=FIX_DT){ step(FIX_DT); acc-=FIX_DT; }
+  hudState.textContent=stateLabel(); hudScore.textContent=(HOME&&AWAY)?`${HOME.score} : ${AWAY.score}`:"– : –";
+  draw(); requestAnimationFrame(loop);
+}
 requestAnimationFrame(loop);
 
-/* ------------ Utils ------------ */
-function label(){return STATE==="first"?"1. Halbzeit":STATE==="second"?"2. Halbzeit":STATE==="half"?"Halbzeit":STATE==="pause"?"Pause":STATE==="end"?"Ende":"Pre-Match";}
+/* ===== Utils & Modal ===== */
+function stateLabel(){return STATE==="first"?"1. Halbzeit":STATE==="second"?"2. Halbzeit":STATE==="half"?"Halbzeit":STATE==="pause"?"Pause":STATE==="end"?"Ende":"Pre-Match";}
 function minStr(m){const M=Math.floor(m||0),S=Math.floor(((m||0)-M)*60);return `${String(M).padStart(2,"0")}:${String(S).padStart(2,"0")}`;}
-function r(a,b){return Math.random()*(b-a)+a;}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-function dist2(x1,y1,x2,y2){return Math.hypot(x1-x2,y1-y2);}
+function mStr(m){return minStr(m);}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+function norm(x,y){const l=Math.hypot(x,y)||1;return {x:x/l,y:y/l};}
 
-/* Render init */
 leagueSel.onchange=renderMatches; renderMatches(); renderSlip();
 
-/* ------------ Modal ------------ */
-const modalBg=$("#modalBg"), modalC=$("#modalContent"), mCancel=$("#mCancel"), mOk=$("#mOk"); let onOk=()=>{};
-mCancel.onclick=()=>modalBg.style.display="none"; mOk.onclick=()=>{onOk(); modalBg.style.display="none";};
+const modalBg=$("#modalBg"), modalC=$("#modalContent"); let onOk=()=>{};
+$("#mCancel").onclick=()=>modalBg.style.display="none";
+$("#mOk").onclick=()=>{onOk(); modalBg.style.display="none";};
 function openModal(html,cb){modalC.innerHTML=html;onOk=cb||(()=>{});modalBg.style.display="flex";}
-function closeModal(){modalBg.style.display="none";}
-function confirmClose(cb){
-  openModal(`<h3 style="margin:0 0 6px">Visualisierung schließen?</h3>
-             <div>Wenn du bestätigst, wird das laufende Spiel beendet, zusammengefasst und Tickets werden gewertet.</div>`, cb);
-}
+function confirmClose(cb){openModal(`<h3 style="margin:0 0 6px">Visualisierung schließen?</h3><div>Das laufende Spiel wird gewertet und beendet.</div>`,cb);}
 </script>
 </body>
 </html>
