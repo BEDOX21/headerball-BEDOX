@@ -3,249 +3,220 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Headerball – Frankfurt 1v1</title>
+  <title>BEDOX Fußballmanager – Frankfurt Arena</title>
   <style>
-    html, body { margin:0; padding:0; height:100%; background:#0b0f1a; color:#eee; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    #wrap { display:flex; flex-direction:column; align-items:center; gap:8px; padding:12px; }
-    canvas { background: linear-gradient(#0b0f1a 0%, #0b0f1a 55%, #0f1c33 100%); border:1px solid #223; max-width:100%; height:auto; }
-    .bar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center; }
-    .btn { background:#1f3159; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
-    .btn:hover { background:#2a4174; }
-    .small { font-size:12px; opacity:.8 }
-    .card { background:#101725; border:1px solid #223; padding:10px; border-radius:8px; }
-    .row { display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; }
-    .head { width:72px; height:72px; border-radius:50%; position:relative; display:inline-block; border:3px solid #333; cursor:pointer; }
-    .head.sel { outline:3px solid #68d; }
-    .tag { position:absolute; bottom:-20px; width:100%; text-align:center; font-size:12px; color:#bcd; }
+    :root{
+      --bg:#0b0f1a; --panel:#101725; --line:#223; --accent:#68d; --text:#eaeef7;
+      --btn:#1f3159; --btnH:#2a4174; --ok:#16a34a; --warn:#f59e0b; --bad:#ef4444;
+    }
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+    #wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px}
+    h2{margin:8px 0 2px}
+    .bar, .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+    .small{font-size:12px;opacity:.85}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+    .btn{background:var(--btn);color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
+    .btn:hover{background:var(--btnH)}
+    select, input[type="range"]{background:#0f172a;color:#e5e7eb;border:1px solid #334; border-radius:8px;padding:6px}
+    canvas{background:#0b0f1a;border:1px solid #223;max-width:100%;height:auto;border-radius:8px}
+    #log{max-height:220px;overflow:auto;white-space:pre-wrap;background:#0d1424;border:1px solid #213; padding:8px;border-radius:8px;font-size:12px}
+    .pill{padding:2px 8px;border-radius:999px;border:1px solid #234;background:#0e1a33}
+    .score{font:700 28px system-ui,sans-serif}
+    .hidden{display:none}
   </style>
 </head>
 <body>
 <div id="wrap">
-  <h2>Headerball – Frankfurt 1v1</h2>
-  <div class="bar small">Steuerung: Spieler 1 (A/D = links/rechts, W/Leertaste = springen) · Spieler 2 (←/→ = links/rechts, ↑ = springen) · P = Pause · R = Neustart</div>
+  <h2>BEDOX Fußballmanager – Frankfurt Arena</h2>
+  <div class="bar small">Manager-Modus: Zwei Teams spielen per KI gegeneinander – mit Live-Visualisierung. P = Pause/Weiter · R = Neustart</div>
 
-  <div id="menu" class="card">
-    <h3 style="margin-top:0">Wähle deine Köpfe</h3>
-    <div class="row" id="pick"></div>
-    <div class="row" style="margin-top:8px;">
-      <button id="startPvAI" class="btn">Start: Spieler vs. KI</button>
-      <button id="startPvP" class="btn">Start: Spieler 1 vs. Spieler 2</button>
+  <!-- Setup -->
+  <div id="setup" class="card">
+    <div class="row">
+      <div>
+        <div class="small">Team Links</div>
+        <select id="teamL"></select>
+      </div>
+      <div>
+        <div class="small">Formation Links</div>
+        <select id="formL">
+          <option value="433">4-3-3</option>
+          <option value="442">4-4-2</option>
+        </select>
+      </div>
+      <div>
+        <div class="small">Team Rechts</div>
+        <select id="teamR"></select>
+      </div>
+      <div>
+        <div class="small">Formation Rechts</div>
+        <select id="formR">
+          <option value="433">4-3-3</option>
+          <option value="442" selected>4-4-2</option>
+        </select>
+      </div>
+      <button id="randomize" class="btn">Zufällige Kader</button>
+      <button id="start" class="btn">Match starten</button>
+    </div>
+    <div class="row small" style="margin-top:6px">
+      <span class="pill">Tipp: Erst Teams/Formation wählen → „Match starten“</span>
     </div>
   </div>
 
-  <canvas id="game" width="960" height="540"></canvas>
-  <div class="bar small">Ort: Frankfurt – Skyline im Hintergrund. <span id="msg"></span></div>
+  <!-- HUD -->
+  <div class="bar">
+    <div class="score" id="score">0 : 0</div>
+    <div class="pill" id="minute">00:00</div>
+    <div class="pill" id="statePill">Vorbereitung</div>
+    <div class="row">
+      <label class="small">Sim-Speed: <span id="spdLbl">1.0×</span></label>
+      <input id="speed" type="range" min="0.5" max="4" step="0.5" value="1">
+      <button id="pauseBtn" class="btn">Pause</button>
+      <button id="resetBtn" class="btn">Neustart</button>
+    </div>
+  </div>
+
+  <canvas id="pitch" width="960" height="540"></canvas>
+
+  <div class="card" style="max-width:960px;width:100%">
+    <div class="small" style="margin-bottom:6px">Ereignisse</div>
+    <div id="log"></div>
+  </div>
 </div>
 
 <script>
-/* ---------- Utils & Figuren ---------- */
-const TAU=Math.PI*2;
-const CHARACTERS=[
- {id:"sevban",name:"Sevban",age:20,draw:(c,x,y,r)=>{c.fillStyle="#f0c8a8";c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
-  c.fillStyle="#b37a38";for(let i=-3;i<=3;i++){c.beginPath();c.arc(x+i*8,y-r*0.6+Math.cos(i)*2,r*0.35,0,TAU);c.fill();}
-  c.fillStyle="rgba(60,40,30,0.25)";c.beginPath();c.arc(x,y+r*0.25,r*0.65,0,Math.PI);c.fill();
-  c.fillStyle="#222";c.beginPath();c.arc(x-r*0.28,y-r*0.05,r*0.08,0,TAU);c.arc(x+r*0.28,y-r*0.05,r*0.08,0,TAU);c.fill();
-  c.strokeStyle="#333";c.lineWidth=2;c.beginPath();c.arc(x,y+r*0.25,r*0.35,0.1*Math.PI,0.9*Math.PI);c.stroke();}},
- {id:"bedri",name:"Bedri",age:40,draw:(c,x,y,r)=>{c.fillStyle="#e8b892";c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
-  c.fillStyle="rgba(255,255,255,0.15)";c.beginPath();c.arc(x-r*0.25,y-r*0.5,r*0.35,0,TAU);c.fill();
-  c.fillStyle="#111";c.beginPath();c.arc(x,y+r*0.2,r*0.75,0,Math.PI);c.fill();
-  c.fillStyle="#222";c.beginPath();c.arc(x-r*0.28,y-r*0.05,r*0.08,0,TAU);c.arc(x+r*0.28,y-r*0.05,r*0.08,0,TAU);c.fill();}},
- {id:"haydar",name:"Haydar",age:33,draw:(c,x,y,r)=>{c.fillStyle="#e2a97f";c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
-  c.fillStyle="#1a1a1a";c.beginPath();c.arc(x,y-r*0.35,r*0.9,Math.PI,0);c.fill();
-  c.fillStyle="#1a1a1a";c.beginPath();c.arc(x,y+r*0.2,r*0.75,0,Math.PI);c.fill();
-  c.fillStyle="#222";c.beginPath();c.arc(x-r*0.28,y-r*0.05,r*0.08,0,TAU);c.arc(x+r*0.28,y-r*0.05,r*0.08,0,TAU);c.fill();}}
+/* ==============================
+   TEAMS & DATA
+================================*/
+const TEAMS_PRESETS = [
+  mkTeamPreset("BEDOX United", "#f59e0b", ["Sevban","Bedri","Haydar","Ali","Can","Mert","Ilyas","Timur","Onur","Arda","Emre"]),
+  mkTeamPreset("Frankfurt Skyline FC", "#60a5fa", ["Max","Jonas","Leo","Paul","Finn","Felix","Elias","Noah","Luca","Moritz","Mika"]),
+  mkTeamPreset("Mainz Flipsters", "#34d399", ["Tom","Jan","Eric","Phil","Sami","Yunus","Ibo","Marc","Ben","Lars","Roman"]),
+  mkTeamPreset("Wiesbaden Builders", "#a78bfa", ["Aykut","Sinan","Efe","Serkan","Hakan","Umut","Okan","Baran","Deniz","Kaan","Kerem"])
 ];
 
-/* ---------- Menü-Auswahl ---------- */
-const pick=document.getElementById("pick");
-let choiceP1=CHARACTERS[0].id, choiceP2=CHARACTERS[1].id;
-function head(ch){
-  const d=document.createElement("div"); d.style.position="relative"; d.style.padding="22px 12px 10px";
-  const cn=document.createElement("canvas"); cn.width=72; cn.height=72; ch.draw(cn.getContext("2d"),36,36,32);
-  const tag=document.createElement("div"); tag.className="tag"; tag.textContent=ch.name;
-  const w=document.createElement("div"); w.className="head"; w.title=ch.name; w.appendChild(cn); w.appendChild(tag);
-  w.addEventListener("click",()=>{
-    if(!choiceP1 || choiceP2){ choiceP1=ch.id; choiceP2=null; [...pick.querySelectorAll(".head")].forEach(e=>e.classList.remove("sel")); w.classList.add("sel"); }
-    else { choiceP2=ch.id; w.classList.add("sel"); }
-  });
-  d.appendChild(w); return d;
-}
-CHARACTERS.forEach(ch=>pick.appendChild(head(ch)));
-
-/* ---------- Canvas & State ---------- */
-const canvas=document.getElementById("game"), ctx=canvas.getContext("2d");
-canvas.tabIndex=0; canvas.addEventListener("mousedown",()=>canvas.focus());
-
-const menu=document.getElementById("menu"), msg=document.getElementById("msg");
-let state="menu", mode="PvAI", P1,P2,BALL,SCORE;
-let goalLock=0;                           // Sperrzeit (Sekunden) nach Tor
-let goalCounterL=0, goalCounterR=0;       // Entprellung / Mehrfach-Frames
-const G=1500, DT=1/60, FLOOR=canvas.height-60, GOAL_W=40, GOAL_H=140;
-
-/* ---------- Spieler & Reset ---------- */
-function makePlayer(side,id){
-  const x=side==="left"?200:canvas.width-200;
-  return {id,side,x,y:FLOOR-36,r:36,vx:0,vy:0,onGround:true,left:false,right:false};
-}
-function findChar(id){ return CHARACTERS.find(c=>c.id===id)||CHARACTERS[0]; }
-function reset(){
-  SCORE={L:0,R:0,toWin:5};
-  P1=makePlayer("left",choiceP1);
-  P2=makePlayer("right",choiceP2||CHARACTERS[1].id);
-  BALL={x:canvas.width/2,y:canvas.height/2-80,vx:(Math.random()<.5?220:-220),vy:-300,r:16};
-  goalLock=0; goalCounterL=0; goalCounterR=0; msg.textContent="";
+function mkTeamPreset(name, color, names){
+  return {
+    name, color,
+    baseSkill: rnd(55,75),
+    names
+  };
 }
 
-/* ---------- Eingabe ---------- */
-const keys={};
-function handleDown(e){
-  const k=(e.code||e.key||"").toLowerCase();
-  if(["arrowup","arrowleft","arrowright"," "].includes(k)) e.preventDefault();
-  if(k==="keyp"||k==="p"){ state=(state==="pause"?"play":"pause"); acc=0; last=null; return; }
-  if(k==="keyr"||k==="r"){ reset(); state="play"; acc=0; last=null; return; }
-  keys[k]=true;
+function mkPlayer(name, sideColor){
+  return {
+    name,
+    spd: rnd(55,95),     // Geschwindigkeit
+    pas: rnd(55,95),     // Passen
+    sht: rnd(55,95),     // Schuss
+    def: rnd(55,95),     // Defensiv
+    color: sideColor,
+    x:0,y:0,vx:0,vy:0, r:10, // gesetzt beim Aufstellen
+    homeX:0,homeY:0,
+    hasBall:false
+  };
 }
-function handleUp(e){ const k=(e.code||e.key||"").toLowerCase(); keys[k]=false; }
-addEventListener("keydown",handleDown,{passive:false});
-addEventListener("keyup",handleUp,{passive:false});
-addEventListener("blur",()=>{for(const k in keys) keys[k]=false;});
 
-function input(){
-  const a=keys["keya"]||keys["a"], d=keys["keyd"]||keys["d"], w=keys["keyw"]||keys["w"]||keys[" "];
-  P1.left=!!a; P1.right=!!d; if(w&&P1.onGround){P1.vy=-600;P1.onGround=false;}
-  if(mode==="PvP"){
-    const L=keys["arrowleft"], R=keys["arrowright"], U=keys["arrowup"];
-    P2.left=!!L; P2.right=!!R; if(U&&P2.onGround){P2.vy=-600;P2.onGround=false;}
-  }else{
-    const t=BALL.x;
-    P2.left=P2.x>t+10; P2.right=P2.x<t-10;
-    if(BALL.vy>0 && Math.abs(BALL.x-P2.x)<50 && P2.onGround && BALL.y<P2.y-40){P2.vy=-600;P2.onGround=false;}
+function mkTeam(preset, side, formation){
+  const names = [...preset.names];
+  const players = [];
+  for(let i=0;i<11;i++){
+    const n = names[i] || ("Spieler "+(i+1));
+    players.push(mkPlayer(n, preset.color));
+  }
+  return {
+    name: preset.name,
+    color: preset.color,
+    side, // "L" | "R"
+    formation,
+    players,
+    score:0
+  };
+}
+
+/* ==============================
+   FORMATIONS (normalized layout)
+   coords in [0..1] left-to-right; mirrored for right side
+================================*/
+const FORM = {
+  "433":[ // GK + 4 D + 3 M + 3 F
+    [0.05,0.50], // GK
+    [0.20,0.20],[0.20,0.38],[0.20,0.62],[0.20,0.80],
+    [0.45,0.30],[0.45,0.50],[0.45,0.70],
+    [0.72,0.25],[0.72,0.50],[0.72,0.75]
+  ],
+  "442":[ // GK + 4 D + 4 M + 2 F
+    [0.05,0.50],
+    [0.20,0.22],[0.20,0.38],[0.20,0.62],[0.20,0.78],
+    [0.45,0.28],[0.45,0.44],[0.45,0.56],[0.45,0.72],
+    [0.72,0.40],[0.72,0.60]
+  ]
+};
+
+function placeTeam(team, W,H){
+  const P = team.players;
+  const f = FORM[team.formation];
+  for(let i=0;i<P.length;i++){
+    const [nx,ny]=f[i];
+    const rx = team.side==="L" ? nx : 1-nx;
+    P[i].x = P[i].homeX = 40 + rx*(W-80);
+    P[i].y = P[i].homeY = 30 + ny*(H-60);
+    P[i].vx = P[i].vy = 0;
+    P[i].hasBall = false;
   }
 }
 
-/* ---------- Physik ---------- */
-function stepP(p){
-  const ACC=1400, MAXV=260, FRI=0.86;
-  if(p.left)p.vx-=ACC*DT; if(p.right)p.vx+=ACC*DT; p.vx=Math.max(-MAXV,Math.min(MAXV,p.vx));
-  p.vy+=G*DT; p.x+=p.vx*DT; p.y+=p.vy*DT;
-  if(p.y+p.r>FLOOR){p.y=FLOOR-p.r;p.vy=0;p.onGround=true;p.vx*=FRI;}
-  p.x=Math.max(p.r+GOAL_W+5,Math.min(canvas.width-p.r-GOAL_W-5,p.x));
-}
-function collide(b,cx,cy,cr){
-  const dx=b.x-cx,dy=b.y-cy,dist=Math.hypot(dx,dy),min=b.r+cr;
-  if(dist<min){
-    const nx=dx/(dist||1e-6), ny=dy/(dist||1e-6), ov=min-dist;
-    b.x+=nx*ov; b.y+=ny*ov;
-    const v=b.vx*nx+b.vy*ny; b.vx-=1.9*v*nx; b.vy-=1.9*v*ny; b.vx+=nx*60; b.vy+=ny*60;
-  }
-}
-function rb(rx,ry,rw,rh){
-  if(BALL.y>ry&&BALL.y<ry+rh){
-    if(BALL.x-BALL.r<rx&&BALL.vx<0){BALL.x=rx+BALL.r;BALL.vx*=-0.8;}
-    if(BALL.x+BALL.r>rx+rw&&BALL.vx>0){BALL.x=rx+rw-BALL.r;BALL.vx*=-0.8;}
-  }
-  if(BALL.x>rx&&BALL.x<rx+rw){
-    if(BALL.y-BALL.r<ry&&BALL.vy<0){BALL.y=ry+BALL.r;BALL.vy*=-0.8;}
-  }
-}
+/* ==============================
+   ENGINE & MATCH
+================================*/
+const canvas = document.getElementById("pitch");
+const g = canvas.getContext("2d");
+const W = canvas.width, H = canvas.height;
 
-/* ---------- Ball-Step (mit robuster Torlogik) ---------- */
-function stepB(){
-  // Integration
-  BALL.vy += G*DT;
-  BALL.x  += BALL.vx*DT;
-  BALL.y  += BALL.vy*DT;
+const GOAL_H = 150, GOAL_W = 10;
+const MID = {x:W/2, y:H/2};
+const FRIC = 0.98;
+const PLAYER_ACC = 900;
+const PLAYER_MAX = 150;
+const DT_FIX = 1/60;
 
-  // Boden & Außenwände
-  if (BALL.y + BALL.r > FLOOR) { BALL.y = FLOOR - BALL.r; BALL.vy *= -0.6; BALL.vx *= 0.99; }
-  if (BALL.x - BALL.r < 0) { BALL.x = BALL.r; BALL.vx *= -0.8; }
-  if (BALL.x + BALL.r > canvas.width) { BALL.x = canvas.width - BALL.r; BALL.vx *= -0.8; }
-
-  // Pfosten/Latte
-  const top = FLOOR - GOAL_H;
-  rb(0, top, GOAL_W, GOAL_H);
-  rb(canvas.width - GOAL_W, top, GOAL_W, GOAL_H);
-
-  // Köpfe
-  collide(BALL, P1.x, P1.y, P1.r);
-  collide(BALL, P2.x, P2.y, P2.r);
-
-  // Lock nach Tor
-  if (goalLock > 0) goalLock -= DT;
-
-  // Tor-Erkennung (Entprellt & nicht an Außenwand)
-  const inBand = (BALL.y + BALL.r > top + 10) && (BALL.y - BALL.r < FLOOR);
-  const inner = 2, outer = 2;
-
-  const insideLeft =
-    inBand &&
-    (BALL.x + BALL.r <= GOAL_W - inner) &&
-    (BALL.x - BALL.r >= 0 + outer) &&
-    (BALL.vx < 0);
-
-  const insideRight =
-    inBand &&
-    (BALL.x - BALL.r >= canvas.width - GOAL_W + inner) &&
-    (BALL.x + BALL.r <= canvas.width - outer) &&
-    (BALL.vx > 0);
-
-  if (goalLock <= 0) {
-    if (insideLeft)  goalCounterR++; else goalCounterR = 0;
-    if (insideRight) goalCounterL++; else goalCounterL = 0;
-
-    if (goalCounterR > 6) { goal("R"); goalLock = 1.0; goalCounterL = goalCounterR = 0; return; }
-    if (goalCounterL > 6) { goal("L"); goalLock = 1.0; goalCounterL = goalCounterR = 0; return; }
-  }
-}
-
-/* ---------- Tor, Zeichnen, Loop ---------- */
-function goal(side){
-  if(side==="L")SCORE.L++; else if(side==="R")SCORE.R++;
-  BALL.x=canvas.width/2; BALL.y=180; BALL.vx=(Math.random()<.5?220:-220); BALL.vy=-200;
-  P1.x=200; P2.x=canvas.width-200; P1.vx=P1.vy=0; P2.vx=P2.vy=0; P1.onGround=P2.onGround=true;
-  goalCounterL=goalCounterR=0;
-
-  if(SCORE.L>=SCORE.toWin || SCORE.R>=SCORE.toWin){
-    msg.textContent=`Spielende – ${SCORE.L>SCORE.R?"Links":"Rechts"} gewinnt! R = Neustart`;
-    state="pause"; last=null; acc=0;
-  }else{
-    msg.textContent=`Tor! L ${SCORE.L} : R ${SCORE.R}`;
-  }
-}
-
-function drawBG(){
-  const base=FLOOR,w=canvas.width,h=canvas.height,g=ctx;
-  g.fillStyle="#0a1529";g.beginPath();g.moveTo(0,base-20);
-  const t=[[40,110],[100,70],[150,95],[210,60],[260,130],[320,85],[380,140],[450,75],[520,115],[580,65],[640,125],[700,90],[760,135],[820,70],[900,120]];
-  let x=0;t.forEach(([w2,h2])=>{g.lineTo(x,base-20);g.lineTo(x,base-20-h2);g.lineTo(x+w2,base-20-h2);g.lineTo(x+w2,base-20);x+=w2+10;});
-  g.lineTo(w,base-20);g.lineTo(w,h);g.lineTo(0,h);g.closePath();g.fill();
-  g.fillStyle="#1d3b2f";g.fillRect(0,FLOOR,w,h-FLOOR);g.fillStyle="#27523f";g.fillRect(0,FLOOR-4,w,4);
-  g.strokeStyle="rgba(255,255,255,0.2)";g.setLineDash([8,8]);g.beginPath();g.moveTo(w/2,FLOOR);g.lineTo(w/2,h);g.stroke();g.setLineDash([]);
-  g.fillStyle="#d7e6ff";g.fillRect(0,FLOOR-GOAL_H,GOAL_W,4);g.fillRect(w-GOAL_W,FLOOR-GOAL_H,GOAL_W,4);
-  g.fillRect(0,FLOOR-GOAL_H,4,GOAL_H);g.fillRect(GOAL_W-4,FLOOR-GOAL_H,4,GOAL_H);g.fillRect(w-GOAL_W,FLOOR-GOAL_H,4,GOAL_H);g.fillRect(w-4,FLOOR-GOAL_H,4,GOAL_H);
-}
-function drawP(p){findChar(p.id).draw(ctx,p.x,p.y,p.r);}
-function drawBall(){ctx.fillStyle="#e8e8e8";ctx.beginPath();ctx.arc(BALL.x,BALL.y,BALL.r,0,TAU);ctx.fill();
- ctx.strokeStyle="#bbb";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(BALL.x-BALL.r,BALL.y);ctx.lineTo(BALL.x+BALL.r,BALL.y);ctx.stroke();
- ctx.beginPath();ctx.arc(BALL.x,BALL.y,BALL.r*0.6,0,TAU);ctx.stroke();}
-function drawScore(){ctx.fillStyle="#fff";ctx.font="bold 28px system-ui,sans-serif";ctx.textAlign="center";ctx.fillText(`${SCORE.L} : ${SCORE.R}`,canvas.width/2,40);}
-
+let TEAM_L=null, TEAM_R=null;
+let BALL=null, STATE="setup";
+let speed = 1.0;
 let last=null, acc=0;
-function renderFrame(){ctx.clearRect(0,0,canvas.width,canvas.height); drawBG(); drawP(P1); drawP(P2); drawBall(); drawScore();}
-function loop(t){
-  if(last===null) last=t;
-  const dt=Math.min(0.05,(t-last)/1000); last=t;
-  if(state!=="play"){ acc=0; renderFrame(); return requestAnimationFrame(loop); }
-  acc+=dt; while(acc>=DT){ input(); stepP(P1); stepP(P2); stepB(); acc-=DT; }
-  renderFrame(); requestAnimationFrame(loop);
+let simMinute = 0;                 // 0..90
+const MINUTES_PER_REAL_SEC_AT_1X = 12; // 90 Min ~ 7.5 echte Min bei 1x
+
+const elTeamL = document.getElementById("teamL");
+const elTeamR = document.getElementById("teamR");
+const elFormL = document.getElementById("formL");
+const elFormR = document.getElementById("formR");
+const elScore = document.getElementById("score");
+const elMinute= document.getElementById("minute");
+const elState = document.getElementById("statePill");
+const elLog   = document.getElementById("log");
+const elSpeed = document.getElementById("speed");
+const elSpdLbl= document.getElementById("spdLbl");
+
+function fillTeamSelects(){
+  for(const p of TEAMS_PRESETS){
+    const o1=document.createElement("option"); o1.value=p.name; o1.textContent=p.name; elTeamL.appendChild(o1);
+    const o2=document.createElement("option"); o2.value=p.name; o2.textContent=p.name; elTeamR.appendChild(o2.cloneNode(true));
+  }
+  elTeamL.value = TEAMS_PRESETS[0].name;
+  elTeamR.value = TEAMS_PRESETS[1].name;
+}
+fillTeamSelects();
+
+function presetByName(n){ return TEAMS_PRESETS.find(t=>t.name===n) || TEAMS_PRESETS[0]; }
+
+function kickoff(side="L"){
+  // Ball in Mitte, leichter Impuls
+  BALL = { x:MID.x, y:MID.y, vx:(side==="L"?80:-80), vy:rnd(-30,30), r:6, owner:null };
+  TEAM_L.players.forEach(p=>p.hasBall=false);
+  TEAM_R.players.forEach(p=>p.hasBall=false);
 }
 
-/* ---------- Start-Buttons ---------- */
-document.getElementById("startPvAI").addEventListener("click",()=>{mode="PvAI";reset();menu.style.display="none";state="play";canvas.focus();});
-document.getElementById("startPvP").addEventListener("click",()=>{mode="PvP"; reset();menu.style.display="none";state="play";canvas.focus();});
-
-/* ---------- Los ---------- */
-reset(); requestAnimationFrame(loop);
-</script>
-</body>
-</html>
+function startMatch(){
+  TEAM_L = mkTeam(presetByName(elTe_
