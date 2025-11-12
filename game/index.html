@@ -153,7 +153,7 @@ const MATCHES=[
   Match("UEFA Europa League","Leverkusen","Liverpool","21:00",{H:2.60,D:3.60,A:2.55}),
   Match("UEFA Europa League","Roma","AC Milan","21:00",{H:2.70,D:3.10,A:2.65}),
 ];
-const RESULTS={}; // per Match: {status,scoreH,scoreA,htH,htA,scH[],scA[]}
+const RESULTS={}; // je Match: {status,scoreH,scoreA,htH,htA,scH[],scA[]}
 
 const $=q=>document.querySelector(q); const $$=q=>document.querySelectorAll(q);
 const fmt=n=>Number(n).toFixed(2);
@@ -262,8 +262,11 @@ speedEl.oninput=()=>{spdLbl.textContent=parseFloat(speedEl.value).toFixed(2)+"×
 
 let cur=null, HOME=null, AWAY=null, BALL=null;
 let STATE="idle", prevAfterPause="first", simMinute=0, halfCD=0;
-const FIX_DT=1/60, MIN_PER_SEC=1.0; // 90 Spielminuten ≙ ~90 Sekunden
-let rafLast=null, acc=0, rafId=0, nudgeTimer=0, stuckTimer=0;
+const FIX_DT=1/60, MIN_PER_SEC=1.0; // 90 Spielminuten ≙ ~90 Sekunden total
+let rafLast=null, acc=0, rafId=0, nudgeTimer=0, stuckTimer=0, cornerL=0, cornerR=0;
+
+// wie viele Spieler jagen aktiv? (dein Wunsch: „nur die nächsten Spieler“ → 2)
+const CHASERS = 2;
 
 function tryStart(mid){
   const m=MATCHES.find(x=>x.id===mid);
@@ -276,8 +279,8 @@ function start(m){
   HOME=newTeam(m.home,"L"); AWAY=newTeam(m.away,"R"); place(HOME); place(AWAY);
   kickoff(Math.random()<0.5?"L":"R");
 
-  // Engine sauber resetten
-  STATE="first"; simMinute=0; halfCD=0; nudgeTimer=0; stuckTimer=0;
+  // Engine resetten
+  STATE="first"; simMinute=0; halfCD=0; nudgeTimer=0; stuckTimer=0; cornerL=cornerR=0;
   rafLast=null; acc=0;
 
   hudTeams.textContent=`${m.home} – ${m.away}`; hudState.textContent="1. Halbzeit";
@@ -336,21 +339,30 @@ function showSummary(mid,headline){
     <div class="pill" style="display:inline-block;margin-top:6px">Schützen ${m.away}: ${list(R.scA)}</div>`);
 }
 
-/* ===== Teams & KI (mind. 3 Jäger, kein Ball-Kleben) ===== */
-function newTeam(name,side){const c=color(name);const p=[];for(let i=0;i<11;i++)p.push({name:i===0?"GK":"P"+i,spd:70+Math.random()*30,pas:70+Math.random()*30,sht:70+Math.random()*30,x:0,y:0,vx:0,vy:0,r:10,homeX:0,homeY:0});return {name,side,players:p,score:0,scorers:[],c};}
-function color(n){const m={"Real Madrid":"#ffffff","Manchester City":"#6cb6ff","Bayern München":"#c80a0a","Paris SG":"#1f3b6d","Barcelona":"#aa1e3f","Inter":"#1e2a78","Borussia Dortmund":"#f6d000","Atlético Madrid":"#b30d2f","RB Leipzig":"#d20f2a","Arsenal":"#d21e2e","Porto":"#1b3a8a","Juventus":"#e6e6e6","Leverkusen":"#e11d48","Liverpool":"#c8102e","Roma":"#8a1c1c","AC Milan":"#222"};return m[n]||"#60a5fa";}
+/* ===== Teams & KI (nur nächste Spieler jagen) ===== */
+function newTeam(name,side){
+  const c=color(name, side);
+  const p=[]; for(let i=0;i<11;i++) p.push({name:i===0?"GK":"P"+i,spd:70+Math.random()*30,pas:70+Math.random()*30,sht:70+Math.random()*30,x:0,y:0,vx:0,vy:0,r:10,homeX:0,homeY:0});
+  return {name,side,players:p,score:0,scorers:[],c};
+}
+// Farben: definierte Palette; Fallback garantiert: links blau, rechts rot → immer unterschiedlich
+function color(n,side){
+  const map={"Real Madrid":"#ffffff","Manchester City":"#6cb6ff","Bayern München":"#c80a0a","Paris SG":"#1f3b6d","Barcelona":"#aa1e3f","Inter":"#1e2a78","Borussia Dortmund":"#f6d000","Atlético Madrid":"#b30d2f","RB Leipzig":"#d20f2a","Arsenal":"#d21e2e","Porto":"#1b3a8a","Juventus":"#e6e6e6","Leverkusen":"#e11d48","Liverpool":"#c8102e","Roma":"#8a1c1c","AC Milan":"#222"};
+  const fallback = side==="L" ? "#3b82f6" : "#ef4444";
+  return map[n] || fallback;
+}
 const F433=[[0.05,0.50],[0.20,0.20],[0.20,0.38],[0.20,0.62],[0.20,0.80],[0.45,0.30],[0.45,0.50],[0.45,0.70],[0.72,0.25],[0.72,0.50],[0.72,0.75]];
 function place(T){const f=T.side==="L"?F433:F433.map(([x,y])=>[1-x,y]);for(let i=0;i<T.players.length;i++){const[nx,ny]=f[i];const px=40+nx*(W-80),py=30+ny*(H-60);Object.assign(T.players[i],{x:px,y:py,vx:0,vy:0,homeX:px,homeY:py});}}
 function kickoff(side){
   BALL={x:MID.x,y:MID.y,vx:(side==="L"?130:-130),vy:(Math.random()*2-1)*45,r:6,own:null};
 }
 function aiChase(T,Opp,dt){
-  const chasers=[...T.players].sort((a,b)=>dist(a,BALL)-dist(b,BALL)).slice(0,3);
+  const chasers=[...T.players].sort((a,b)=>dist(a,BALL)-dist(b,BALL)).slice(0,CHASERS);
   const carrier = getCarrier(T);
   for(const p of T.players){
     if(carrier===p){
       const goalX=T.side==="L"?W-20:20, dir=norm(goalX-p.x,(H/2)-p.y);
-      // Ball nie „kleben“ lassen -> nur kurz führen
+      // Ball nur kurz führen, nie kleben
       BALL.x=p.x+dir.x*12; BALL.y=p.y+dir.y*12; BALL.vx=dir.x*190; BALL.vy=dir.y*190;
       if(!p._carry) p._carry=0; p._carry+=dt; if(p._carry>0.7){ BALL.own=null; p._carry=0; }
       // Abschluss/Pass
@@ -379,7 +391,7 @@ function moveTo(p,tx,ty,dt,boost){
   p.x=Math.max(20,Math.min(W-20,p.x)); p.y=Math.max(20,Math.min(H-20,p.y));
 }
 
-/* ===== Physik – Billiard + Anti-Stuck ===== */
+/* ===== Physik – Billiard + Anti-Stuck + Corner-Kick-Out ===== */
 function physics(dt){
   const all=[...HOME.players,...AWAY.players];
   // Spieler ↔ Spieler Separation
@@ -394,7 +406,7 @@ function physics(dt){
   if(BALL.x<4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("H");} else {BALL.x=4;BALL.vx*=-0.92;BALL.own=null;} }
   if(BALL.x>W-4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("A");} else {BALL.x=W-4;BALL.vx*=-0.92;BALL.own=null;} }
 
-  // Ball ↔ Spieler: reiner Impuls + Mindesttempo
+  // Ball ↔ Spieler: Impuls + Mindesttempo
   for(const p of all){
     const dx=BALL.x-p.x, dy=BALL.y-p.y, d=Math.hypot(dx,dy)||1, min=BALL.r+p.r;
     if(d<min){
@@ -408,12 +420,19 @@ function physics(dt){
     }
   }
 
-  // Anti-Sandwich + Nudge
+  // Anti-Sandwich + Nudge (gegen „stehen bleiben“)
   const near=all.filter(p=>dist(p,BALL)<(p.r+BALL.r+7));
   const sp=Math.hypot(BALL.vx,BALL.vy);
   if(near.length>=2 && sp<28){ stuckTimer+=dt; } else { stuckTimer=0; }
   if(stuckTimer>0.25){ let nx=0,ny=0; near.forEach(p=>{nx+=BALL.x-p.x;ny+=BALL.y-p.y;}); const n=norm(nx,ny); BALL.vx=n.x*300; BALL.vy=n.y*300; stuckTimer=0; }
   nudgeTimer+=dt; if(sp<16 && nudgeTimer>0.8){ const n=norm(Math.random()-0.5,Math.random()-0.5); BALL.vx+=n.x*220; BALL.vy+=n.y*220; nudgeTimer=0; }
+
+  // Corner-Kick-Out: Ball darf NIE in der Ecke stecken bleiben
+  const nearTop=BALL.y<30, nearBot=BALL.y>H-30;
+  if(BALL.x<12 && (nearTop||nearBot)){ cornerL+=dt; } else cornerL=0;
+  if(BALL.x>W-12 && (nearTop||nearBot)){ cornerR+=dt; } else cornerR=0;
+  if(cornerL>0.15){ const v=norm(MID.x-BALL.x,MID.y-BALL.y); BALL.vx=v.x*360; BALL.vy=v.y*360; cornerL=0; }
+  if(cornerR>0.15){ const v=norm(MID.x-BALL.x,MID.y-BALL.y); BALL.vx=v.x*360; BALL.vy=v.y*360; cornerR=0; }
 }
 function separate(a,b){
   const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy)||1, min=a.r+b.r+2;
@@ -423,7 +442,7 @@ function goal(side){
   const m=Math.round(simMinute);
   if(side==="H"){ HOME.score++; HOME.scorers.push({n:"P"+(1+Math.floor(Math.random()*10)),m}); ticker.textContent+=`${mStr(simMinute)} TOR ${HOME.name}!\n`; }
   else { AWAY.score++; AWAY.scorers.push({n:"P"+(1+Math.floor(Math.random()*10)),m}); ticker.textContent+=`${mStr(simMinute)} TOR ${AWAY.name}!\n`; }
-  place(HOME); place(AWAY); kickoff(side==="H"?"A":"H"); // sofortiger Wiederanstoß
+  place(HOME); place(AWAY); kickoff(side==="H"?"A":"H"); // sofort weiter
 }
 
 /* ===== Zeichnen & Loop ===== */
