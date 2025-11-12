@@ -219,4 +219,340 @@ function kickoff(side="L"){
 }
 
 function startMatch(){
-  TEAM_L = mkTeam(presetByName(elTe_
+  TEAM_L = mkTeam(presetByName(elTeamL.value), "L", elFormL.value);
+  TEAM_R = mkTeam(presetByName(elTeamR.value), "R", elFormR.value);
+  placeTeam(TEAM_L, W,H);
+  placeTeam(TEAM_R, W,H);
+  TEAM_L.score = TEAM_R.score = 0;
+  simMinute = 0;
+  kickoff(Math.random()<0.5?"L":"R");
+  STATE="play"; last=null; acc=0;
+  elState.textContent = "1. Halbzeit";
+  logEvt("Anpfiff! "+TEAM_L.name+" vs. "+TEAM_R.name);
+}
+
+function resetAll(){
+  STATE="setup";
+  elState.textContent="Vorbereitung";
+  elScore.textContent="0 : 0";
+  elMinute.textContent="00:00";
+  elLog.textContent="";
+  TEAM_L=TEAM_R=BALL=null;
+}
+
+function pauseToggle(){
+  if(STATE==="play"){ STATE="pause"; elState.textContent="Pause"; }
+  else if(STATE==="pause"){ STATE="play"; elState.textContent=simMinute<45?"1. Halbzeit":"2. Halbzeit"; }
+}
+
+/* ==============================
+   AI & PHYSICS
+================================*/
+function teamAll(){ return [...TEAM_L.players, ...TEAM_R.players]; }
+function dist(a,b){ const dx=a.x-b.x, dy=a.y-b.y; return Math.hypot(dx,dy); }
+function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+
+function nearestPlayerToBall(team){
+  let best=null, bd=1e9;
+  for(const p of team.players){
+    const d = Math.hypot(p.x-BALL.x, p.y-BALL.y);
+    if(d<bd){ bd=d; best=p; }
+  }
+  return best;
+}
+
+function opponentTeam(team){ return team===TEAM_L?TEAM_R:TEAM_L; }
+function goalX(team){ return team.side==="L" ? W-GOAL_W-4 : GOAL_W+4; } // schießen Richtung Gegner
+
+function aiStep(dt){
+  const teams=[TEAM_L,TEAM_R];
+  for(const T of teams){
+    const opp = opponentTeam(T);
+    const carrier = nearestPlayerToBall(T);
+    // Jeder Spieler hat Ziel:
+    for(let i=0;i<T.players.length;i++){
+      const p = T.players[i];
+      let tx=p.homeX, ty=p.homeY;
+
+      // leichte Verschiebung mit Ball-x
+      const shift = clamp((BALL.x - MID.x)/(W*0.5), -0.8, 0.8);
+      const dir = (T.side==="L"?1:-1);
+      tx += dir * shift * 60;
+
+      if(p===carrier){
+        // Zum Ball sprinten / dribbeln
+        if(dist(p,BALL)<14){
+          // Ballkontrolle: dribbeln Richtung Tor, ab und zu Pass/Schuss
+          p.hasBall=true; BALL.owner=p;
+          const gx = goalX(T);
+          const toGoal = normVec(gx - p.x, (H/2) - p.y);
+          // Entscheidung
+          const closeToGoal = Math.abs(p.x-gx)<160;
+          const pressure = nearestOpponentDist(p, opp);
+          if(closeToGoal && Math.random()<0.02){
+            shoot(p, toGoal, 240 + p.sht*0.8);
+          }else if(pressure<70 && Math.random()<0.04){
+            const mate = pickPassTarget(p, T);
+            if(mate) passBall(p, mate);
+          }else{
+            // Dribble
+            p.vx += toGoal.x * PLAYER_ACC * dt * 0.9;
+            p.vy += toGoal.y * PLAYER_ACC * dt * 0.9;
+          }
+          // Ball „klebt“ leicht vorne am Fuß
+          BALL.x = p.x + toGoal.x*12;
+          BALL.y = p.y + toGoal.y*12;
+          BALL.vx *= 0.92; BALL.vy*=0.92;
+        }else{
+          p.hasBall=false;
+          moveToward(p, BALL.x, BALL.y, dt, 1.15); // Sprintfaktor
+        }
+      }else{
+        p.hasBall=false;
+        moveToward(p, tx, ty, dt, 0.7); // in Formation halten
+      }
+    }
+  }
+}
+
+function nearestOpponentDist(p, oppTeam){
+  let bd=1e9; for(const o of oppTeam.players){ const d=Math.hypot(o.x-p.x,o.y-p.y); if(d<bd) bd=d; } return bd;
+}
+
+function pickPassTarget(p, team){
+  // einfacher Heuristik: freie Mitspieler Richtung Tor
+  const gx = goalX(team);
+  const forward = team.side==="L" ? 1 : -1;
+  const cands = team.players.filter(m=>m!==p && (forward*(m.x - p.x) > 0));
+  if(!cands.length) return null;
+  cands.sort((a,b)=> (Math.abs(b.y-p.y)<Math.abs(a.y-p.y)?1:-1));
+  return cands[0];
+}
+
+function passBall(from, to){
+  const dir = normVec(to.x - from.x, to.y - from.y);
+  const power = 180 + from.pas*0.6;
+  BALL.vx = dir.x * power;
+  BALL.vy = dir.y * power;
+  BALL.owner=null;
+  from.hasBall=false;
+  logEvt(minuteStr()+" Pass von "+from.name+" → "+to.name);
+}
+
+function shoot(p, dir, power){
+  BALL.vx = dir.x * power;
+  BALL.vy = dir.y * power;
+  BALL.owner=null;
+  p.hasBall=false;
+  logEvt(minuteStr()+" Schuss von "+p.name+"!");
+}
+
+function moveToward(p, tx, ty, dt, factor=1){
+  const dx=tx-p.x, dy=ty-p.y;
+  const a = PLAYER_ACC*factor*dt;
+  // Beschleunigen Richtung Ziel
+  const len=Math.hypot(dx,dy)||1;
+  p.vx += (dx/len)*a;
+  p.vy += (dy/len)*a;
+  // Clamp
+  const vlen=Math.hypot(p.vx,p.vy);
+  const vmax=PLAYER_MAX*(0.7+ p.spd/200);
+  if(vlen>vmax){ p.vx=p.vx/vlen*vmax; p.vy=p.vy/vlen*vmax; }
+  // Integrate
+  p.x += p.vx*dt; p.y += p.vy*dt;
+  p.vx *= 0.9; p.vy *= 0.9;
+  // Spielfeldgrenzen
+  p.x = clamp(p.x, 20, W-20); p.y = clamp(p.y, 20, H-20);
+}
+
+function normVec(x,y){ const l=Math.hypot(x,y)||1; return {x:x/l, y:y/l}; }
+
+/* Ball-Physik & Tore */
+function stepBall(dt){
+  if(BALL.owner){ return; } // wird am Fuß geführt
+  BALL.vx *= FRIC; BALL.vy *= FRIC;
+  BALL.x += BALL.vx*dt; BALL.y += BALL.vy*dt;
+
+  // Banden
+  if(BALL.y < 10){ BALL.y=10; BALL.vy*=-0.85; }
+  if(BALL.y > H-10){ BALL.y=H-10; BALL.vy*=-0.85; }
+  if(BALL.x < 4){ // linke Tor-/Außenlinie
+    // Tor für rechts?
+    if(Math.abs(BALL.y - H/2) < GOAL_H/2){
+      goal("R");
+    }else{ BALL.x=4; BALL.vx*=-0.9; }
+  }
+  if(BALL.x > W-4){
+    if(Math.abs(BALL.y - H/2) < GOAL_H/2){
+      goal("L");
+    }else{ BALL.x=W-4; BALL.vx*=-0.9; }
+  }
+
+  // Spieler-Kontakt (einfach)
+  for(const p of teamAll()){
+    const d = Math.hypot(BALL.x-p.x, BALL.y-p.y);
+    if(d < p.r+6){
+      // leichter Abpraller Richtung Spielerbewegung
+      const dir = normVec(BALL.x-p.x, BALL.y-p.y);
+      BALL.x = p.x + dir.x*(p.r+6);
+      BALL.y = p.y + dir.y*(p.r+6);
+      BALL.vx += dir.x*40 + p.vx*0.5;
+      BALL.vy += dir.y*40 + p.vy*0.5;
+    }
+  }
+}
+
+function goal(side){ // side = "L" bekommt Tor
+  if(side==="L"){ TEAM_L.score++; }
+  else{ TEAM_R.score++; }
+  elScore.textContent = TEAM_L.score+" : "+TEAM_R.score;
+  logEvt(minuteStr()+" TOR für "+(side==="L"?TEAM_L.name:TEAM_R.name)+"!");
+
+  // Neuaufstellung & Anstoß Gegner
+  placeTeam(TEAM_L, W,H); placeTeam(TEAM_R, W,H);
+  kickoff(side==="L"?"R":"L");
+}
+
+/* ==============================
+   RENDERING
+================================*/
+function drawPitch(){
+  // Rasen
+  const grd = g.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,"#0b1b12"); grd.addColorStop(1,"#123a22");
+  g.fillStyle=grd; g.fillRect(0,0,W,H);
+
+  // Mittelkreis & Linien
+  g.strokeStyle="rgba(255,255,255,.65)"; g.lineWidth=2;
+  g.strokeRect(20,20,W-40,H-40);
+  g.beginPath(); g.moveTo(MID.x,20); g.lineTo(MID.x,H-20); g.stroke();
+  g.beginPath(); g.arc(MID.x,MID.y,60,0,Math.PI*2); g.stroke();
+
+  // Strafräume
+  drawBox(20, H/2-80, 70, 160); // links 16er
+  drawBox(W-90, H/2-80, 70, 160); // rechts 16er
+
+  // Tore
+  g.fillStyle="#d7e6ff";
+  g.fillRect(0, H/2-GOAL_H/2, GOAL_W, 4);
+  g.fillRect(0, H/2+GOAL_H/2-4, GOAL_W, 4);
+  g.fillRect(W-GOAL_W, H/2-GOAL_H/2, GOAL_W, 4);
+  g.fillRect(W-GOAL_W, H/2+GOAL_H/2-4, GOAL_W, 4);
+}
+
+function drawBox(x,y,w,h){ g.strokeStyle="rgba(255,255,255,.5)"; g.strokeRect(x,y,w,h); }
+
+function drawTeams(){
+  drawTeam(TEAM_L); drawTeam(TEAM_R);
+}
+
+function drawTeam(T){
+  for(const p of T.players){
+    g.fillStyle=T.color; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill();
+    g.fillStyle="rgba(0,0,0,.5)"; g.font="10px system-ui"; g.textAlign="center";
+    g.fillText(p.name, p.x, p.y-14);
+    if(p.hasBall){
+      g.strokeStyle="#fff"; g.lineWidth=2; g.beginPath(); g.arc(p.x,p.y,p.r+3,0,Math.PI*2); g.stroke();
+    }
+  }
+}
+
+function drawBall(){
+  g.fillStyle="#eeeeee"; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r,0,Math.PI*2); g.fill();
+  g.strokeStyle="#bbbbbb"; g.lineWidth=2; g.beginPath(); g.arc(BALL.x,BALL.y,BALL.r*0.6,0,Math.PI*2); g.stroke();
+}
+
+/* ==============================
+   CLOCK & LOOP
+================================*/
+function minuteStr(){
+  const m = Math.floor(simMinute);
+  const s = Math.floor((simMinute - m)*60);
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function logEvt(t){
+  elLog.textContent += (t+"\n");
+  elLog.scrollTop = elLog.scrollHeight;
+}
+
+function step(dt){
+  if(STATE!=="play"){ return; }
+
+  // Uhr
+  simMinute += dt * MINUTES_PER_REAL_SEC_AT_1X * speed;
+  if(simMinute>=45 && elState.textContent==="1. Halbzeit"){
+    elState.textContent="Halbzeit";
+    logEvt("Halbzeit. Spielstand: "+TEAM_L.score+" : "+TEAM_R.score);
+    STATE="pause"; return;
+  }
+  if(elState.textContent==="Halbzeit" && STATE==="play" && simMinute<45){
+    elState.textContent="2. Halbzeit";
+  }
+  if(simMinute>=90){
+    STATE="pause";
+    elState.textContent="Ende";
+    logEvt("Abpfiff. Ergebnis: "+TEAM_L.name+" "+TEAM_L.score+" : "+TEAM_R.score+" "+TEAM_R.name);
+  }
+  elMinute.textContent = minuteStr();
+
+  // KI & Physik
+  aiStep(dt);
+  stepBall(dt);
+}
+
+function render(){
+  g.clearRect(0,0,W,H);
+  drawPitch();
+  if(TEAM_L&&TEAM_R&&BALL){
+    drawTeams();
+    drawBall();
+  }
+}
+
+function loop(t){
+  if(last===null) last=t;
+  const dt = Math.min(0.05,(t-last)/1000); last=t;
+  acc += dt;
+  while(acc>=DT_FIX){ step(DT_FIX); acc-=DT_FIX; }
+  render();
+  requestAnimationFrame(loop);
+}
+
+/* ==============================
+   UI HOOKS
+================================*/
+document.getElementById("start").addEventListener("click", startMatch);
+document.getElementById("randomize").addEventListener("click", ()=>{
+  // neue Namen / Skills per Preset neu laden (hier reicht „Neu starten“)
+  startMatch();
+});
+document.getElementById("pauseBtn").addEventListener("click", ()=>{
+  pauseToggle();
+});
+document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+document.addEventListener("keydown", (e)=>{
+  const k=(e.code||e.key||"").toLowerCase();
+  if(k==="keyp"||k==="p"){ pauseToggle(); }
+  if(k==="keyr"||k==="r"){ resetAll(); }
+});
+
+elSpeed.addEventListener("input", ()=>{
+  speed = parseFloat(elSpeed.value);
+  document.getElementById("spdLbl").textContent = speed.toFixed(1)+"×";
+});
+
+/* ==============================
+   HELPERS
+================================*/
+function rnd(a,b){ return Math.random()*(b-a)+a; }
+
+/* ==============================
+   BOOT
+================================*/
+resetAll();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
