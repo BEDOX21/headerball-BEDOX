@@ -8,120 +8,250 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
     }
 
     body {
-      background: radial-gradient(circle at top, #5b3b0f, #100805);
-      color: #f8f0c8;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      background:
+        radial-gradient(circle at top, #7b411a 0%, #12060a 40%, #050308 100%);
+      color: #fbecc7;
+      overflow: hidden;
     }
 
     .game-wrapper {
-      width: 900px;
+      width: 960px;
       max-width: 100%;
-      background: #1a1010;
-      border-radius: 16px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.7);
-      padding: 16px 24px 24px;
+      padding: 18px 28px 26px;
+      background: radial-gradient(circle at top, #241216, #050308);
+      border-radius: 20px;
+      border: 4px solid #d6af3b;
+      box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.9),
+        0 0 25px rgba(255, 215, 128, 0.35) inset;
       position: relative;
-      border: 3px solid #d4af37;
+      overflow: hidden;
+    }
+
+    /* --- Intro Overlay (Start) --- */
+
+    .intro-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(0,0,0,0.95), rgba(0,0,0,0.98));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 60;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .intro-title {
+      font-size: 40px;
+      margin-bottom: 10px;
+      letter-spacing: 3px;
+      color: #ffe37a;
+      text-shadow:
+        0 0 15px rgba(0,0,0,0.9),
+        0 0 25px rgba(255, 215, 128, 0.9);
+    }
+
+    .intro-sub {
+      font-size: 15px;
+      color: #f3d9a0;
+      max-width: 520px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .intro-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 10%, #ffffff 0, #f5d473 18%, #d8923c 40%, #5e2914 75%);
+      border: 4px solid #f7e29b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 54px;
+      margin-bottom: 18px;
+      box-shadow:
+        0 0 18px rgba(0,0,0,0.8),
+        0 0 35px rgba(255, 228, 162, 0.7);
+    }
+
+    .btn-big {
+      padding: 10px 26px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 700;
+      color: #3b240b;
+      background: linear-gradient(135deg, #ffe68a, #d9a634);
+      box-shadow:
+        0 3px 0 #8f6c1d,
+        0 0 22px rgba(255, 215, 128, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    .btn-big:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .btn-big:active {
+      transform: translateY(1px);
+      box-shadow:
+        0 1px 0 #6d5216,
+        0 0 9px rgba(255, 215, 128, 0.4);
+    }
+
+    /* --- Header --- */
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .logo-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sheikh-badge {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 3px solid #f6e688;
+      background: radial-gradient(circle at 30% 5%, #fff 0, #f7d777 18%, #d88c3b 38%, #5b2613 78%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      box-shadow:
+        0 0 12px rgba(0,0,0,0.8),
+        0 0 18px rgba(255, 215, 128, 0.7);
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 6px;
-      font-size: 32px;
+      font-size: 30px;
       letter-spacing: 2px;
-      text-shadow: 0 0 8px rgba(0,0,0,0.7);
-      color: #ffd86b;
+      color: #ffe37a;
+      text-shadow:
+        0 0 10px rgba(0,0,0,0.9),
+        0 0 18px rgba(255, 186, 73, 0.9);
     }
 
     .subtitle {
-      text-align: center;
       font-size: 13px;
-      color: #f5deb3;
-      margin-bottom: 10px;
+      color: #f0dab0;
+      opacity: 0.9;
     }
 
-    .sheikh-banner {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 12px;
-      padding: 8px;
-      background: linear-gradient(90deg, #5d381c, #8a5a23, #5d381c);
+    .panel-small {
+      padding: 6px 10px;
       border-radius: 12px;
-      border: 2px solid #e7c76c;
-    }
-
-    .sheikh-portrait {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      border: 3px solid #f9e28a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      background: #2b1510;
-      margin-right: 14px;
-    }
-
-    .sheikh-text {
-      font-size: 14px;
+      border: 1px solid #c7973a;
+      background: linear-gradient(135deg, #2a1710, #3d2011);
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
+      font-size: 12px;
+      text-align: right;
       line-height: 1.4;
     }
 
-    .slot-container {
+    /* --- Slot Area --- */
+
+    .slot-area {
       margin-top: 10px;
-      background: radial-gradient(circle at top, #3d250f, #140a06);
-      border-radius: 14px;
-      border: 3px solid #c79b3b;
-      padding: 14px;
+      background:
+        radial-gradient(circle at top, #4a2715 0, #1a0907 40%, #070208 100%);
+      border-radius: 18px;
+      border: 3px solid #cfa43c;
+      box-shadow:
+        0 12px 24px rgba(0,0,0,0.85),
+        0 0 26px rgba(255, 204, 102, 0.35) inset;
+      padding: 16px 18px 14px;
+      transform-origin: center top;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .slot-area.spinning {
+      transform: perspective(900px) rotateX(11deg) scale(1.02);
+      box-shadow:
+        0 20px 32px rgba(0,0,0,0.95),
+        0 0 40px rgba(255, 204, 102, 0.5) inset;
     }
 
     .reels {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       grid-template-rows: repeat(3, 1fr);
-      gap: 6px;
-      margin-bottom: 14px;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .symbol {
-      background: #2b1810;
-      border-radius: 8px;
-      border: 2px solid #77491e;
+      background:
+        linear-gradient(145deg, #64341f, #3a1b13);
+      border-radius: 12px;
+      border: 2px solid #8a572b;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
-      padding: 4px;
-      box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      font-size: 32px;
+      box-shadow:
+        inset 3px 3px 6px rgba(0,0,0,0.7),
+        inset -3px -3px 8px rgba(255, 204, 128, 0.12);
+      position: relative;
+      overflow: hidden;
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease,
+        background 0.15s ease;
+    }
+
+    .symbol::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent 42%, rgba(0,0,0,0.5) 68%);
+      mix-blend-mode: screen;
+      pointer-events: none;
     }
 
     .symbol.win {
-      border-color: #ffd86b;
-      box-shadow: 0 0 10px rgba(255, 215, 128, 0.9);
-      transform: scale(1.08);
+      border-color: #ffe47d;
+      box-shadow:
+        0 0 16px rgba(255, 235, 145, 0.9),
+        inset 0 0 10px rgba(0,0,0,0.7);
+      transform: translateY(-2px) scale(1.06);
+      background: linear-gradient(135deg, #8d5426, #4d2214);
     }
 
-    .controls {
+    /* --- Controls --- */
+
+    .controls-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 14px;
-      margin-top: 4px;
       gap: 12px;
       flex-wrap: wrap;
+      font-size: 14px;
     }
 
-    .controls-section {
+    .controls-group {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -129,67 +259,99 @@
     }
 
     .label {
-      color: #f8e3a1;
-      font-weight: bold;
-    }
-
-    button {
-      background: #d4af37;
-      color: #1a1010;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 2px 0 #917623;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    }
-
-    button:hover {
-      background: #f8d14b;
-    }
-
-    button:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 0 #6d581a;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+      color: #f7e4ad;
+      font-weight: 600;
+      text-shadow: 0 0 4px rgba(0,0,0,0.8);
     }
 
     .value-box {
-      padding: 4px 8px;
-      background: #26120c;
-      border-radius: 6px;
-      border: 1px solid #8c6239;
-      min-width: 60px;
+      padding: 5px 10px;
+      border-radius: 10px;
+      min-width: 70px;
       text-align: center;
-      font-weight: bold;
+      font-weight: 700;
+      background: linear-gradient(135deg, #271310, #422219);
+      border: 1px solid #b07b37;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.7);
+    }
+
+    button.small-btn {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(135deg, #f3cf7d, #c4872e);
+      color: #33200c;
+      box-shadow: 0 2px 0 #8b6324;
+      font-size: 13px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button.small-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    button.small-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #6e4f1c;
+    }
+
+    button.small-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .spin-btn {
+      padding: 8px 22px;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #fff8d4 0, #ffd769 37%, #e29930 68%, #763415 100%);
+      color: #3a200b;
+      box-shadow:
+        0 3px 0 #8f6123,
+        0 0 18px rgba(255, 231, 158, 0.8);
+    }
+
+    .spin-btn.glow {
+      box-shadow:
+        0 3px 0 #8f6123,
+        0 0 22px rgba(255, 241, 188, 1);
     }
 
     .message {
       margin-top: 8px;
-      min-height: 20px;
+      min-height: 22px;
       font-size: 14px;
       text-align: center;
-      color: #ffe9a0;
+      color: #ffeac1;
+      text-shadow: 0 0 5px rgba(0,0,0,0.7);
     }
 
-    /* PowerSpin Overlay (4-fach Bildschirm) */
+    .footer-note {
+      margin-top: 6px;
+      font-size: 11px;
+      text-align: center;
+      color: #ccb184;
+      opacity: 0.85;
+    }
+
+    /* --- PowerPlay Overlay --- */
 
     .powerspin-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.9);
+      background: radial-gradient(circle at top, rgba(0,0,0,0.96), rgba(0,0,0,0.98));
       display: none;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 24px;
-      z-index: 50;
+      z-index: 55;
     }
 
     .powerspin-overlay.active {
@@ -198,71 +360,157 @@
 
     .powerspin-title {
       font-size: 26px;
-      margin-bottom: 14px;
-      color: #ffd86b;
-      text-shadow: 0 0 10px rgba(255,215,128,0.9);
+      margin-bottom: 8px;
       text-align: center;
+      color: #ffe37a;
+      text-shadow:
+        0 0 14px rgba(0,0,0,0.9),
+        0 0 22px rgba(255, 215, 128, 0.9);
     }
 
     .powerspin-sub {
       font-size: 14px;
-      margin-bottom: 16px;
       text-align: center;
+      margin-bottom: 16px;
+      color: #f3d9a3;
+      max-width: 520px;
     }
 
     .powerspin-grids {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       grid-template-rows: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 12px;
       width: 100%;
-      max-width: 700px;
+      max-width: 720px;
+      margin-bottom: 14px;
     }
 
     .mini-grid {
-      background: #1a1010;
-      border-radius: 10px;
-      border: 2px solid #c79b3b;
-      padding: 6px;
+      background: radial-gradient(circle at top, #3f1d13, #120707);
+      border-radius: 14px;
+      border: 2px solid #cda53f;
+      padding: 7px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
       gap: 4px;
+      box-shadow:
+        0 0 16px rgba(0,0,0,0.8),
+        0 0 18px rgba(255, 203, 112, 0.35) inset;
     }
 
     .mini-symbol {
-      background: #2d1811;
-      border-radius: 6px;
-      border: 1px solid #75441e;
+      background: linear-gradient(145deg, #64341f, #391911);
+      border-radius: 7px;
+      border: 1px solid #8d5627;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 20px;
+      box-shadow:
+        inset 2px 2px 4px rgba(0,0,0,0.75),
+        inset -2px -2px 5px rgba(255, 211, 137, 0.16);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mini-symbol::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent 45%, rgba(0,0,0,0.6) 75%);
+      mix-blend-mode: screen;
     }
 
     .powerspin-footer {
       font-size: 13px;
       margin-bottom: 10px;
       text-align: center;
+      color: #f4dca4;
     }
 
-    .footer-note {
-      margin-top: 6px;
+    .overlay-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .footer-note-overlay {
       font-size: 11px;
+      color: #c7aa73;
       text-align: center;
-      color: #c8a971;
-      opacity: 0.8;
+      opacity: 0.85;
+    }
+
+    button.overlay-btn {
+      padding: 7px 16px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #ffe183, #c58c32);
+      color: #3b220b;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #8c6223;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button.overlay-btn:hover {
+      filter: brightness(1.07);
+      transform: translateY(-1px);
+    }
+
+    button.overlay-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #6b4a1a;
+    }
+
+    button.overlay-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    @media (max-width: 780px) {
+      .game-wrapper {
+        padding: 14px 14px 20px;
+      }
+      .reels {
+        gap: 4px;
+      }
+      .symbol {
+        font-size: 26px;
+      }
+      .powerspin-grids {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="game-wrapper">
+    <!-- Intro (Start) -->
+    <div id="intro-overlay" class="intro-overlay">
+      <div class="intro-logo">🧔‍♂️</div>
+      <div class="intro-title">Lucky&nbsp;Scheisch</div>
+      <div class="intro-sub">
+        Willkommen im Palast des Scheischs!<br />
+        Dies ist eine <strong>reine Demo</strong> ohne echtes Geld.
+        Gewinne Diamanten 💎 und den Scheisch 🧔‍♂️ selbst für starke Auszahlungen.
+      </div>
+      <button id="intro-start" class="btn-big">Spiel starten</button>
+    </div>
+
+    <!-- PowerPlay Overlay -->
     <div id="powerspin" class="powerspin-overlay">
-      <div class="powerspin-title">POWERSPIN – Lucky Scheisch!</div>
+      <div class="powerspin-title">POWERPLAY – 4-fach Bildschirm!</div>
       <div class="powerspin-sub">
-        Großer Treffer! Dein Gewinn ist mindestens <strong>4× Einsatz</strong>.<br/>
-        Der Scheisch belohnt dich mit 4 Extra-Screens!
+        Dein Gewinn liegt bei mindestens <strong>4× Einsatz</strong>.<br />
+        Starte jetzt den PowerPlay des Scheischs: Vier 3×3-Grids
+        flackern gleichzeitig auf – ganz wie im Casino.
       </div>
       <div class="powerspin-grids">
         <div class="mini-grid" id="mini-1"></div>
@@ -270,55 +518,63 @@
         <div class="mini-grid" id="mini-3"></div>
         <div class="mini-grid" id="mini-4"></div>
       </div>
-      <div class="powerspin-footer" id="powerspin-info"></div>
-      <button id="powerspin-close">Weiter spielen</button>
-      <div class="footer-note">Hinweis: Demo-Spiel ohne echtes Geld.</div>
-    </div>
-
-    <h1>Lucky Scheisch</h1>
-    <div class="subtitle">Demo-Slot inspiriert von klassischen Casino-Games (ohne Echtgeld).</div>
-
-    <div class="sheikh-banner">
-      <div class="sheikh-portrait">
-        <!-- später eigenes Bild / Avatar einbauen -->
-        🧔‍♂️
+      <div id="powerspin-footer" class="powerspin-footer"></div>
+      <div class="overlay-buttons">
+        <button id="powerspin-start" class="overlay-btn">PowerPlay starten</button>
+        <button id="powerspin-close" class="overlay-btn" disabled>Zurück zum Spiel</button>
       </div>
-      <div class="sheikh-text">
-        Der mächtige Scheisch wacht über deine Spins.<br/>
-        Triff Diamanten 💎 und Sheikhs 🧔‍♂️ für hohe Gewinne!
+      <div class="footer-note-overlay">
+        Hinweis: Demo-Simulation, keine Echtgeld-Auszahlung.
       </div>
     </div>
 
-    <div class="slot-container">
-      <div id="reels" class="reels"></div>
-
-      <div class="controls">
-        <div class="controls-section">
-          <span class="label">Einsatz:</span>
-          <button id="bet-minus">−</button>
-          <div id="bet-value" class="value-box">1</div>
-          <button id="bet-plus">+</button>
-        </div>
-
-        <div class="controls-section">
-          <span class="label">Guthaben:</span>
-          <div id="balance" class="value-box">100</div>
-        </div>
-
-        <div class="controls-section">
-          <button id="spin-btn">SPIN</button>
+    <header>
+      <div class="logo-text">
+        <div class="sheikh-badge">🧔‍♂️</div>
+        <div>
+          <h1>Lucky Scheisch</h1>
+          <div class="subtitle">Diamant-Slot im Wüstentempel (Demo)</div>
         </div>
       </div>
-
-      <div id="message" class="message"></div>
-      <div class="footer-note">
-        Symbole: 💎 Diamant (hoch), 🧔‍♂️ Scheisch (sehr hoch), 🐪 Kamel, 🏺 Krug, 🔺 Juwel, K/Q/J Karten.
+      <div class="panel-small">
+        <div><strong>Modus:</strong> Fun-Play (kein Echtgeld)</div>
+        <div>Großer Treffer ab 4× Einsatz → PowerPlay mit 4 Screens</div>
       </div>
-    </div>
+    </header>
+
+    <main>
+      <div id="slot-area" class="slot-area">
+        <div id="reels" class="reels"></div>
+
+        <div class="controls-row">
+          <div class="controls-group">
+            <span class="label">Einsatz</span>
+            <button id="bet-minus" class="small-btn">−</button>
+            <div id="bet-value" class="value-box">1</div>
+            <button id="bet-plus" class="small-btn">+</button>
+          </div>
+
+          <div class="controls-group">
+            <span class="label">Guthaben</span>
+            <div id="balance" class="value-box">100</div>
+          </div>
+
+          <div class="controls-group">
+            <button id="spin-btn" class="small-btn spin-btn" disabled>Spin</button>
+          </div>
+        </div>
+
+        <div id="message" class="message"></div>
+        <div class="footer-note">
+          Hohe Symbole: 💎 Diamant (x5 Basis) &nbsp;|&nbsp; 🧔‍♂️ Scheisch (x8 Basis)<br />
+          Mittlere Symbole: 🐪 Kamel, 🏺 Krug, 🔺 Rubin &nbsp;|&nbsp; Niedrig: K / Q / J
+        </div>
+      </div>
+    </main>
   </div>
 
   <script>
-    // --- Grunddaten ---
+    // --- Grundparameter ---
     const rows = 3;
     const cols = 5;
 
@@ -328,18 +584,19 @@
       { name: "camel",   emoji: "🐪", basePayout: 3 },
       { name: "vase",    emoji: "🏺", basePayout: 2 },
       { name: "ruby",    emoji: "🔺", basePayout: 2 },
-      { name: "K",       emoji: "K", basePayout: 1 },
-      { name: "Q",       emoji: "Q", basePayout: 1 },
-      { name: "J",       emoji: "J", basePayout: 1 }
+      { name: "K",       emoji: "K",  basePayout: 1 },
+      { name: "Q",       emoji: "Q",  basePayout: 1 },
+      { name: "J",       emoji: "J",  basePayout: 1 }
     ];
 
-    // Reel-Gewichte (häufigkeit in der Verlosung)
+    // einfache Gewichtung (Häufigkeit)
     const weights = [5, 3, 7, 8, 6, 10, 10, 10];
 
     let grid = [];
     let balance = 100;
     let bet = 1;
     let spinning = false;
+    let gameStarted = false;
 
     const reelsEl = document.getElementById("reels");
     const messageEl = document.getElementById("message");
@@ -348,10 +605,28 @@
     const spinBtn = document.getElementById("spin-btn");
     const betMinusBtn = document.getElementById("bet-minus");
     const betPlusBtn = document.getElementById("bet-plus");
+    const slotAreaEl = document.getElementById("slot-area");
 
+    // Intro
+    const introOverlay = document.getElementById("intro-overlay");
+    const introStart = document.getElementById("intro-start");
+
+    // PowerPlay
     const powerspinOverlay = document.getElementById("powerspin");
-    const powerspinInfo = document.getElementById("powerspin-info");
-    const powerspinClose = document.getElementById("powerspin-close");
+    const powerspinFooter = document.getElementById("powerspin-footer");
+    const powerspinStartBtn = document.getElementById("powerspin-start");
+    const powerspinCloseBtn = document.getElementById("powerspin-close");
+
+    const miniIds = ["mini-1", "mini-2", "mini-3", "mini-4"];
+    let powerspinSpinning = false;
+    let powerspinTimer = null;
+
+    // Paylines: 3 horizontale Linien
+    const paylines = [
+      [ {r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3},{r:0,c:4} ],
+      [ {r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4} ],
+      [ {r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4} ]
+    ];
 
     function initGrid() {
       grid = [];
@@ -373,8 +648,7 @@
     }
 
     function randomSymbol() {
-      // gewichtete Zufallswahl
-      const totalWeight = weights.reduce((a,b) => a + b, 0);
+      const totalWeight = weights.reduce((a, b) => a + b, 0);
       let rnd = Math.random() * totalWeight;
       for (let i = 0; i < symbols.length; i++) {
         if (rnd < weights[i]) return symbols[i];
@@ -402,22 +676,13 @@
       }
     }
 
-    // einfache Paylines: jede der 3 Reihen
-    const paylines = [
-      [ {r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3},{r:0,c:4} ],
-      [ {r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4} ],
-      [ {r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4} ]
-    ];
-
     function evaluateWin() {
       let totalWin = 0;
       let winPositions = [];
 
       for (const line of paylines) {
-        // wir zählen gleiche Symbole von links nach rechts
         const first = grid[line[0].r][line[0].c];
         let count = 1;
-
         for (let i = 1; i < line.length; i++) {
           const sym = grid[line[i].r][line[i].c];
           if (sym.name === first.name) {
@@ -426,7 +691,6 @@
             break;
           }
         }
-
         if (count >= 3) {
           const lineWin = first.basePayout * bet * count;
           totalWin += lineWin;
@@ -441,6 +705,7 @@
     }
 
     function spin() {
+      if (!gameStarted) return;
       if (spinning) return;
       if (bet > balance) {
         showMessage("Nicht genug Guthaben für diesen Einsatz.");
@@ -451,13 +716,14 @@
       spinBtn.disabled = true;
       betMinusBtn.disabled = true;
       betPlusBtn.disabled = true;
-      showMessage("Rollen drehen ...");
+      spinBtn.classList.remove("glow");
+      slotAreaEl.classList.add("spinning");
+      showMessage("Der Scheisch dreht die Walzen ...");
 
       balance -= bet;
       updateBalance();
 
-      // einfache „Animation“: 6 Zwischenzustände
-      let steps = 6;
+      let steps = 7;
       const interval = setInterval(() => {
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
@@ -480,15 +746,18 @@
         updateBalance();
         showMessage(`Gewinn: ${win} Coins (Einsatz ${bet}).`);
         if (win >= bet * 4) {
-          triggerPowerspin(win);
+          preparePowerspin(win);
         }
       } else {
         showMessage("Kein Gewinn. Der Scheisch fordert einen neuen Spin.");
       }
+
       spinning = false;
       spinBtn.disabled = false;
       betMinusBtn.disabled = false;
       betPlusBtn.disabled = false;
+      slotAreaEl.classList.remove("spinning");
+      spinBtn.classList.add("glow");
     }
 
     function showMessage(text) {
@@ -504,11 +773,10 @@
       betValueEl.textContent = bet.toString();
     }
 
-    // --- PowerSpin (4-fach Bildschirm) ---
+    // --- PowerPlay-Logik ---
 
-    function triggerPowerspin(winAmount) {
-      // mini-Grids füllen
-      const miniIds = ["mini-1", "mini-2", "mini-3", "mini-4"];
+    function preparePowerspin(winAmount) {
+      // Mini-Grids initial leer befüllen
       miniIds.forEach(id => {
         const container = document.getElementById(id);
         container.innerHTML = "";
@@ -520,28 +788,75 @@
         }
       });
 
-      powerspinInfo.textContent =
-        `PowerSpin ausgelöst! Dein Gewinn betrug ${winAmount} Coins (mindestens 4× Einsatz).`;
+      powerspinFooter.textContent =
+        `PowerPlay verfügbar! Vorheriger Gewinn: ${winAmount} Coins (≥ 4× Einsatz).`;
 
       powerspinOverlay.classList.add("active");
+      powerspinStartBtn.disabled = false;
+      powerspinCloseBtn.disabled = true;
     }
 
-    powerspinClose.addEventListener("click", () => {
+    function animateMiniGrids() {
+      miniIds.forEach(id => {
+        const container = document.getElementById(id);
+        const minis = Array.from(container.children);
+        minis.forEach(el => {
+          el.textContent = randomSymbol().emoji;
+        });
+      });
+    }
+
+    function startPowerspin() {
+      if (powerspinSpinning) return;
+      powerspinSpinning = true;
+      powerspinStartBtn.disabled = true;
+      powerspinCloseBtn.disabled = true;
+      powerspinFooter.textContent = "PowerPlay läuft – die vier Bildschirme flackern ...";
+
+      let steps = 18; // Dauer der Animation
+      powerspinTimer = setInterval(() => {
+        animateMiniGrids();
+        steps--;
+        if (steps <= 0) {
+          clearInterval(powerspinTimer);
+          powerspinTimer = null;
+          powerspinSpinning = false;
+          powerspinFooter.textContent = "PowerPlay beendet. Der Scheisch ist zufrieden.";
+          powerspinCloseBtn.disabled = false;
+        }
+      }, 90);
+    }
+
+    function closePowerspin() {
+      if (powerspinSpinning) return; // erst beenden lassen
       powerspinOverlay.classList.remove("active");
+      powerspinFooter.textContent = "";
+    }
+
+    // --- Intro-Logik ---
+
+    introStart.addEventListener("click", () => {
+      gameStarted = true;
+      introOverlay.style.display = "none";
+      spinBtn.disabled = false;
+      spinBtn.classList.add("glow");
+      showMessage("Willkommen bei Lucky Scheisch! Drücke SPIN, um zu starten.");
     });
 
     // --- Events ---
 
     spinBtn.addEventListener("click", spin);
-
     betMinusBtn.addEventListener("click", () => setBet(bet - 1));
     betPlusBtn.addEventListener("click", () => setBet(bet + 1));
 
-    // --- Start ---
+    powerspinStartBtn.addEventListener("click", startPowerspin);
+    powerspinCloseBtn.addEventListener("click", closePowerspin);
+
+    // --- Initialisierung ---
     initGrid();
     updateBalance();
     setBet(1);
-    showMessage("Willkommen bei Lucky Scheisch! Drücke SPIN.");
+    showMessage("Tippe auf „Spiel starten“, um den Palast des Scheischs zu betreten.");
   </script>
 </body>
 </html>
