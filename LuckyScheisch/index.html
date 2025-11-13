@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lucky Scheisch</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #5b3b0f, #100805);
+      color: #f8f0c8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .game-wrapper {
+      width: 900px;
+      max-width: 100%;
+      background: #1a1010;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.7);
+      padding: 16px 24px 24px;
+      position: relative;
+      border: 3px solid #d4af37;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 6px;
+      font-size: 32px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.7);
+      color: #ffd86b;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #f5deb3;
+      margin-bottom: 10px;
+    }
+
+    .sheikh-banner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 8px;
+      background: linear-gradient(90deg, #5d381c, #8a5a23, #5d381c);
+      border-radius: 12px;
+      border: 2px solid #e7c76c;
+    }
+
+    .sheikh-portrait {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid #f9e28a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      background: #2b1510;
+      margin-right: 14px;
+    }
+
+    .sheikh-text {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .slot-container {
+      margin-top: 10px;
+      background: radial-gradient(circle at top, #3d250f, #140a06);
+      border-radius: 14px;
+      border: 3px solid #c79b3b;
+      padding: 14px;
+    }
+
+    .reels {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .symbol {
+      background: #2b1810;
+      border-radius: 8px;
+      border: 2px solid #77491e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      padding: 4px;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .symbol.win {
+      border-color: #ffd86b;
+      box-shadow: 0 0 10px rgba(255, 215, 128, 0.9);
+      transform: scale(1.08);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin-top: 4px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .controls-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .label {
+      color: #f8e3a1;
+      font-weight: bold;
+    }
+
+    button {
+      background: #d4af37;
+      color: #1a1010;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #917623;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    }
+
+    button:hover {
+      background: #f8d14b;
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #6d581a;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .value-box {
+      padding: 4px 8px;
+      background: #26120c;
+      border-radius: 6px;
+      border: 1px solid #8c6239;
+      min-width: 60px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .message {
+      margin-top: 8px;
+      min-height: 20px;
+      font-size: 14px;
+      text-align: center;
+      color: #ffe9a0;
+    }
+
+    /* PowerSpin Overlay (4-fach Bildschirm) */
+
+    .powerspin-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      z-index: 50;
+    }
+
+    .powerspin-overlay.active {
+      display: flex;
+    }
+
+    .powerspin-title {
+      font-size: 26px;
+      margin-bottom: 14px;
+      color: #ffd86b;
+      text-shadow: 0 0 10px rgba(255,215,128,0.9);
+      text-align: center;
+    }
+
+    .powerspin-sub {
+      font-size: 14px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .powerspin-grids {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .mini-grid {
+      background: #1a1010;
+      border-radius: 10px;
+      border: 2px solid #c79b3b;
+      padding: 6px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    .mini-symbol {
+      background: #2d1811;
+      border-radius: 6px;
+      border: 1px solid #75441e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .powerspin-footer {
+      font-size: 13px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .footer-note {
+      margin-top: 6px;
+      font-size: 11px;
+      text-align: center;
+      color: #c8a971;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+    <div id="powerspin" class="powerspin-overlay">
+      <div class="powerspin-title">POWERSPIN – Lucky Scheisch!</div>
+      <div class="powerspin-sub">
+        Großer Treffer! Dein Gewinn ist mindestens <strong>4× Einsatz</strong>.<br/>
+        Der Scheisch belohnt dich mit 4 Extra-Screens!
+      </div>
+      <div class="powerspin-grids">
+        <div class="mini-grid" id="mini-1"></div>
+        <div class="mini-grid" id="mini-2"></div>
+        <div class="mini-grid" id="mini-3"></div>
+        <div class="mini-grid" id="mini-4"></div>
+      </div>
+      <div class="powerspin-footer" id="powerspin-info"></div>
+      <button id="powerspin-close">Weiter spielen</button>
+      <div class="footer-note">Hinweis: Demo-Spiel ohne echtes Geld.</div>
+    </div>
+
+    <h1>Lucky Scheisch</h1>
+    <div class="subtitle">Demo-Slot inspiriert von klassischen Casino-Games (ohne Echtgeld).</div>
+
+    <div class="sheikh-banner">
+      <div class="sheikh-portrait">
+        <!-- später eigenes Bild / Avatar einbauen -->
+        🧔‍♂️
+      </div>
+      <div class="sheikh-text">
+        Der mächtige Scheisch wacht über deine Spins.<br/>
+        Triff Diamanten 💎 und Sheikhs 🧔‍♂️ für hohe Gewinne!
+      </div>
+    </div>
+
+    <div class="slot-container">
+      <div id="reels" class="reels"></div>
+
+      <div class="controls">
+        <div class="controls-section">
+          <span class="label">Einsatz:</span>
+          <button id="bet-minus">−</button>
+          <div id="bet-value" class="value-box">1</div>
+          <button id="bet-plus">+</button>
+        </div>
+
+        <div class="controls-section">
+          <span class="label">Guthaben:</span>
+          <div id="balance" class="value-box">100</div>
+        </div>
+
+        <div class="controls-section">
+          <button id="spin-btn">SPIN</button>
+        </div>
+      </div>
+
+      <div id="message" class="message"></div>
+      <div class="footer-note">
+        Symbole: 💎 Diamant (hoch), 🧔‍♂️ Scheisch (sehr hoch), 🐪 Kamel, 🏺 Krug, 🔺 Juwel, K/Q/J Karten.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Grunddaten ---
+    const rows = 3;
+    const cols = 5;
+
+    const symbols = [
+      { name: "diamond", emoji: "💎", basePayout: 5 },
+      { name: "sheikh",  emoji: "🧔‍♂️", basePayout: 8 },
+      { name: "camel",   emoji: "🐪", basePayout: 3 },
+      { name: "vase",    emoji: "🏺", basePayout: 2 },
+      { name: "ruby",    emoji: "🔺", basePayout: 2 },
+      { name: "K",       emoji: "K", basePayout: 1 },
+      { name: "Q",       emoji: "Q", basePayout: 1 },
+      { name: "J",       emoji: "J", basePayout: 1 }
+    ];
+
+    // Reel-Gewichte (häufigkeit in der Verlosung)
+    const weights = [5, 3, 7, 8, 6, 10, 10, 10];
+
+    let grid = [];
+    let balance = 100;
+    let bet = 1;
+    let spinning = false;
+
+    const reelsEl = document.getElementById("reels");
+    const messageEl = document.getElementById("message");
+    const balanceEl = document.getElementById("balance");
+    const betValueEl = document.getElementById("bet-value");
+    const spinBtn = document.getElementById("spin-btn");
+    const betMinusBtn = document.getElementById("bet-minus");
+    const betPlusBtn = document.getElementById("bet-plus");
+
+    const powerspinOverlay = document.getElementById("powerspin");
+    const powerspinInfo = document.getElementById("powerspin-info");
+    const powerspinClose = document.getElementById("powerspin-close");
+
+    function initGrid() {
+      grid = [];
+      reelsEl.innerHTML = "";
+      for (let r = 0; r < rows; r++) {
+        const row = [];
+        for (let c = 0; c < cols; c++) {
+          const sym = randomSymbol();
+          row.push(sym);
+          const el = document.createElement("div");
+          el.className = "symbol";
+          el.dataset.row = r;
+          el.dataset.col = c;
+          el.textContent = sym.emoji;
+          reelsEl.appendChild(el);
+        }
+        grid.push(row);
+      }
+    }
+
+    function randomSymbol() {
+      // gewichtete Zufallswahl
+      const totalWeight = weights.reduce((a,b) => a + b, 0);
+      let rnd = Math.random() * totalWeight;
+      for (let i = 0; i < symbols.length; i++) {
+        if (rnd < weights[i]) return symbols[i];
+        rnd -= weights[i];
+      }
+      return symbols[symbols.length - 1];
+    }
+
+    function updateGridDisplay(winPositions = []) {
+      const children = Array.from(reelsEl.children);
+      for (const child of children) {
+        child.classList.remove("win");
+      }
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const index = r * cols + c;
+          const el = children[index];
+          el.textContent = grid[r][c].emoji;
+
+          if (winPositions.some(pos => pos.r === r && pos.c === c)) {
+            el.classList.add("win");
+          }
+        }
+      }
+    }
+
+    // einfache Paylines: jede der 3 Reihen
+    const paylines = [
+      [ {r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3},{r:0,c:4} ],
+      [ {r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4} ],
+      [ {r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4} ]
+    ];
+
+    function evaluateWin() {
+      let totalWin = 0;
+      let winPositions = [];
+
+      for (const line of paylines) {
+        // wir zählen gleiche Symbole von links nach rechts
+        const first = grid[line[0].r][line[0].c];
+        let count = 1;
+
+        for (let i = 1; i < line.length; i++) {
+          const sym = grid[line[i].r][line[i].c];
+          if (sym.name === first.name) {
+            count++;
+          } else {
+            break;
+          }
+        }
+
+        if (count >= 3) {
+          const lineWin = first.basePayout * bet * count;
+          totalWin += lineWin;
+          for (let i = 0; i < count; i++) {
+            winPositions.push(line[i]);
+          }
+        }
+      }
+
+      updateGridDisplay(winPositions);
+      return totalWin;
+    }
+
+    function spin() {
+      if (spinning) return;
+      if (bet > balance) {
+        showMessage("Nicht genug Guthaben für diesen Einsatz.");
+        return;
+      }
+
+      spinning = true;
+      spinBtn.disabled = true;
+      betMinusBtn.disabled = true;
+      betPlusBtn.disabled = true;
+      showMessage("Rollen drehen ...");
+
+      balance -= bet;
+      updateBalance();
+
+      // einfache „Animation“: 6 Zwischenzustände
+      let steps = 6;
+      const interval = setInterval(() => {
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            grid[r][c] = randomSymbol();
+          }
+        }
+        updateGridDisplay();
+        steps--;
+        if (steps <= 0) {
+          clearInterval(interval);
+          const win = evaluateWin();
+          finishSpin(win);
+        }
+      }, 90);
+    }
+
+    function finishSpin(win) {
+      if (win > 0) {
+        balance += win;
+        updateBalance();
+        showMessage(`Gewinn: ${win} Coins (Einsatz ${bet}).`);
+        if (win >= bet * 4) {
+          triggerPowerspin(win);
+        }
+      } else {
+        showMessage("Kein Gewinn. Der Scheisch fordert einen neuen Spin.");
+      }
+      spinning = false;
+      spinBtn.disabled = false;
+      betMinusBtn.disabled = false;
+      betPlusBtn.disabled = false;
+    }
+
+    function showMessage(text) {
+      messageEl.textContent = text;
+    }
+
+    function updateBalance() {
+      balanceEl.textContent = balance.toString();
+    }
+
+    function setBet(newBet) {
+      bet = Math.max(1, Math.min(10, newBet));
+      betValueEl.textContent = bet.toString();
+    }
+
+    // --- PowerSpin (4-fach Bildschirm) ---
+
+    function triggerPowerspin(winAmount) {
+      // mini-Grids füllen
+      const miniIds = ["mini-1", "mini-2", "mini-3", "mini-4"];
+      miniIds.forEach(id => {
+        const container = document.getElementById(id);
+        container.innerHTML = "";
+        for (let i = 0; i < 9; i++) {
+          const miniEl = document.createElement("div");
+          miniEl.className = "mini-symbol";
+          miniEl.textContent = randomSymbol().emoji;
+          container.appendChild(miniEl);
+        }
+      });
+
+      powerspinInfo.textContent =
+        `PowerSpin ausgelöst! Dein Gewinn betrug ${winAmount} Coins (mindestens 4× Einsatz).`;
+
+      powerspinOverlay.classList.add("active");
+    }
+
+    powerspinClose.addEventListener("click", () => {
+      powerspinOverlay.classList.remove("active");
+    });
+
+    // --- Events ---
+
+    spinBtn.addEventListener("click", spin);
+
+    betMinusBtn.addEventListener("click", () => setBet(bet - 1));
+    betPlusBtn.addEventListener("click", () => setBet(bet + 1));
+
+    // --- Start ---
+    initGrid();
+    updateBalance();
+    setBet(1);
+    showMessage("Willkommen bei Lucky Scheisch! Drücke SPIN.");
+  </script>
+</body>
+</html>
