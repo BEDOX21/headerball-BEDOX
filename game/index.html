@@ -134,10 +134,8 @@
       <button id="place" class="btn" style="width:100%">Wette abgeben (Spielgeld)</button>
 
       <div class="ticket">
-        <div class="row" style="justify-content:space-between"><strong>Tickets</strong><span class="sub">Offen</span></div>
-        <div id="ticketsOpen" class="sub"></div>
-        <div class="row" style="justify-content:space-between;margin-top:8px"><span></span><span class="sub">Abgeschlossen</span></div>
-        <div id="ticketsClosed" class="sub"></div>
+        <strong>Tickets</strong>
+        <div id="ticketsAll" class="sub"></div>
       </div>
     </div>
   </div>
@@ -265,7 +263,7 @@ function renderSlip(){
 stakeEl.oninput=renderSlip;
 
 /* ========= Tickets (pro Konto) ========= */
-const tOpen=$("#ticketsOpen"), tClosed=$("#ticketsClosed");
+const ticketsAll=$("#ticketsAll");
 function addTicket(selections,stake,tot){
   const acc=currentAccount();
   const t={id:rndId(),selections,stake,tot,payout:+(stake*tot).toFixed(2),status:"Offen"};
@@ -275,29 +273,52 @@ function addTicket(selections,stake,tot){
   renderTickets();
   renderAccounts();
 }
+
 function renderTickets(){
-  const acc=currentAccount();
-  const tickets=acc.tickets;
-  const mk=t=>{
-    const sels=t.selections.map(s=>{
-      const m=MATCHES.find(x=>x.id===s.mid); const lab=s.market==='H'?'1':s.market==='D'?'X':'2';
-      return `${m.home}–${m.away} ${lab} (${fmt(s.odd)})`;
-    }).join(" · ");
-    const sym=t.status==="Gewonnen"?"✓":t.status==="Verloren"?"✗":"…";
-    const cls=t.status==="Gewonnen"?"ok":t.status==="Verloren"?"bad":"";
-    return `<div style="margin:6px 0">
-      <b>Ticket ${t.id.slice(-6)}</b> <span class="${cls}">${sym} ${t.status}</span><br>
-      ${sels}<br>Einsatz <b>${t.stake.toFixed(2)} €</b> · Quote <b>${fmt(t.tot)}</b> · Auszahlung <b>${t.payout.toFixed(2)} €</b>
-    </div>`;
-  };
-  const open=tickets.filter(t=>t.status==="Offen");
-  const done=tickets.filter(t=>t.status!=="Offen");
-  tOpen.innerHTML=open.length?open.map(mk).join(""):"<div class='sub'>–</div>";
-  tClosed.innerHTML=done.length?done.map(mk).join(""):"<div class='sub'>–</div>";
+  const blocks=[];
+  Object.values(ACCOUNTS).forEach(acc=>{
+    let block=`<div style="margin:6px 0 10px;border-top:1px solid #22334f;padding-top:4px">
+      <div class="row" style="justify-content:space-between">
+        <span><b>${acc.name}</b></span>
+        <span class="sub">Guthaben: ${acc.balance.toFixed(2)} €</span>
+      </div>`;
+    if(!acc.tickets.length){
+      block+=`<div class="sub">Keine Tickets.</div>`;
+    }else{
+      acc.tickets.forEach(t=>{
+        const sym=t.status==="Gewonnen"?"✓":t.status==="Verloren"?"✗":"…";
+        const cls=t.status==="Gewonnen"?"ok":t.status==="Verloren"?"bad":"";
+        block+=`<div style="margin:4px 0 6px">
+          <b>Ticket ${t.id.slice(-6)}</b> <span class="${cls}">${sym} ${t.status}</span><br>`;
+        t.selections.forEach(s=>{
+          const m=MATCHES.find(x=>x.id===s.mid);
+          const lab=s.market==='H'?'1':s.market==='D'?'X':'2';
+          const R=RESULTS[s.mid];
+          let resScore="–:–", sSym="…", sCls="", resText="offen";
+          if(R && R.status==="ended"){
+            const won=checkSel(s,R);
+            resScore=`${R.scoreH}:${R.scoreA}`;
+            resText=won?"getroffen":"verfehlt";
+            sSym=won?"✓":"✗";
+            sCls=won?"ok":"bad";
+          }
+          block+=`<div class="sub"><span class="${sCls}">${sSym}</span> ${m.home}–${m.away} ${lab} @ ${fmt(s.odd)} · Ergebnis: ${resScore} (${resText})</div>`;
+        });
+        block+=`Einsatz <b>${t.stake.toFixed(2)} €</b> · Quote <b>${fmt(t.tot)}</b> · Auszahlung <b>${t.payout.toFixed(2)} €</b>
+        </div>`;
+      });
+    }
+    block+="</div>";
+    blocks.push(block);
+  });
+  ticketsAll.innerHTML=blocks.join("");
 }
+
 $("#place").onclick=()=>{
   if(!SLIP.length) return;
   const stake=+stakeEl.value||0; const tot=SLIP.reduce((a,b)=>a*b.odd,1);
+  if(stake<=0) return;
+  if(stake>currentAccount().balance) return; // kein Minus
   addTicket(SLIP.map(s=>({mid:s.mid,market:s.market,odd:s.odd})), stake, tot);
   SLIP=[]; renderSlip(); refreshOddSelections();
 };
@@ -311,7 +332,7 @@ speedEl.oninput=()=>{spdLbl.textContent=parseFloat(speedEl.value).toFixed(2)+"×
 
 let cur=null, HOME=null, AWAY=null, BALL=null;
 let STATE="idle", prevAfterPause="first", simMinute=0, halfCD=0;
-const FIX_DT=1/60, MIN_PER_SEC=1.0; // 90 Spielminuten ≙ ~90 Sekunden total (≈1,5 echte Minuten)
+const FIX_DT=1/60, MIN_PER_SEC=1.0; // 90 Spielminuten ≙ ~90 Sekunden total
 let rafLast=null, acc=0, rafId=0, nudgeTimer=0, stuckTimer=0, cornerL=0, cornerR=0;
 
 // wie viele Spieler jagen aktiv? (dein Wunsch: „nur die nächsten Spieler“ → 2)
@@ -401,7 +422,12 @@ function settleTicketsFor(mid){
 }
 function checkSel(s,R){
   if(!R) return false;
-  switch(s.market){case"H":return R.scoreH>R.scoreA;case"D":return R.scoreH===R.scoreA;case"A":return R.scoreA>R.scoreH;default:return false;}
+  switch(s.market){
+    case"H":return R.scoreH>R.scoreA;
+    case"D":return R.scoreH===R.scoreA;
+    case"A":return R.scoreA>R.scoreH;
+    default:return false;
+  }
 }
 function showSummary(mid,headline){
   const R=RESULTS[mid], m=MATCHES.find(x=>x.id===mid);
