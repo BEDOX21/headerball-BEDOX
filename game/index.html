@@ -40,10 +40,15 @@
 
   .accRow{display:flex;justify-content:space-between;align-items:center;
           padding:4px 6px;border-radius:8px;margin-top:4px;cursor:pointer;
-          background:#0c1530;border:1px solid #1f2a44}
+          background:#0c1530;border:1px solid #1f2a44;font-size:12px}
   .accRow.active{border-color:var(--accent);background:#10243a}
   .accName{font-weight:600}
-  .accBal{font-size:12px;color:var(--muted)}
+  .accBal{font-size:11px;color:var(--muted)}
+  .miniBtn,.miniDel{
+    background:#143364;border:none;color:#fff;border-radius:6px;
+    padding:2px 6px;font-size:10px;cursor:pointer;margin-left:4px
+  }
+  .miniBtn:hover,.miniDel:hover{background:#1a4486}
 
   canvas{background:#07121e;border:1px solid #223;border-radius:12px;max-width:100%;height:auto}
   .hud{display:flex;align-items:center;justify-content:space-between;margin:6px 0}
@@ -182,13 +187,63 @@ const accountsEl=$("#accounts");
 const activeAccLabel=$("#activeAccLabel");
 const currentAccount=()=>ACCOUNTS[currentAccountKey];
 
+const RESET_CODE="212903";
+const SECURITY_ANSWER="am müllerwald 9";
+
+function handleReset(key){
+  const entered=prompt("Reset-Code (6-stellig) eingeben:");
+  if(entered===null) return;
+  if(entered.trim()===RESET_CODE){
+    const acc=ACCOUNTS[key];
+    acc.balance=1000;
+    acc.tickets=[];
+    renderAccounts();
+    renderTickets();
+    alert("Konto wurde zurückgesetzt.");
+  }else{
+    alert("Falscher Code.");
+  }
+}
+function handleForgot(){
+  const ans=prompt("Sicherheitsfrage – Kindheits-Wohnungsadresse?");
+  if(ans===null) return;
+  if(ans.trim().toLowerCase()===SECURITY_ANSWER){
+    alert("Dein Reset-Code lautet: "+RESET_CODE);
+  }else{
+    alert("Antwort ist nicht korrekt.");
+  }
+}
+
 function renderAccounts(){
   accountsEl.innerHTML="";
   Object.values(ACCOUNTS).forEach(acc=>{
     const row=document.createElement("div");
     row.className="accRow"+(acc.key===currentAccountKey?" active":"");
-    row.innerHTML=`<div class="accName">${acc.name}</div>
-                   <div class="accBal">${acc.balance.toFixed(2)} €</div>`;
+
+    const nameSpan=document.createElement("div");
+    nameSpan.className="accName";
+    nameSpan.textContent=acc.name;
+
+    const balSpan=document.createElement("div");
+    balSpan.className="accBal";
+    balSpan.textContent=acc.balance.toFixed(2)+" €";
+
+    const resetBtn=document.createElement("button");
+    resetBtn.className="miniBtn";
+    resetBtn.textContent="Reset";
+    resetBtn.onclick=(ev)=>{ev.stopPropagation();handleReset(acc.key);};
+
+    const forgotBtn=document.createElement("button");
+    forgotBtn.className="miniBtn";
+    forgotBtn.textContent="?";
+    forgotBtn.title="Passwort vergessen";
+    forgotBtn.onclick=(ev)=>{ev.stopPropagation();handleForgot();};
+
+    row.appendChild(nameSpan);
+    row.appendChild(balSpan);
+    row.appendChild(resetBtn);
+    row.appendChild(forgotBtn);
+
     row.onclick=()=>{currentAccountKey=acc.key;renderAccounts();renderTickets();};
     accountsEl.appendChild(row);
   });
@@ -268,8 +323,7 @@ function addTicket(selections,stake,tot){
   const acc=currentAccount();
   const t={id:rndId(),selections,stake,tot,payout:+(stake*tot).toFixed(2),status:"Offen"};
   acc.tickets.unshift(t);
-  // Einsatz sofort abziehen
-  acc.balance-=stake;
+  acc.balance-=stake; // Einsatz abziehen
   renderTickets();
   renderAccounts();
 }
@@ -302,16 +356,31 @@ function renderTickets(){
             sSym=won?"✓":"✗";
             sCls=won?"ok":"bad";
           }
-          block+=`<div class="sub"><span class="${sCls}">${sSym}</span> ${m.home}–${m.away} ${lab} @ ${fmt(s.odd)} · Ergebnis: ${resScore} (${resText})</div>`;
+          block+=`<div class="sub"><span class="${sCls}">${sSym}</span>
+            ${m.home}–${m.away} ${lab} @ ${fmt(s.odd)} · Ergebnis:
+            <span style="color:#fff;font-weight:700">${resScore}</span> (${resText})</div>`;
         });
-        block+=`Einsatz <b>${t.stake.toFixed(2)} €</b> · Quote <b>${fmt(t.tot)}</b> · Auszahlung <b>${t.payout.toFixed(2)} €</b>
-        </div>`;
+        block+=`Einsatz <b>${t.stake.toFixed(2)} €</b> · Quote <b>${fmt(t.tot)}</b> · Auszahlung <b>${t.payout.toFixed(2)} €</b>`;
+        if(t.status!=="Offen"){
+          block+=` <button class="miniDel" data-acc="${acc.key}" data-tid="${t.id}">löschen</button>`;
+        }
+        block+=`</div>`;
       });
     }
     block+="</div>";
     blocks.push(block);
   });
   ticketsAll.innerHTML=blocks.join("");
+
+  // Delete-Buttons für abgelaufene Tickets
+  ticketsAll.querySelectorAll(".miniDel").forEach(btn=>{
+    btn.onclick=()=>{
+      const acc=ACCOUNTS[btn.dataset.acc];
+      acc.tickets=acc.tickets.filter(t=>t.id!==btn.dataset.tid);
+      renderTickets();
+      renderAccounts();
+    };
+  });
 }
 
 $("#place").onclick=()=>{
@@ -332,10 +401,10 @@ speedEl.oninput=()=>{spdLbl.textContent=parseFloat(speedEl.value).toFixed(2)+"×
 
 let cur=null, HOME=null, AWAY=null, BALL=null;
 let STATE="idle", prevAfterPause="first", simMinute=0, halfCD=0;
-const FIX_DT=1/60, MIN_PER_SEC=1.0; // 90 Spielminuten ≙ ~90 Sekunden total
-let rafLast=null, acc=0, rafId=0, nudgeTimer=0, stuckTimer=0, cornerL=0, cornerR=0;
+const FIX_DT=1/60, MIN_PER_SEC=1.5; // 90 Spielminuten ≙ ~60 Sekunden total bei Speed 1
+let rafLast=null, acc=0, rafId=0, nudgeTimer=0, stuckTimer=0, cornerL=0, cornerR=0, ballStillTimer=0, lastBallX=null,lastBallY=null;
 
-// wie viele Spieler jagen aktiv? (dein Wunsch: „nur die nächsten Spieler“ → 2)
+// wie viele Spieler jagen aktiv? (nur die nächsten Spieler) → 2
 const CHASERS=2;
 
 function tryStart(mid){
@@ -358,10 +427,20 @@ function start(m){
   draw(); // Spieler sofort sichtbar
 }
 function ensureRes(mid){ if(!RESULTS[mid]) RESULTS[mid]={status:"pre",scoreH:0,scoreA:0,htH:0,htA:0,scH:[],scA:[]}; }
-function forceEnd(){ if(!cur) return; finalize(cur.id,true); settleTicketsFor(cur.id); showSummary(cur.id,"Match beendet."); clearEngine(); }
-function clearEngine(){ STATE="idle"; cur=null; HOME=AWAY=BALL=null; simMinute=0; hudTeams.textContent="–"; hudScore.textContent="– : –"; hudClock.textContent="00:00"; hudState.textContent="Pre-Match"; ticker.textContent=""; }
+function forceEnd(){
+  if(!cur) return;
+  finalize(cur.id,true);
+  settleTicketsFor(cur.id);
+  showSummary(cur.id,"Match vorzeitig beendet (Sim-Abbruch).");
+  clearEngine();
+}
+function clearEngine(){
+  STATE="idle"; cur=null; HOME=AWAY=BALL=null; simMinute=0;
+  hudTeams.textContent="–"; hudScore.textContent="– : –"; hudClock.textContent="00:00"; hudState.textContent="Pre-Match"; ticker.textContent="";
+  ballStillTimer=0; lastBallX=null; lastBallY=null;
+}
 pauseBtn.onclick=()=>{ if(STATE==="pause"){STATE=prevAfterPause;hudState.textContent=label();} else{prevAfterPause=STATE;STATE="pause";hudState.textContent="Pause";} };
-resetBtn.onclick=()=>{ if(cur && STATE!=="idle" && STATE!=="end") confirmClose(()=>clearEngine()); else clearEngine(); };
+resetBtn.onclick=()=>{ if(cur && STATE!=="idle" && STATE!=="end") confirmClose(()=>forceEnd()); else clearEngine(); };
 closeVis.onclick=()=>{ if(!cur || STATE==="idle"||STATE==="end") return; confirmClose(()=>forceEnd()); };
 document.addEventListener("keydown",e=>{const k=(e.code||e.key||"").toLowerCase(); if(k==="keyp"||k==="p") pauseBtn.click(); if(k==="keyr"||k==="r") resetBtn.click();});
 
@@ -387,7 +466,7 @@ function step(dt){
   if(STATE==="first" && simMinute>=45){
     const R=RESULTS[cur.id];
     R.htH=HOME.score; R.htA=AWAY.score;
-    STATE="half"; halfCD=3;
+    STATE="half"; halfCD=5;
     ticker.textContent+=`Halbzeit ${HOME.score}:${AWAY.score}\n`;
     return;
   }
@@ -399,10 +478,22 @@ function step(dt){
   hudScore.textContent=`${HOME.score} : ${AWAY.score}`;
 }
 function finalize(mid,forced){
-  const R=RESULTS[mid]; R.status="ended"; R.scoreH=HOME.score; R.scoreA=AWAY.score;
-  if(R.htH===undefined){R.htH=HOME.score;R.htA=AWAY.score;}
-  R.scH=HOME.scorers.slice(); R.scA=AWAY.scorers.slice();
-  if(!forced) ticker.textContent+=`Endstand ${HOME.name} ${HOME.score}:${AWAY.score} ${AWAY.name}\n`;
+  const R=RESULTS[mid];
+  let h=HOME?HOME.score:0;
+  let a=AWAY?AWAY.score:0;
+
+  // Wenn Simulation abgebrochen wurde und noch 0:0 → Zufallsergebnis erzeugen
+  if(forced && h===0 && a===0){
+    h=Math.floor(Math.random()*5);
+    a=Math.floor(Math.random()*5);
+    if(HOME) HOME.score=h;
+    if(AWAY) AWAY.score=a;
+  }
+
+  R.status="ended"; R.scoreH=h; R.scoreA=a;
+  if(R.htH===undefined){R.htH=h;R.htA=a;}
+  R.scH=HOME?HOME.scorers.slice():[]; R.scA=AWAY?AWAY.scorers.slice():[];
+  if(!forced) ticker.textContent+=`Endstand ${HOME.name} ${h}:${a} ${AWAY.name}\n`;
 }
 function settleTicketsFor(mid){
   Object.values(ACCOUNTS).forEach(acc=>{
@@ -439,7 +530,7 @@ function showSummary(mid,headline){
     <div class="pill" style="display:inline-block;margin-top:6px">Schützen ${m.away}: ${list(R.scA)}</div>`);
 }
 
-/* ===== Teams & KI (nur nächste Spieler jagen) ===== */
+/* ===== Teams & KI ===== */
 function newTeam(name,side){
   const c=color(name, side);
   const p=[]; for(let i=0;i<11;i++) p.push({name:i===0?"GK":"P"+i,spd:70+Math.random()*30,pas:70+Math.random()*30,sht:70+Math.random()*30,x:0,y:0,vx:0,vy:0,r:10,homeX:0,homeY:0});
@@ -455,6 +546,7 @@ const F433=[[0.05,0.50],[0.20,0.20],[0.20,0.38],[0.20,0.62],[0.20,0.80],[0.45,0.
 function place(T){const f=T.side==="L"?F433:F433.map(([x,y])=>[1-x,y]);for(let i=0;i<T.players.length;i++){const[nx,ny]=f[i];const px=40+nx*(W-80),py=30+ny*(H-60);Object.assign(T.players[i],{x:px,y:py,vx:0,vy:0,homeX:px,homeY:py});}}
 function kickoff(side){
   BALL={x:MID.x,y:MID.y,vx:(side==="L"?130:-130),vy:(Math.random()*2-1)*45,r:6,own:null};
+  ballStillTimer=0; lastBallX=BALL.x; lastBallY=BALL.y;
 }
 function aiChase(T,Opp,dt){
   const chasers=[...T.players].sort((a,b)=>dist(a,BALL)-dist(b,BALL)).slice(0,CHASERS);
@@ -491,7 +583,7 @@ function moveTo(p,tx,ty,dt,boost){
   p.x=Math.max(20,Math.min(W-20,p.x)); p.y=Math.max(20,Math.min(H-20,p.y));
 }
 
-/* ===== Physik – Billiard + Anti-Stuck + Corner-Kick-Out ===== */
+/* ===== Physik – Anti-Stuck + Corner-Kick-Out ===== */
 function physics(dt){
   const all=[...HOME.players,...AWAY.players];
   // Spieler ↔ Spieler Separation
@@ -506,7 +598,7 @@ function physics(dt){
   if(BALL.x<4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("H");} else {BALL.x=4;BALL.vx*=-0.92;BALL.own=null;} }
   if(BALL.x>W-4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("A");} else {BALL.x=W-4;BALL.vx*=-0.92;BALL.own=null;} }
 
-  // Ball ↔ Spieler: Impuls + Mindesttempo (Ball ca. 3x schneller als Spieler)
+  // Ball ↔ Spieler – Impuls + Mindesttempo
   for(const p of all){
     const dx=BALL.x-p.x,
           dy=BALL.y-p.y,
@@ -532,7 +624,7 @@ function physics(dt){
     }
   }
 
-  // Anti-Sandwich + Nudge (gegen „stehen bleiben“)
+  // Anti-Sandwich + Nudge
   const near=all.filter(p=>dist(p,BALL)<(p.r+BALL.r+7));
   const sp=Math.hypot(BALL.vx,BALL.vy);
   if(near.length>=2 && sp<28){ stuckTimer+=dt; } else { stuckTimer=0; }
@@ -546,12 +638,11 @@ function physics(dt){
     BALL.vx+=n.x*220; BALL.vy+=n.y*220; nudgeTimer=0;
   }
 
-  // Corner-Kick-Out: Ball darf NIE in der Ecke stecken bleiben
+  // Corner-Kick-Out – Ball darf nicht in der Ecke stecken bleiben
   const nearTop=BALL.y<40, nearBot=BALL.y>H-40;
   if(BALL.x<16 && (nearTop||nearBot) && sp<80){ cornerL+=dt; } else { cornerL=0; }
   if(BALL.x>W-16 && (nearTop||nearBot) && sp<80){ cornerR+=dt; } else { cornerR=0; }
 
-  // nach ca. 2 Sekunden kräftig ins Feld zurückschießen
   if(cornerL>2){
     BALL.x=40; BALL.y=H/2;
     const v=norm(MID.x-BALL.x,MID.y-BALL.y);
@@ -561,6 +652,18 @@ function physics(dt){
     BALL.x=W-40; BALL.y=H/2;
     const v=norm(MID.x-BALL.x,MID.y-BALL.y);
     BALL.vx=v.x*480; BALL.vy=v.y*480; cornerR=0;
+  }
+
+  // Globaler Anti-Stick: wenn Ball fast nicht bewegt wird (>2 s auf ~1cm²)
+  if(lastBallX===null){ lastBallX=BALL.x; lastBallY=BALL.y; }
+  const movedDist=Math.hypot(BALL.x-lastBallX,BALL.y-lastBallY);
+  if(movedDist<2){ ballStillTimer+=dt; } else { ballStillTimer=0; lastBallX=BALL.x; lastBallY=BALL.y; }
+  if(ballStillTimer>2){
+    // Ball 2–3 cm "woanders" hin und mit Schub ins Feld
+    BALL.x=MID.x; BALL.y=MID.y;
+    const n=norm(Math.random()-0.5,Math.random()-0.5);
+    BALL.vx=n.x*420; BALL.vy=n.y*420;
+    ballStillTimer=0; lastBallX=BALL.x; lastBallY=BALL.y;
   }
 }
 function separate(a,b){
