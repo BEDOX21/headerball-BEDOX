@@ -406,19 +406,44 @@ function physics(dt){
   if(BALL.x<4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("H");} else {BALL.x=4;BALL.vx*=-0.92;BALL.own=null;} }
   if(BALL.x>W-4){ if(Math.abs(BALL.y-H/2)<GOAL_H/2){goal("A");} else {BALL.x=W-4;BALL.vx*=-0.92;BALL.own=null;} }
 
-  // Ball ↔ Spieler: Impuls + Mindesttempo
-  for(const p of all){
-    const dx=BALL.x-p.x, dy=BALL.y-p.y, d=Math.hypot(dx,dy)||1, min=BALL.r+p.r;
-    if(d<min){
-      const nx=dx/d, ny=dy/d, ov=min-d;
-      BALL.x+=nx*ov; BALL.y+=ny*ov;
-      const vn=BALL.vx*nx+BALL.vy*ny, vt=BALL.vx*(-ny)+BALL.vy*(nx);
-      BALL.vx -= 2.0*vn*nx + 0.4*vt*(-ny);
-      BALL.vy -= 2.0*vn*ny + 0.4*vt*(nx);
-      const minS=140, sp=Math.hypot(BALL.vx,BALL.vy); if(sp<minS){const s=minS/(sp||1); BALL.vx*=s; BALL.vy*=s;}
-      BALL.own=null;
+    // Ball ↔ Spieler: Impuls + Mindesttempo (Ball ca. 3x schneller als Spieler)
+  for (const p of all) {
+    const dx = BALL.x - p.x,
+          dy = BALL.y - p.y,
+          d  = Math.hypot(dx, dy) || 1,
+          min = BALL.r + p.r;
+
+    if (d < min) {
+      const nx = dx / d,
+            ny = dy / d,
+            ov = min - d;
+
+      // Ball etwas aus dem Spieler „heraus schieben“
+      BALL.x += nx * ov;
+      BALL.y += ny * ov;
+
+      // elastische Kollision (wie Billiard)
+      const vn = BALL.vx * nx + BALL.vy * ny;          // normaler Anteil
+      const vt = BALL.vx * (-ny) + BALL.vy * (nx);     // tangentialer Anteil
+      BALL.vx -= 2.0 * vn * nx + 0.4 * vt * (-ny);
+      BALL.vy -= 2.0 * vn * ny + 0.4 * vt * (nx);
+
+      // >>> HIER: Ball-Geschwindigkeit hochziehen <<<
+      // Spieler laufen max. ca. 190 px/s → Ball mindestens ~3x so schnell
+      const playerMaxApprox = 190;              // grobe Spielergeschwindigkeit
+      const minS = playerMaxApprox * 3;         // ≈ 570 px/s
+      const speedAfter = Math.hypot(BALL.vx, BALL.vy);
+
+      if (speedAfter < minS) {
+        const s = minS / (speedAfter || 1);
+        BALL.vx *= s;
+        BALL.vy *= s;
+      }
+
+      BALL.own = null; // Ball nie „kleben“ lassen
     }
   }
+
 
   // Anti-Sandwich + Nudge (gegen „stehen bleiben“)
   const near=all.filter(p=>dist(p,BALL)<(p.r+BALL.r+7));
