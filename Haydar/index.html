@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>BEDOX Catcher – Mini Game</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{
+      margin:0;
+      background:#0b1020;
+      color:#eaf0ff;
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+    .wrap{
+      background:#0f172a;
+      border:1px solid #1f2a44;
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,.5);
+    }
+    canvas{
+      display:block;
+      background:#020617;
+      border-radius:12px;
+      border:1px solid #1f2937;
+      margin-top:8px;
+      max-width:100%;
+      height:auto;
+    }
+    .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row">
+    <h2 style="margin:0">BEDOX Catcher</h2>
+    <div>← → bewegen · Leertaste = neu starten</div>
+  </div>
+  <canvas id="game" width="640" height="360"></canvas>
+</div>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const W=canvas.width,H=canvas.height;
+let left=false,right=false;
+addEventListener("keydown",e=>{
+  if(e.code==="ArrowLeft") left=true;
+  if(e.code==="ArrowRight") right=true;
+  if(e.code==="Space" && gameOver) start();
+});
+addEventListener("keyup",e=>{
+  if(e.code==="ArrowLeft") left=false;
+  if(e.code==="ArrowRight") right=false;
+});
+
+let player,ball,score,time,gameOver,last;
+function start(){
+  player={x:W/2,y:H-30,w:80,h:12,s:260};
+  ball={x:Math.random()*W,y:0,r:10,vy:120};
+  score=0;
+  time=30; // 30 Sekunden
+  gameOver=false;
+  last=null;
+}
+start();
+
+function step(dt){
+  if(gameOver) return;
+  time-=dt;
+  if(time<=0){gameOver=true;return;}
+  if(left) player.x-=player.s*dt;
+  if(right) player.x+=player.s*dt;
+  player.x=Math.max(player.w/2,Math.min(W-player.w/2,player.x));
+
+  ball.vy+=20*dt;
+  ball.y+=ball.vy*dt;
+
+  if(ball.y-ball.r>H){
+    // verpasst
+    ball.y=0;ball.x=Math.random()*W;ball.vy=120;
+  }
+
+  // Kollision mit Spieler
+  if(ball.y+ball.r>=player.y-player.h/2 &&
+     ball.y-ball.r<=player.y+player.h/2 &&
+     ball.x>=player.x-player.w/2 &&
+     ball.x<=player.x+player.w/2){
+    score++;
+    ball.y=0;ball.x=Math.random()*W;ball.vy=120+score*10;
+  }
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // Hintergrund
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#022c22");
+  g.addColorStop(1,"#115e59");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  // Spieler
+  ctx.fillStyle="#e5e7eb";
+  ctx.fillRect(player.x-player.w/2,player.y-player.h/2,player.w,player.h);
+
+  // Ball
+  ctx.beginPath();
+  ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
+  ctx.fillStyle="#facc15";
+  ctx.fill();
+
+  // HUD
+  ctx.fillStyle="#f9fafb";
+  ctx.font="16px system-ui";
+  ctx.fillText("Punkte: "+score,14,24);
+  ctx.fillText("Zeit: "+time.toFixed(1)+"s",W-130,24);
+
+  if(gameOver){
+    ctx.fillStyle="#f9fafb";
+    ctx.font="24px system-ui";
+    ctx.textAlign="center";
+    ctx.fillText("Game Over – Punkte: "+score,W/2,H/2);
+    ctx.font="16px system-ui";
+    ctx.fillText("Leertaste für neues Spiel",W/2,H/2+30);
+    ctx.textAlign="start";
+  }
+}
+
+function loop(ts){
+  if(last==null) last=ts;
+  const dt=Math.min(0.05,(ts-last)/1000);
+  last=ts;
+  step(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
