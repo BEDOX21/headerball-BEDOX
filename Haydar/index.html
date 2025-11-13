@@ -2,139 +2,445 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>BEDOX Catcher – Mini Game</title>
+  <title>BEDOX Worlds – Mini Sandbox</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    body{
+    :root{
+      --bg:#020617;
+      --panel:#0f172a;
+      --border:#1e293b;
+      --accent:#22c55e;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+    }
+    html,body{
       margin:0;
-      background:#0b1020;
-      color:#eaf0ff;
+      height:100%;
+      background:radial-gradient(circle at top,#0f172a 0,#020617 55%);
+      color:var(--text);
       font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    }
+    body{
       display:flex;
-      justify-content:center;
       align-items:center;
-      height:100vh;
+      justify-content:center;
+      padding:8px;
+      box-sizing:border-box;
     }
     .wrap{
-      background:#0f172a;
-      border:1px solid #1f2a44;
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 10px 30px rgba(0,0,0,.5);
+      max-width:1100px;
+      width:100%;
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 18px 40px rgba(0,0,0,.7);
     }
+    .topRow{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-bottom:8px;
+    }
+    h1{margin:0;font-size:22px}
+    .sub{font-size:12px;color:var(--muted)}
     canvas{
       display:block;
       background:#020617;
-      border-radius:12px;
-      border:1px solid #1f2937;
-      margin-top:8px;
+      border-radius:14px;
+      border:1px solid #111827;
       max-width:100%;
       height:auto;
     }
-    .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin:8px 0;
+      flex-wrap:wrap;
+    }
+    .palette{
+      display:flex;
+      gap:4px;
+      flex-wrap:wrap;
+    }
+    .blockBtn{
+      min-width:60px;
+      border-radius:999px;
+      border:1px solid #1f2937;
+      background:#020617;
+      color:var(--text);
+      font-size:11px;
+      padding:4px 8px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+    .blockSwatch{
+      width:14px;height:14px;border-radius:4px;border:1px solid rgba(15,23,42,.7);
+    }
+    .blockBtn.active{
+      border-color:var(--accent);
+      outline:2px solid rgba(34,197,94,.6);
+      background:#052e16;
+    }
+    .btn{
+      border-radius:999px;
+      border:1px solid #1d4ed8;
+      background:#1d4ed8;
+      color:#f9fafb;
+      font-size:12px;
+      padding:6px 10px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .btn.secondary{
+      background:#020617;
+      border-color:#334155;
+      color:var(--muted);
+    }
+    .btn:hover{filter:brightness(1.08);}
+    .info{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+      line-height:1.4;
+    }
+    .pill{
+      padding:2px 8px;
+      border-radius:999px;
+      background:#020617;
+      border:1px solid #334155;
+      font-size:11px;
+      color:var(--muted);
+    }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="row">
-    <h2 style="margin:0">BEDOX Catcher</h2>
-    <div>← → bewegen · Leertaste = neu starten</div>
+  <div class="topRow">
+    <div>
+      <h1>BEDOX Worlds – Mini Sandbox</h1>
+      <div class="sub">WASD/←→↑ bewegen & springen · Maus: Block setzen/entfernen · 1–6 Blockauswahl</div>
+    </div>
+    <div class="pill">Nur offline / Singleplayer – inspiriert von Roblox-Welten</div>
   </div>
-  <canvas id="game" width="640" height="360"></canvas>
+
+  <div class="bar">
+    <div class="palette" id="palette"></div>
+    <div class="bar" style="justify-content:flex-end;flex:1">
+      <button class="btn secondary" id="newWorld">Neue Welt</button>
+      <button class="btn secondary" id="saveWorld">Speichern</button>
+      <button class="btn secondary" id="loadWorld">Laden</button>
+    </div>
+  </div>
+
+  <canvas id="world" width="960" height="576"></canvas>
+
+  <div class="info">
+    Links/Rechts = laufen · W/↑ = springen · <b>1–6</b> = Blocktyp wählen ·
+    Linksklick = Block setzen, Rechtsklick = Block entfernen.<br>
+    Die Welt wird als JSON im Browser (localStorage) gespeichert – keine Server, nur Spaß.
+  </div>
 </div>
 
 <script>
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
-const W=canvas.width,H=canvas.height;
-let left=false,right=false;
-addEventListener("keydown",e=>{
-  if(e.code==="ArrowLeft") left=true;
-  if(e.code==="ArrowRight") right=true;
-  if(e.code==="Space" && gameOver) start();
-});
-addEventListener("keyup",e=>{
-  if(e.code==="ArrowLeft") left=false;
-  if(e.code==="ArrowRight") right=false;
-});
+/* ======= Grundeinstellungen ======= */
+const canvas = document.getElementById("world");
+const ctx = canvas.getContext("2d");
+const W = canvas.width;
+const H = canvas.height;
 
-let player,ball,score,time,gameOver,last;
-function start(){
-  player={x:W/2,y:H-30,w:80,h:12,s:260};
-  ball={x:Math.random()*W,y:0,r:10,vy:120};
-  score=0;
-  time=30; // 30 Sekunden
-  gameOver=false;
-  last=null;
+// Gittergröße
+const COLS = 30;
+const ROWS = 18;
+const TILE = 32; // 30*32=960; 18*32=576
+
+// Blocktypen
+const BLOCKS = [
+  {id:0, name:"Leer", color:"#020617", solid:false},
+  {id:1, name:"Gras", color:"#22c55e", solid:true},
+  {id:2, name:"Erde", color:"#713f12", solid:true},
+  {id:3, name:"Stein", color:"#4b5563", solid:true},
+  {id:4, name:"Ziegel", color:"#b91c1c", solid:true},
+  {id:5, name:"Wasser", color:"#0ea5e9", solid:false},
+  {id:6, name:"Gold", color:"#facc15", solid:true}
+];
+
+const SOLID_IDS = new Set(BLOCKS.filter(b=>b.solid).map(b=>b.id));
+
+let world = createDefaultWorld();
+let selectedBlock = 1;
+
+/* ======= Spieler ======= */
+const player = {
+  x: W/2,
+  y: 5*TILE,
+  w: 20,
+  h: 28,
+  vx: 0,
+  vy: 0,
+  onGround: false
+};
+
+const GRAV = 900;
+const RUN_SPEED = 250;
+const JUMP = -430;
+const keys = {};
+
+/* ======= Hilfen ======= */
+function tileAt(px, py){
+  const c = Math.floor(px / TILE);
+  const r = Math.floor(py / TILE);
+  if(c<0 || c>=COLS || r<0 || r>=ROWS) return 0;
+  return world[r][c];
 }
-start();
-
-function step(dt){
-  if(gameOver) return;
-  time-=dt;
-  if(time<=0){gameOver=true;return;}
-  if(left) player.x-=player.s*dt;
-  if(right) player.x+=player.s*dt;
-  player.x=Math.max(player.w/2,Math.min(W-player.w/2,player.x));
-
-  ball.vy+=20*dt;
-  ball.y+=ball.vy*dt;
-
-  if(ball.y-ball.r>H){
-    // verpasst
-    ball.y=0;ball.x=Math.random()*W;ball.vy=120;
+function setTile(c, r, id){
+  if(c<0 || c>=COLS || r<0 || r>=ROWS) return;
+  world[r][c] = id;
+}
+function rectVsTile(px1,py1,px2,py2){
+  const c1=Math.floor(px1/TILE), c2=Math.floor(px2/TILE);
+  const r1=Math.floor(py1/TILE), r2=Math.floor(py2/TILE);
+  const hits=[];
+  for(let r=r1;r<=r2;r++){
+    for(let c=c1;c<=c2;c++){
+      if(c<0||c>=COLS||r<0||r>=ROWS) continue;
+      const id = world[r][c];
+      if(SOLID_IDS.has(id)){
+        hits.push({c,r,x:c*TILE,y:r*TILE,w:TILE,h:TILE});
+      }
+    }
   }
+  return hits;
+}
 
-  // Kollision mit Spieler
-  if(ball.y+ball.r>=player.y-player.h/2 &&
-     ball.y-ball.r<=player.y+player.h/2 &&
-     ball.x>=player.x-player.w/2 &&
-     ball.x<=player.x+player.w/2){
-    score++;
-    ball.y=0;ball.x=Math.random()*W;ball.vy=120+score*10;
+/* ======= Welt erzeugen ======= */
+function createDefaultWorld(){
+  const w=[];
+  for(let r=0;r<ROWS;r++){
+    const row=[];
+    for(let c=0;c<COLS;c++){
+      let id=0;
+      const ground = ROWS-3;
+      if(r>ground) id=2;          // Erde
+      else if(r===ground) id=1;   // Gras
+      else if(r===ground-4 && c%3===0) id=3; // paar Steine in der Luft
+      row.push(id);
+    }
+    w.push(row);
+  }
+  return w;
+}
+
+/* ======= Palette aufbauen ======= */
+const paletteEl = document.getElementById("palette");
+BLOCKS.filter(b=>b.id!==0).forEach((b,i)=>{
+  const btn=document.createElement("button");
+  btn.className="blockBtn";
+  btn.dataset.id=b.id;
+  btn.innerHTML=`<span class="blockSwatch" style="background:${b.color}"></span>${i+1}. ${b.name}`;
+  btn.onclick=()=>{selectedBlock=b.id; refreshPalette();};
+  paletteEl.appendChild(btn);
+});
+function refreshPalette(){
+  document.querySelectorAll(".blockBtn").forEach(btn=>{
+    const id=Number(btn.dataset.id);
+    btn.classList.toggle("active",id===selectedBlock);
+  });
+}
+refreshPalette();
+
+/* ======= Eingaben ======= */
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+  const k=e.key.toLowerCase();
+  if(k==="a"||k==="arrowleft") keys.left=true;
+  if(k==="d"||k==="arrowright") keys.right=true;
+  if(k==="w"||k==="arrowup") {
+    if(player.onGround){
+      player.vy=JUMP;
+      player.onGround=false;
+    }
+  }
+  // Block per Ziffer
+  if(k>="1"&&k<="6"){
+    const idx = Number(k);
+    const b = BLOCKS[idx] && BLOCKS[idx].id;
+    if(b!=null){selectedBlock=b;refreshPalette();}
+  }
+});
+document.addEventListener("keyup",e=>{
+  const k=e.key.toLowerCase();
+  if(k==="a"||k==="arrowleft") keys.left=false;
+  if(k==="d"||k==="arrowright") keys.right=false;
+});
+
+/* ======= Maus / Bauen ======= */
+let hoverC=-1, hoverR=-1;
+canvas.addEventListener("mousemove",e=>{
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX-rect.left)*canvas.width/rect.width;
+  const y = (e.clientY-rect.top)*canvas.height/rect.height;
+  hoverC = Math.floor(x/TILE);
+  hoverR = Math.floor(y/TILE);
+});
+canvas.addEventListener("mouseleave",()=>{hoverC=-1;hoverR=-1;});
+
+canvas.addEventListener("mousedown",e=>{
+  e.preventDefault();
+  if(hoverC<0||hoverC>=COLS||hoverR<0||hoverR>=ROWS) return;
+
+  if(e.button===0){
+    // Links: Block setzen – nicht wenn Spieler drin steht
+    const tileX=hoverC*TILE, tileY=hoverR*TILE;
+    const pX1=player.x-player.w/2, pY1=player.y-player.h/2;
+    const pX2=player.x+player.w/2, pY2=player.y+player.h/2;
+    const overlap=!(pX2<=tileX || pX1>=tileX+TILE || pY2<=tileY || pY1>=tileY+TILE);
+    if(!overlap) setTile(hoverC,hoverR,selectedBlock);
+  }else if(e.button===2){
+    // Rechts: löschen
+    setTile(hoverC,hoverR,0);
+  }
+});
+canvas.addEventListener("contextmenu",e=>e.preventDefault());
+
+/* ======= Speicherfunktionen ======= */
+const SAVE_KEY="bedox-world-v1";
+
+document.getElementById("saveWorld").onclick=()=>{
+  try{
+    localStorage.setItem(SAVE_KEY,JSON.stringify(world));
+    alert("Welt gespeichert im Browser (localStorage).");
+  }catch(err){
+    alert("Konnte nicht speichern: "+err);
+  }
+};
+document.getElementById("loadWorld").onclick=()=>{
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw){alert("Keine gespeicherte Welt gefunden.");return;}
+    const data=JSON.parse(raw);
+    if(!Array.isArray(data) || !data.length){throw new Error("ungültig");}
+    world=data;
+    alert("Welt geladen.");
+  }catch(err){
+    alert("Konnte Welt nicht laden: "+err);
+  }
+};
+document.getElementById("newWorld").onclick=()=>{
+  if(confirm("Neue Welt erstellen? Aktuelle Änderungen, die nicht gespeichert sind, gehen verloren.")){
+    world=createDefaultWorld();
+    player.x=W/2;player.y=5*TILE;player.vx=0;player.vy=0;
+  }
+};
+
+/* ======= Physik ======= */
+function update(dt){
+  // horizontale Bewegung
+  if(keys.left && !keys.right) player.vx=-RUN_SPEED;
+  else if(keys.right && !keys.left) player.vx=RUN_SPEED;
+  else player.vx*=0.80;
+
+  // Schwerkraft
+  player.vy += GRAV*dt;
+  if(player.vy>900) player.vy=900;
+
+  // X-Achse bewegen + Kollision
+  player.x += player.vx*dt;
+  resolveCollisions("x");
+
+  // Y-Achse
+  player.y += player.vy*dt;
+  player.onGround=false;
+  resolveCollisions("y");
+
+  // Bildschirmbegrenzung
+  if(player.x<player.w/2) player.x=player.w/2;
+  if(player.x>W-player.w/2) player.x=W-player.w/2;
+}
+
+function resolveCollisions(axis){
+  const px1 = player.x-player.w/2;
+  const py1 = player.y-player.h/2;
+  const px2 = player.x+player.w/2;
+  const py2 = player.y+player.h/2;
+  const hits = rectVsTile(px1,py1,px2,py2);
+  for(const t of hits){
+    if(axis==="x"){
+      if(player.vx>0){ player.x = t.x - player.w/2; player.vx=0; }
+      else if(player.vx<0){ player.x = t.x + t.w + player.w/2; player.vx=0; }
+    }else{
+      if(player.vy>0){
+        player.y = t.y - player.h/2;
+        player.vy=0;
+        player.onGround=true;
+      }else if(player.vy<0){
+        player.y = t.y + t.h + player.h/2;
+        player.vy=0;
+      }
+    }
   }
 }
 
+/* ======= Zeichnen ======= */
 function draw(){
-  ctx.clearRect(0,0,W,H);
   // Hintergrund
-  const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,"#022c22");
-  g.addColorStop(1,"#115e59");
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const grd = ctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,"#0f172a");
+  grd.addColorStop(1,"#020617");
+  ctx.fillStyle=grd;
+  ctx.fillRect(0,0,W,H);
+
+  // Blöcke
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const id=world[r][c];
+      if(id===0) continue;
+      const def = BLOCKS.find(b=>b.id===id);
+      ctx.fillStyle=def?def.color:"#6b7280";
+      const x=c*TILE,y=r*TILE;
+      ctx.fillRect(x,y,TILE,TILE);
+      // leichte Kante
+      ctx.strokeStyle="rgba(15,23,42,0.35)";
+      ctx.strokeRect(x+0.5,y+0.5,TILE-1,TILE-1);
+    }
+  }
+
+  // Hover-Rahmen
+  if(hoverC>=0 && hoverC<COLS && hoverR>=0 && hoverR<ROWS){
+    const x=hoverC*TILE,y=hoverR*TILE;
+    ctx.strokeStyle="rgba(250,250,250,.6)";
+    ctx.lineWidth=2;
+    ctx.strokeRect(x+1.5,y+1.5,TILE-3,TILE-3);
+  }
 
   // Spieler
-  ctx.fillStyle="#e5e7eb";
-  ctx.fillRect(player.x-player.w/2,player.y-player.h/2,player.w,player.h);
-
-  // Ball
+  ctx.save();
+  ctx.translate(player.x,player.y);
+  ctx.fillStyle="#fbbf24";
   ctx.beginPath();
-  ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
-  ctx.fillStyle="#facc15";
+  ctx.roundRect(-player.w/2,-player.h/2,player.w,player.h,4);
   ctx.fill();
-
-  // HUD
-  ctx.fillStyle="#f9fafb";
-  ctx.font="16px system-ui";
-  ctx.fillText("Punkte: "+score,14,24);
-  ctx.fillText("Zeit: "+time.toFixed(1)+"s",W-130,24);
-
-  if(gameOver){
-    ctx.fillStyle="#f9fafb";
-    ctx.font="24px system-ui";
-    ctx.textAlign="center";
-    ctx.fillText("Game Over – Punkte: "+score,W/2,H/2);
-    ctx.font="16px system-ui";
-    ctx.fillText("Leertaste für neues Spiel",W/2,H/2+30);
-    ctx.textAlign="start";
-  }
+  // Kopf
+  ctx.beginPath();
+  ctx.arc(0,-player.h/2-10,12,0,Math.PI*2);
+  ctx.fillStyle="#fde68a";
+  ctx.fill();
+  ctx.restore();
 }
 
+/* ======= Game Loop ======= */
+let last=null;
 function loop(ts){
   if(last==null) last=ts;
   const dt=Math.min(0.05,(ts-last)/1000);
   last=ts;
-  step(dt);
+  update(dt);
   draw();
   requestAnimationFrame(loop);
 }
