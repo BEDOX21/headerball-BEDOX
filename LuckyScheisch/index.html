@@ -197,16 +197,16 @@
     .reels {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 10px;
+      grid-template-rows: repeat(1, 1fr);
+      gap: 12px;
       margin-bottom: 18px;
-      height: 430px;
+      height: 260px;
     }
 
     .symbol {
       background:
         linear-gradient(145deg, #6a3820, #3d1c13);
-      border-radius: 14px;
+      border-radius: 16px;
       border: 2px solid #905528;
       display: flex;
       align-items: center;
@@ -233,13 +233,34 @@
       pointer-events: none;
     }
 
+    /* Farbvarianten für Juwelen */
+    .symbol.sym-red {
+      background: radial-gradient(circle at top, #ff626f 0, #ff1840 35%, #7a0414 90%);
+      font-size: 56px;
+    }
+
+    .symbol.sym-blue {
+      background: radial-gradient(circle at top, #5ad1ff 0, #1a7dd6 40%, #003764 95%);
+    }
+
+    .symbol.sym-green {
+      background: radial-gradient(circle at top, #92ffb4 0, #11a95e 40%, #044025 95%);
+    }
+
+    .symbol.sym-purple {
+      background: radial-gradient(circle at top, #f1a6ff 0, #9b2dda 40%, #3f084f 95%);
+    }
+
+    .symbol.sym-gold {
+      background: radial-gradient(circle at top, #ffe9a3 0, #e1aa34 40%, #7a4a08 95%);
+    }
+
     .symbol.win {
       border-color: #ffe47d;
       box-shadow:
         0 0 18px rgba(255, 235, 145, 0.9),
         inset 0 0 10px rgba(0,0,0,0.8);
       transform: translateY(-2px) scale(1.06);
-      background: linear-gradient(135deg, #8d5426, #4d2214);
     }
 
     /* --- Controls --- */
@@ -435,8 +456,11 @@
 
     .overlay-buttons {
       display: flex;
+      justify-content: space-between;
       gap: 10px;
       margin-bottom: 6px;
+      width: 100%;
+      max-width: 420px;
     }
 
     .footer-note-overlay {
@@ -477,16 +501,111 @@
       box-shadow: none;
     }
 
+    /* --- Paytable Overlay --- */
+
+    .paytable-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(0,0,0,0.92), rgba(0,0,0,0.97));
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .paytable-overlay.active {
+      display: flex;
+    }
+
+    .paytable-box {
+      background: radial-gradient(circle at top, #352018, #120808);
+      border-radius: 18px;
+      border: 2px solid #caa13e;
+      padding: 18px 20px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 0 26px rgba(0,0,0,0.9);
+      color: #f8e7c0;
+    }
+
+    .paytable-title {
+      font-size: 22px;
+      margin-bottom: 6px;
+      color: #ffe58a;
+      text-align: center;
+    }
+
+    .paytable-sub {
+      font-size: 13px;
+      text-align: center;
+      color: #e7d0a1;
+      margin-bottom: 10px;
+    }
+
+    .paytable-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .paytable-table th,
+    .paytable-table td {
+      padding: 4px 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .paytable-table th {
+      text-align: left;
+      color: #ffe58a;
+      font-weight: 600;
+    }
+
+    .pt-symbol {
+      text-align: center;
+      font-size: 20px;
+    }
+
+    .pt-name {
+      font-size: 12px;
+    }
+
+    .pt-symbol.sym-red {
+      background: radial-gradient(circle at top, #ff626f, #7a0414);
+      border-radius: 999px;
+    }
+
+    .pt-symbol.sym-blue {
+      background: radial-gradient(circle at top, #5ad1ff, #003764);
+      border-radius: 999px;
+    }
+
+    .pt-symbol.sym-green {
+      background: radial-gradient(circle at top, #92ffb4, #044025);
+      border-radius: 999px;
+    }
+
+    .pt-symbol.sym-purple {
+      background: radial-gradient(circle at top, #f1a6ff, #3f084f);
+      border-radius: 999px;
+    }
+
+    .pt-symbol.sym-gold {
+      background: radial-gradient(circle at top, #ffe9a3, #7a4a08);
+      border-radius: 999px;
+    }
+
     @media (max-width: 900px) {
       .game-wrapper {
         padding: 14px 12px 18px;
       }
       .reels {
         gap: 6px;
-        height: 360px;
+        height: 220px;
       }
       .symbol {
-        font-size: 32px;
+        font-size: 36px;
       }
       header {
         flex-direction: column;
@@ -518,8 +637,8 @@
       <div class="powerspin-title">POWERPLAY – 4-fach Bildschirm!</div>
       <div class="powerspin-sub">
         Dein Gewinn liegt bei mindestens <strong>4× Einsatz</strong>.<br />
-        Starte jetzt den PowerPlay des Scheischs: Vier 3×3-Grids
-        flackern gleichzeitig – ähnlich wie bei Lucky Pharaoh.
+        PowerPlay nutzt diesen Gewinn als Guthaben:
+        jeder Power-Spin kostet <strong>4× Einsatz</strong>, bis das Power-Guthaben aufgebraucht ist.
       </div>
       <div class="powerspin-grids">
         <div class="mini-grid" id="mini-1"></div>
@@ -529,11 +648,40 @@
       </div>
       <div id="powerspin-footer" class="powerspin-footer"></div>
       <div class="overlay-buttons">
-        <button id="powerspin-start" class="overlay-btn">PowerPlay starten</button>
         <button id="powerspin-close" class="overlay-btn" disabled>Zurück zum Spiel</button>
+        <button id="powerspin-start" class="overlay-btn">PowerPlay starten</button>
       </div>
       <div class="footer-note-overlay">
         Hinweis: Demo-Simulation, keine Echtgeld-Auszahlung.
+      </div>
+    </div>
+
+    <!-- Paytable Overlay -->
+    <div id="paytable-overlay" class="paytable-overlay">
+      <div class="paytable-box">
+        <div class="paytable-title">Gewinntabelle</div>
+        <div class="paytable-sub">
+          Beispiel-Auszahlungen bei Einsatz <strong>1,00&nbsp;€</strong> (eine aktive Linie mit 5 Juwelen).
+        </div>
+        <table class="paytable-table">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Name</th>
+              <th>3 in Reihe</th>
+              <th>4 in Reihe</th>
+              <th>5 in Reihe</th>
+            </tr>
+          </thead>
+          <tbody id="paytable-body"></tbody>
+        </table>
+        <div style="text-align:center; margin-top:10px; font-size:11px; color:#e5cfa0;">
+          Tatsächliche Gewinne skalieren mit deinem Einsatz.<br />
+          PowerPlay wird bei Gewinnen ≥ 4× Einsatz ausgelöst.
+        </div>
+        <div style="text-align:center; margin-top:10px;">
+          <button id="paytable-close" class="overlay-btn">Schließen</button>
+        </div>
       </div>
     </div>
 
@@ -542,7 +690,7 @@
         <div class="sheikh-badge">🧔‍♂️</div>
         <div>
           <h1>Lucky Scheisch</h1>
-          <div class="subtitle">Diamant-Slot im Wüstentempel (Demo)</div>
+          <div class="subtitle">Juwelen-Slot im Wüstentempel (Demo)</div>
         </div>
       </div>
       <div class="panel-small">
@@ -574,14 +722,18 @@
           </div>
 
           <div class="controls-group">
+            <button id="paytable-btn" class="small-btn">Gewinntabelle</button>
+          </div>
+
+          <div class="controls-group">
             <button id="spin-btn" class="small-btn spin-btn" disabled>Spin</button>
           </div>
         </div>
 
         <div id="message" class="message"></div>
         <div class="footer-note">
-          Hohe Symbole: 💎 Diamant (x5 Basis) &nbsp;|&nbsp; 🧔‍♂️ Scheisch (x8 Basis)<br />
-          Mittlere Symbole: 🐪 Kamel, 🏺 Krug, 🔺 Rubin &nbsp;|&nbsp; Niedrig: K / Q / J – alles als €-Gewinne berechnet.
+          Symbole: Weißer Diamant (rot) = höchster Gewinn &nbsp;|&nbsp; blaue, grüne, violette und goldene Juwelen mit absteigender Wertigkeit.<br />
+          Eine Linie mit 5 Spalten – die Juwelen müssen von links nach rechts durchlaufen.
         </div>
       </div>
     </main>
@@ -592,6 +744,7 @@
     const audioEngine = {
       ctx: null,
       masterGain: null,
+      spinOsc: null,
       init() {
         if (this.ctx) {
           if (this.ctx.state === "suspended") {
@@ -619,28 +772,29 @@
         osc.start(now);
         osc.stop(now + duration);
       },
-      playSweep(from = 220, to = 880, duration = 0.4, type = "sawtooth", volume = 0.8) {
+      spinStart() {
         if (!this.ctx || this.ctx.state === "closed") return;
+        // kontinuierlicher Spin-Sound
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(from, now);
-        osc.frequency.linearRampToValueAtTime(to, now + duration);
-        gain.gain.setValueAtTime(volume, now);
-        gain.gain.linearRampToValueAtTime(0.0, now + duration);
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(220, now);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.4);
         osc.connect(gain);
         gain.connect(this.masterGain);
         osc.start(now);
-        osc.stop(now + duration + 0.05);
-      },
-      click() {
-        this.playBeep(650, 0.06, "square", 0.6);
-      },
-      spinStart() {
-        this.playSweep(200, 700, 0.4, "sawtooth", 0.7);
+        this.spinOsc = osc;
       },
       spinStop() {
+        if (this.spinOsc && this.ctx && this.ctx.state !== "closed") {
+          const now = this.ctx.currentTime;
+          try {
+            this.spinOsc.stop(now + 0.05);
+          } catch (e) {}
+          this.spinOsc = null;
+        }
         this.playBeep(280, 0.15, "triangle", 0.6);
       },
       winSmall() {
@@ -653,7 +807,22 @@
         this.playBeep(1040, 0.22, "square", 0.9);
       },
       powerStart() {
-        this.playSweep(350, 1200, 0.5, "sawtooth", 0.9);
+        if (!this.ctx || this.ctx.state === "closed") return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(350, now);
+        osc.frequency.linearRampToValueAtTime(1200, now + 0.5);
+        gain.gain.setValueAtTime(0.9, now);
+        gain.gain.linearRampToValueAtTime(0.0, now + 0.5);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start(now);
+        osc.stop(now + 0.55);
+      },
+      click() {
+        this.playBeep(650, 0.06, "square", 0.6);
       }
     };
 
@@ -664,22 +833,49 @@
     }
 
     // --- Grundparameter ---
-    const rows = 3;
+    const rows = 1;
     const cols = 5;
 
     const symbols = [
-      { name: "diamond", emoji: "💎", basePayout: 5 },
-      { name: "sheikh",  emoji: "🧔‍♂️", basePayout: 8 },
-      { name: "camel",   emoji: "🐪",    basePayout: 3 },
-      { name: "vase",    emoji: "🏺",    basePayout: 2 },
-      { name: "ruby",    emoji: "🔺",    basePayout: 2 },
-      { name: "K",       emoji: "K",     basePayout: 1 },
-      { name: "Q",       emoji: "Q",     basePayout: 1 },
-      { name: "J",       emoji: "J",     basePayout: 1 }
+      {
+        name: "red_diamond",
+        label: "💎",
+        css: "sym-red",
+        title: "Weißer Diamant (rot)",
+        base10: 25
+      },
+      {
+        name: "blue_diamond",
+        label: "💎",
+        css: "sym-blue",
+        title: "Blauer Diamant",
+        base10: 18
+      },
+      {
+        name: "green_gem",
+        label: "💎",
+        css: "sym-green",
+        title: "Grüner Juwel",
+        base10: 14
+      },
+      {
+        name: "purple_gem",
+        label: "💎",
+        css: "sym-purple",
+        title: "Violetter Juwel",
+        base10: 10
+      },
+      {
+        name: "gold_gem",
+        label: "💎",
+        css: "sym-gold",
+        title: "Goldener Stein",
+        base10: 7
+      }
     ];
 
     // Symbol-Häufigkeit (je höher, desto öfter)
-    const weights = [5, 3, 7, 8, 6, 10, 10, 10];
+    const weights = [2, 4, 6, 8, 10];
 
     // Geld in Cent
     let balanceCents = 10000; // 100,00 €
@@ -693,6 +889,11 @@
     let grid = [];
     let spinning = false;
     let gameStarted = false;
+
+    // PowerPlay-Bank (aus dem großen Gewinn)
+    let powerBankCents = 0;
+    let powerCostCents = 0;
+    let powerBaseBetCents = 0;
 
     const reelsEl = document.getElementById("reels");
     const messageEl = document.getElementById("message");
@@ -718,11 +919,14 @@
     let powerspinSpinning = false;
     let powerspinTimer = null;
 
-    // Paylines: 3 horizontale Linien
+    // Paytable
+    const paytableOverlay = document.getElementById("paytable-overlay");
+    const paytableBtn = document.getElementById("paytable-btn");
+    const paytableClose = document.getElementById("paytable-close");
+
+    // Payline: eine horizontale Linie (5 Spalten)
     const paylines = [
-      [ {r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3},{r:0,c:4} ],
-      [ {r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4} ],
-      [ {r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4} ]
+      [ {r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3},{r:0,c:4} ]
     ];
 
     function initGrid() {
@@ -734,10 +938,10 @@
           const sym = randomSymbol();
           row.push(sym);
           const el = document.createElement("div");
-          el.className = "symbol";
+          el.className = "symbol " + sym.css;
           el.dataset.row = r;
           el.dataset.col = c;
-          el.textContent = sym.emoji;
+          el.textContent = sym.label;
           reelsEl.appendChild(el);
         }
         grid.push(row);
@@ -757,14 +961,16 @@
     function updateGridDisplay(winPositions = []) {
       const children = Array.from(reelsEl.children);
       for (const child of children) {
-        child.classList.remove("win");
+        child.className = "symbol";
       }
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const index = r * cols + c;
           const el = children[index];
-          el.textContent = grid[r][c].emoji;
+          const sym = grid[r][c];
+          el.className = "symbol " + sym.css;
+          el.textContent = sym.label;
 
           if (winPositions.some(pos => pos.r === r && pos.c === c)) {
             el.classList.add("win");
@@ -789,7 +995,8 @@
           }
         }
         if (count >= 3) {
-          const lineWinCents = first.basePayout * betCents * count;
+          const lineWinCents =
+            Math.round(betCents * first.base10 * count / 10);
           totalWinCents += lineWinCents;
           for (let i = 0; i < count; i++) {
             winPositions.push(line[i]);
@@ -801,17 +1008,17 @@
       return totalWinCents;
     }
 
-    // Gewinnchance deutlich erhöhen:
+    // Gewinnchance erhöhen:
     // Wenn kein Gewinn, mit ca. 35 % Wahrscheinlichkeit
-    // eine zufällige 3–4er Kombination mit mittlerem/hohen Symbol erzeugen.
+    // künstlich eine 3–4er Kombination mit mittlerem/hohen Symbol bauen.
     function maybeBoostWin(currentWinCents) {
       if (currentWinCents > 0) return currentWinCents;
 
       const chance = 0.35; // 35 % „nachhelfen“
       if (Math.random() > chance) return 0;
 
-      const rowIndex = Math.floor(Math.random() * rows);
-      const goodSymbols = symbols.filter(s => s.basePayout >= 2);
+      const rowIndex = 0; // nur eine Zeile
+      const goodSymbols = symbols.filter(s => s.base10 >= 14);
       const chosen = goodSymbols[Math.floor(Math.random() * goodSymbols.length)];
 
       let count = 3;
@@ -916,20 +1123,28 @@
 
     // --- PowerPlay-Logik ---
 
+    function updatePowerFooter() {
+      powerspinFooter.textContent =
+        `Power-Guthaben: ${formatEuro(powerBankCents)} | Kosten je PowerSpin: ${formatEuro(powerCostCents)}`;
+    }
+
     function preparePowerspin(winCents) {
+      powerBankCents = winCents;
+      powerBaseBetCents = betCents;
+      powerCostCents = powerBaseBetCents * 4;
+
       miniIds.forEach(id => {
         const container = document.getElementById(id);
         container.innerHTML = "";
         for (let i = 0; i < 9; i++) {
           const miniEl = document.createElement("div");
           miniEl.className = "mini-symbol";
-          miniEl.textContent = randomSymbol().emoji;
+          miniEl.textContent = randomSymbol().label;
           container.appendChild(miniEl);
         }
       });
 
-      powerspinFooter.textContent =
-        `PowerPlay verfügbar! Vorheriger Gewinn: ${formatEuro(winCents)} (≥ 4× Einsatz).`;
+      updatePowerFooter();
 
       powerspinOverlay.classList.add("active");
       powerspinStartBtn.disabled = false;
@@ -941,17 +1156,31 @@
         const container = document.getElementById(id);
         const minis = Array.from(container.children);
         minis.forEach(el => {
-          el.textContent = randomSymbol().emoji;
+          el.textContent = randomSymbol().label;
         });
       });
     }
 
     function startPowerspin() {
       if (powerspinSpinning) return;
+
+      if (powerBankCents < powerCostCents) {
+        powerspinFooter.textContent =
+          "Power-Guthaben ist aufgebraucht. Kehre zum Hauptspiel zurück.";
+        powerspinStartBtn.disabled = true;
+        powerspinCloseBtn.disabled = false;
+        return;
+      }
+
+      powerBankCents -= powerCostCents;
+      updatePowerFooter();
+
       powerspinSpinning = true;
       powerspinStartBtn.disabled = true;
       powerspinCloseBtn.disabled = true;
-      powerspinFooter.textContent = "PowerPlay läuft – vier Bildschirme flackern im Palast ...";
+      powerspinFooter.textContent =
+        "PowerPlay läuft – vier Bildschirme flackern im Palast ...";
+
       audioEngine.powerStart();
 
       let steps = 20; // Dauer der PowerPlay-Animation
@@ -962,9 +1191,19 @@
           clearInterval(powerspinTimer);
           powerspinTimer = null;
           powerspinSpinning = false;
-          powerspinFooter.textContent = "PowerPlay beendet. Der Scheisch ist zufrieden.";
-          audioEngine.winBig();
-          powerspinCloseBtn.disabled = false;
+
+          if (powerBankCents >= powerCostCents) {
+            powerspinFooter.textContent =
+              "PowerPlay beendet. Du kannst erneut PowerSpins starten, solange Power-Guthaben vorhanden ist.";
+            powerspinStartBtn.disabled = false;
+            powerspinCloseBtn.disabled = false;
+          } else {
+            powerspinFooter.textContent =
+              "Power-Guthaben ist aufgebraucht. Kehre zum Hauptspiel zurück.";
+            powerspinStartBtn.disabled = true;
+            powerspinCloseBtn.disabled = false;
+          }
+          audioEngine.winSmall();
         }
       }, 90);
     }
@@ -973,6 +1212,52 @@
       if (powerspinSpinning) return; // erst Animation beenden
       powerspinOverlay.classList.remove("active");
       powerspinFooter.textContent = "";
+      powerBankCents = 0;
+      powerCostCents = 0;
+      powerBaseBetCents = 0;
+    }
+
+    // --- Paytable-Logik ---
+
+    function renderPaytable() {
+      const tbody = document.getElementById("paytable-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      const demoBetCents = 100; // 1,00 €
+
+      symbols.forEach(sym => {
+        const tr = document.createElement("tr");
+
+        const tdSymbol = document.createElement("td");
+        tdSymbol.textContent = sym.label;
+        tdSymbol.className = "pt-symbol " + sym.css;
+
+        const tdName = document.createElement("td");
+        tdName.textContent = sym.title;
+        tdName.className = "pt-name";
+
+        const win3 = Math.round(demoBetCents * sym.base10 * 3 / 10);
+        const win4 = Math.round(demoBetCents * sym.base10 * 4 / 10);
+        const win5 = Math.round(demoBetCents * sym.base10 * 5 / 10);
+
+        const td3 = document.createElement("td");
+        td3.textContent = formatEuro(win3);
+
+        const td4 = document.createElement("td");
+        td4.textContent = formatEuro(win4);
+
+        const td5 = document.createElement("td");
+        td5.textContent = formatEuro(win5);
+
+        tr.appendChild(tdSymbol);
+        tr.appendChild(tdName);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        tr.appendChild(td5);
+
+        tbody.appendChild(tr);
+      });
     }
 
     // --- Intro-Logik ---
@@ -1014,11 +1299,22 @@
       closePowerspin();
     });
 
+    paytableBtn.addEventListener("click", () => {
+      audioEngine.click();
+      paytableOverlay.classList.add("active");
+    });
+
+    paytableClose.addEventListener("click", () => {
+      audioEngine.click();
+      paytableOverlay.classList.remove("active");
+    });
+
     // --- Initialisierung ---
     initGrid();
     updateBalance();
     updateLastWin();
     setBet(betCents);
+    renderPaytable();
     showMessage("Tippe auf „Spiel starten“, um den Palast des Scheischs zu betreten.");
   </script>
 </body>
