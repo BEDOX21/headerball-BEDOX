@@ -1,0 +1,334 @@
+import React, { useState, useMemo } from "react";
+
+function parseNumber(value) {
+  const n = parseFloat(String(value).replace(",", "."));
+  return isNaN(n) ? 0 : n;
+}
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(isFinite(value) ? value : 0);
+}
+
+function formatPercent(value) {
+  return `${(isFinite(value) ? value * 100 : 0).toFixed(1)} %`;
+}
+
+const NumberInput = ({ label, value, onChange, step = 1000, suffix, min = 0 }) => {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      <span className="text-xs font-medium text-slate-500">{label}</span>
+      <div className="flex items-center rounded-2xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm shadow-sm">
+        <input
+          type="number"
+          className="flex-1 bg-transparent outline-none"
+          value={value}
+          min={min}
+          step={step}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {suffix && <span className="ml-1 text-xs text-slate-500">{suffix}</span>}
+      </div>
+    </label>
+  );
+};
+
+const ResultRow = ({ label, value, emphasize = false }) => (
+  <div className="flex items-baseline justify-between text-sm">
+    <span className="text-slate-500">{label}</span>
+    <span className={emphasize ? "font-semibold text-slate-900" : "font-medium text-slate-700"}>{value}</span>
+  </div>
+);
+
+const BedoxLogo = () => (
+  <div className="pointer-events-none select-none absolute bottom-10 right-16 flex items-center justify-center">
+    <div className="flex items-center gap-3">
+      {/* Linke Streifen */}
+      <div className="flex flex-col gap-1">
+        <div className="h-[3px] w-16 bg-gradient-to-r from-slate-900 to-slate-400" />
+        <div className="h-[3px] w-16 bg-gradient-to-r from-slate-900 to-slate-400" />
+      </div>
+
+      {/* BEDOX Schriftzug */}
+      <span className="bg-gradient-to-b from-slate-900 to-slate-400 bg-clip-text text-transparent text-5xl font-extrabold tracking-[0.35em]">
+        BEDOX
+      </span>
+
+      {/* Rechte Streifen */}
+      <div className="flex flex-col gap-1">
+        <div className="h-[3px] w-16 bg-gradient-to-l from-slate-900 to-slate-400" />
+        <div className="h-[3px] w-16 bg-gradient-to-l from-slate-900 to-slate-400" />
+      </div>
+    </div>
+  </div>
+);
+
+export default function BedoxFixFlipRechner() {
+  const [purchasePrice, setPurchasePrice] = useState("250000");
+  const [purchaseCostsPercent, setPurchaseCostsPercent] = useState("10");
+  const [renovationCosts, setRenovationCosts] = useState("60000");
+  const [otherCosts, setOtherCosts] = useState("5000");
+
+  const [financingSharePercent, setFinancingSharePercent] = useState("80");
+  const [interestRateAnnual, setInterestRateAnnual] = useState("6");
+  const [holdingMonths, setHoldingMonths] = useState("9");
+
+  const [salesPrice, setSalesPrice] = useState("420000");
+  const [sellingCostsPercent, setSellingCostsPercent] = useState("4");
+
+  const computed = useMemo(() => {
+    const pPrice = parseNumber(purchasePrice);
+    const pCostPct = parseNumber(purchaseCostsPercent) / 100;
+    const reno = parseNumber(renovationCosts);
+    const other = parseNumber(otherCosts);
+    const finShare = parseNumber(financingSharePercent) / 100;
+    const rate = parseNumber(interestRateAnnual) / 100;
+    const months = parseNumber(holdingMonths);
+    const sPrice = parseNumber(salesPrice);
+    const sellCostPct = parseNumber(sellingCostsPercent) / 100;
+
+    const purchaseCosts = pPrice * pCostPct;
+    const totalCostsBeforeInterest = pPrice + purchaseCosts + reno + other;
+
+    const financedAmount = totalCostsBeforeInterest * finShare;
+    const equity = totalCostsBeforeInterest - financedAmount;
+
+    const interestCosts = financedAmount * rate * (months / 12);
+    const sellingCosts = sPrice * sellCostPct;
+
+    const totalCosts = totalCostsBeforeInterest + interestCosts + sellingCosts;
+    const profit = sPrice - totalCosts;
+
+    const roi = equity > 0 ? profit / equity : 0;
+    const annualizedRoi = months > 0 ? Math.pow(1 + roi, 12 / months) - 1 : 0;
+
+    const marginOnSales = sPrice > 0 ? profit / sPrice : 0;
+
+    return {
+      purchaseCosts,
+      totalCostsBeforeInterest,
+      financedAmount,
+      equity,
+      interestCosts,
+      sellingCosts,
+      totalCosts,
+      profit,
+      roi,
+      annualizedRoi,
+      marginOnSales,
+    };
+  }, [
+    purchasePrice,
+    purchaseCostsPercent,
+    renovationCosts,
+    otherCosts,
+    financingSharePercent,
+    interestRateAnnual,
+    holdingMonths,
+    salesPrice,
+    sellingCostsPercent,
+  ]);
+
+  const profitColor = computed.profit > 0 ? "text-emerald-600" : computed.profit < 0 ? "text-rose-600" : "text-slate-700";
+
+  return (
+    <div className="relative min-h-screen bg-slate-100 px-4 py-6">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row">
+        {/* Input-Bereich */}
+        <div className="w-full space-y-4 lg:w-1/2">
+          <h1 className="text-xl font-semibold text-slate-900">BEDOX – Fix &amp; Flip Rechner</h1>
+          <p className="text-xs text-slate-500">
+            Passe die Werte links an – rechts siehst du sofort, ob der Deal sich lohnt (vor Steuern).
+          </p>
+
+          {/* Block: Einkauf & Sanierung */}
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <h2 className="mb-3 text-sm font-semibold text-slate-800">1. Einkauf &amp; Sanierung</h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <NumberInput
+                label="Kaufpreis"
+                value={purchasePrice}
+                onChange={setPurchasePrice}
+                suffix="€"
+              />
+              <NumberInput
+                label="Kaufnebenkosten"
+                value={purchaseCostsPercent}
+                onChange={setPurchaseCostsPercent}
+                step={0.5}
+                suffix="% vom Kaufpreis"
+              />
+              <NumberInput
+                label="Sanierungskosten"
+                value={renovationCosts}
+                onChange={setRenovationCosts}
+                suffix="€"
+              />
+              <NumberInput
+                label="Sonstige Kosten (z. B. Gutachten)"
+                value={otherCosts}
+                onChange={setOtherCosts}
+                suffix="€"
+              />
+            </div>
+          </div>
+
+          {/* Block: Finanzierung & Haltedauer */}
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <h2 className="mb-3 text-sm font-semibold text-slate-800">2. Finanzierung &amp; Haltedauer</h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <NumberInput
+                label="Fremdkapitalanteil"
+                value={financingSharePercent}
+                onChange={setFinancingSharePercent}
+                step={5}
+                suffix="% der Gesamtkosten"
+              />
+              <NumberInput
+                label="Zinssatz p. a."
+                value={interestRateAnnual}
+                onChange={setInterestRateAnnual}
+                step={0.25}
+                suffix="%"
+              />
+              <NumberInput
+                label="Haltezeit"
+                value={holdingMonths}
+                onChange={setHoldingMonths}
+                step={1}
+                suffix="Monate"
+              />
+            </div>
+          </div>
+
+          {/* Block: Verkauf */}
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <h2 className="mb-3 text-sm font-semibold text-slate-800">3. Verkauf</h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <NumberInput
+                label="Verkaufspreis"
+                value={salesPrice}
+                onChange={setSalesPrice}
+                suffix="€"
+              />
+              <NumberInput
+                label="Verkaufskosten (Makler, Notar etc.)"
+                value={sellingCostsPercent}
+                onChange={setSellingCostsPercent}
+                step={0.5}
+                suffix="% vom Verkaufspreis"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Ergebnis-Bereich */}
+        <div className="w-full lg:w-1/2">
+          <div className="sticky top-4 space-y-4">
+            <div className="rounded-2xl bg-slate-900 p-4 text-slate-50 shadow-md">
+              <h2 className="mb-2 text-sm font-semibold tracking-wide text-slate-200">Deal-Zusammenfassung</h2>
+              <div className="mb-2 flex items-baseline justify-between">
+                <span className="text-xs uppercase tracking-wide text-slate-400">Erwarteter Gewinn (vor Steuern)</span>
+                <span className={`text-lg font-semibold ${profitColor}`}>
+                  {formatCurrency(computed.profit)}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-xl bg-slate-800/80 p-2">
+                  <div className="text-slate-400">Eigenkapital-Rendite</div>
+                  <div className="text-sm font-semibold text-slate-50">
+                    {formatPercent(computed.roi)}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-slate-800/80 p-2">
+                  <div className="text-slate-400">Annualisierte Rendite</div>
+                  <div className="text-sm font-semibold text-slate-50">
+                    {formatPercent(computed.annualizedRoi)}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-slate-800/80 p-2">
+                  <div className="text-slate-400">Marge auf Verkaufspreis</div>
+                  <div className="text-sm font-semibold text-slate-50">
+                    {formatPercent(computed.marginOnSales)}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-slate-800/80 p-2">
+                  <div className="text-slate-400">Haltezeit</div>
+                  <div className="text-sm font-semibold text-slate-50">{parseNumber(holdingMonths)} Monate</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Investition &amp; Finanzierung
+                </h3>
+                <div className="space-y-1.5">
+                  <ResultRow
+                    label="Kaufnebenkosten"
+                    value={formatCurrency(computed.purchaseCosts)}
+                  />
+                  <ResultRow
+                    label="Gesamtkosten vor Zinsen"
+                    value={formatCurrency(computed.totalCostsBeforeInterest)}
+                  />
+                  <ResultRow
+                    label="Fremdkapital"
+                    value={formatCurrency(computed.financedAmount)}
+                  />
+                  <ResultRow
+                    label="Eigenkapital-Einsatz"
+                    value={formatCurrency(computed.equity)}
+                    emphasize
+                  />
+                  <ResultRow
+                    label="Zinskosten (Haltezeit)"
+                    value={formatCurrency(computed.interestCosts)}
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Verkauf &amp; Ergebnis
+                </h3>
+                <div className="space-y-1.5">
+                  <ResultRow label="Verkaufspreis" value={formatCurrency(parseNumber(salesPrice))} />
+                  <ResultRow
+                    label="Verkaufskosten"
+                    value={formatCurrency(computed.sellingCosts)}
+                  />
+                  <ResultRow
+                    label="Gesamtkosten inkl. Zins &amp; Verkauf"
+                    value={formatCurrency(computed.totalCosts)}
+                  />
+                  <ResultRow
+                    label="Gewinn (vor Steuern)"
+                    value={formatCurrency(computed.profit)}
+                    emphasize
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-3 text-xs text-slate-500">
+              <p className="font-semibold text-slate-700">Hinweis (Prototyp)</p>
+              <ul className="mt-1 list-disc space-y-1 pl-4">
+                <li>Alle Werte sind vor Steuern und ohne Spekulationsfrist-Regelungen.</li>
+                <li>Du kannst später weitere Kostenblöcke ergänzen (Steuern, Notar beim Verkauf, Sonderfälle).</li>
+                <li>Logik &amp; Felder können wir gemeinsam an deine Fix-&amp;-Flip-Strategie anpassen.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* BEDOX Logo unten rechts mit Streifen */}
+      <BedoxLogo />
+    </div>
+  );
+}
