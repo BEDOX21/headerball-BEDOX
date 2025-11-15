@@ -7,14 +7,14 @@
 
   <style>
     :root {
-      --bg: #f4f5f7;
+      --bg: #e2e8f0;
       --bg-panel: #ffffff;
-      --border: #d0d4dc;
-      --border-soft: #e1e4eb;
-      --primary: #2549a8;
-      --primary-soft: #e2e8ff;
-      --text: #1f2933;
-      --text-soft: #6b7280;
+      --border: #9ca3af;
+      --border-soft: #cbd5e1;
+      --primary: #1d4ed8;
+      --primary-soft: #bfdbfe;
+      --text: #0f172a;
+      --text-soft: #4b5563;
     }
 
     * { box-sizing: border-box; }
@@ -23,7 +23,7 @@
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, #e5edff, #f4f5f7 50%, #e8eef5 100%);
+      background: radial-gradient(circle at top left, #dbeafe, #e5e7eb 55%, #c7d2fe 100%);
       color: var(--text);
     }
 
@@ -34,12 +34,12 @@
     }
 
     .app-header {
-      background: linear-gradient(135deg, #0b1120, #111827);
+      background: linear-gradient(135deg, #020617, #111827);
       color: #fff;
       border-radius: 16px;
       padding: 16px 16px 12px;
       margin-bottom: 16px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.5);
       display: flex;
       flex-wrap: wrap;
       align-items: flex-start;
@@ -102,7 +102,7 @@
 
     .app-subtitle {
       font-size: 12px;
-      color: #cbd5f5;
+      color: #e5e7eb;
       max-width: 620px;
     }
 
@@ -119,7 +119,7 @@
       padding: 4px 10px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.9);
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -141,8 +141,12 @@
       background: var(--bg-panel);
       border-radius: 12px;
       border: 1px solid var(--border-soft);
-      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
       padding: 12px;
+    }
+
+    .panel + .panel {
+      margin-top: 12px;
     }
 
     .panel-header {
@@ -182,7 +186,7 @@
       border-radius: 999px;
       padding: 6px 12px;
       border: 1px solid var(--border);
-      background: #f9fafb;
+      background: #f3f4f6;
       font-size: 11px;
       font-weight: 500;
       cursor: pointer;
@@ -198,7 +202,7 @@
       color: #fff;
     }
     .btn:hover {
-      box-shadow: 0 3px 10px rgba(148, 163, 184, 0.4);
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.4);
       transform: translateY(-1px);
     }
     .btn:active { transform: translateY(0); box-shadow: none; }
@@ -217,7 +221,7 @@
       gap: 4px;
       padding: 2px 6px;
       border-radius: 999px;
-      background: #e5edff;
+      background: #e0e7ff;
       border: 1px solid #c7d2fe;
       font-size: 10px;
       color: #1e293b;
@@ -244,20 +248,20 @@
     }
 
     thead {
-      background: linear-gradient(180deg, #e5edff, #d5ddf5);
+      background: linear-gradient(180deg, #c7d2fe, #a5b4fc);
       border-bottom: 1px solid var(--border);
     }
     thead th {
       padding: 6px 8px;
       text-align: left;
       font-weight: 600;
-      color: #111827;
+      color: #020617;
       border-right: 1px solid var(--border-soft);
       white-space: nowrap;
     }
     thead th:last-child { border-right: none; }
 
-    tbody tr:nth-child(even) { background: #f5f7fb; }
+    tbody tr:nth-child(even) { background: #f3f4f6; }
     tbody tr:nth-child(odd) { background: #ffffff; }
 
     tbody td {
@@ -269,7 +273,7 @@
     tbody td:last-child { border-right: none; }
 
     tfoot {
-      background: #111827;
+      background: #020617;
       color: #f9fafb;
       font-weight: 600;
     }
@@ -325,39 +329,39 @@
     .cell-ep-header { text-align: center; }
 
     .cell-ep-group {
-      border-left: 2px solid #c7d2fe;
-      border-right: 2px solid #c7d2fe;
-      background: #eef2ff;
+      border-left: 2px solid #818cf8;
+      border-right: 2px solid #818cf8;
+      background: #e0e7ff;
     }
     .cell-ep-group input[type="text"] { background: #fefeff; }
 
     .cell-ep-gesamt,
     .cell-gp-gesamt {
-      background: #f1f5f9;
+      background: #e5e7eb;
     }
 
-    /* Spaltenbreiten */
+    /* Spaltenbreiten (etwas enger) */
     th.col-pos, td.col-pos {
-      width: 72px; min-width: 72px; max-width: 72px;
+      width: 64px; min-width: 64px; max-width: 64px;
     }
     th.col-menge, td.col-menge {
       width: 78px; min-width: 78px; max-width: 78px;
     }
     th.col-einheit, td.col-einheit {
-      width: 64px; min-width: 64px; max-width: 64px;
+      width: 60px; min-width: 60px; max-width: 60px;
     }
     th.col-lohn, td.col-lohn {
-      width: 96px; min-width: 96px; max-width: 96px;
+      width: 104px; min-width: 104px; max-width: 104px;
     }
     th.col-gewinn, td.col-gewinn {
-      width: 96px; min-width: 96px; max-width: 96px;
+      width: 104px; min-width: 104px; max-width: 104px;
     }
 
     /* Material-Details */
     .material-details {
       margin-top: 4px;
       padding-top: 4px;
-      border-top: 1px dashed #cbd5f5;
+      border-top: 1px dashed #a5b4fc;
     }
     .material-detail-caption {
       font-size: 10px;
@@ -403,8 +407,8 @@
       line-height: 1.3;
       color: #fff;
     }
-    .btn-mat-add { background: #16a34a; }  /* grün */
-    .btn-mat-remove { background: #b91c1c; } /* rot */
+    .btn-mat-add { background: #16a34a; }
+    .btn-mat-remove { background: #b91c1c; }
 
     .footer-bar {
       display: flex;
@@ -464,7 +468,7 @@
       font-weight: 800;
       letter-spacing: 0.28em;
       text-transform: uppercase;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.65);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.75);
       border: 1px solid rgba(148, 163, 184, 0.9);
       display: inline-flex;
       align-items: center;
@@ -483,6 +487,198 @@
     }
     .floating-logo::before { top: 6px; }
     .floating-logo::after { bottom: 6px; }
+
+    /* BKI-Panel */
+    .bki-panel {
+      margin-top: 12px;
+    }
+    .bki-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+    .bki-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .bki-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .bki-row label {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+    .bki-row small {
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    .bki-results {
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .bki-results-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #cbd5f5;
+      margin-bottom: 2px;
+    }
+    .bki-result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .bki-result-row span.label {
+      color: #e5e7eb;
+    }
+    .bki-result-row span.value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+    .bki-result-row span.value strong {
+      font-weight: 700;
+    }
+    .bki-note {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    /* Aufmaß-UI */
+    .aufmass-toggle {
+      margin-top: 4px;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: #e0f2fe;
+      color: #0369a1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .aufmass-toggle span.icon {
+      font-size: 12px;
+    }
+
+    .aufmass-panel {
+      margin-top: 6px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      background: #f9fafb;
+    }
+
+    .aufmass-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .aufmass-facade {
+      position: relative;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #e5e7eb, #d1d5db);
+      padding: 8px;
+      min-height: 90px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.15);
+    }
+    .aufmass-facade-wall {
+      position: absolute;
+      inset: 0;
+      opacity: 0.22;
+      background-image: linear-gradient(#9ca3af 1px, transparent 1px),
+                        linear-gradient(90deg, #9ca3af 1px, transparent 1px);
+      background-size: 12px 12px;
+    }
+    .aufmass-facade-content {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 6px;
+      height: 100%;
+    }
+
+    .aufmass-corner {
+      width: 6px;
+      height: 70%;
+      border-radius: 999px;
+      background: #0f766e;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.25);
+    }
+
+    .aufmass-facade-windows {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      max-width: 80%;
+    }
+    .aufmass-window {
+      position: relative;
+      width: 26px;
+      height: 36px;
+      border-radius: 3px;
+      background: #eff6ff;
+      border: 2px solid #2563eb;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .aufmass-window span {
+      font-size: 7px;
+      color: #1e3a8a;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .aufmass-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .aufmass-row-input {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .aufmass-row-input label {
+      flex: 1 1 auto;
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+    .aufmass-row-input input {
+      width: 72px;
+      text-align: right;
+      font-size: 10px;
+      padding: 3px 4px;
+    }
+
+    .aufmass-summary {
+      margin-top: 4px;
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+    .aufmass-summary strong { color: var(--primary); }
 
     @media (max-width: 768px) {
       .app-shell { padding: 10px; }
@@ -511,6 +707,14 @@
         right: 8px;
         bottom: 8px;
         letter-spacing: 0.24em;
+      }
+
+      .bki-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .aufmass-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
     }
   </style>
@@ -541,13 +745,14 @@
       </div>
     </header>
 
+    <!-- HAUPT-RECHNER -->
     <main class="panel">
       <div class="panel-header">
         <div class="panel-header-title">
           LV-Tabelle (WDVS – Beispielpositionen)
         </div>
         <div class="panel-header-meta">
-          Pos.-Weise Erfassung ähnlich GAEB / Avaplan – EP-Anteile frei anpassbar, Material in Komponenten aufteilbar.
+          Pos.-weise Erfassung ähnlich GAEB / Avaplan – EP-Anteile frei anpassbar, Material in Komponenten aufteilbar.
         </div>
         <div class="panel-actions">
           <button id="reset-prices" class="btn" type="button">
@@ -572,10 +777,11 @@
       <div class="note">
         <span class="badge-small">
           <span class="icon">ℹ️</span>
-          <span>WDVS-Material-Details</span>
+          <span>WDVS-Material-Details &amp; Aufmaß</span>
         </span>
-        &nbsp; Unter „EP Material“ kannst du pro Position beliebig viele Materialien anlegen (Material 1, 2, 3 ...).
-        Über <strong>+</strong>/<strong>−</strong> fügst du Zeilen hinzu oder entfernst sie. Die Summe läuft automatisch in „EP Material“.
+        &nbsp; Unter „EP Material“ kannst du pro Position Materialien aufteilen. Zusätzlich kannst du über
+        <strong>„Aufmaß öffnen“</strong> eine visuelle Fassade mit Fenstern/Eckschienen nutzen und das Aufmaß direkt
+        in die Menge übernehmen.
       </div>
 
       <div class="table-wrapper">
@@ -583,7 +789,7 @@
           <thead>
             <tr>
               <th class="col-pos">Pos.-Nr.</th>
-              <th>Kurztext</th>
+              <th>Kurztext / Aufmaß</th>
               <th class="col-menge">Menge</th>
               <th class="col-einheit">Einheit</th>
               <th class="cell-ep-header col-lohn">
@@ -605,7 +811,7 @@
           </thead>
 
           <tbody id="positions-body">
-            <!-- Jede Position wird mit dynamischen Material-Details initialisiert -->
+            <!-- Beispiel-Positionen -->
 
             <!-- 010 Gerüst -->
             <tr>
@@ -614,6 +820,48 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Gerüst stellen für WDVS-Fassade, bis 3. OG" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong><br />
+                        ➜ Die Fensterfläche wird automatisch als Menge in dieser Position übernommen (kannst du anpassen).
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
@@ -656,6 +904,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Untergrundvorbereitung, Reinigung und Haftgrund" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
@@ -698,6 +987,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Wärmedämmplatten kleben und ansetzen (EPS / Mineralwolle)" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
@@ -740,6 +1070,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Dübel setzen für WDVS inkl. Bohren" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
@@ -782,6 +1153,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Armierungslage mit Gewebe, vollflächig" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
@@ -824,6 +1236,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Oberputz (z. B. Silikonharzputz) inkl. Strukturierung" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
@@ -866,6 +1319,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Anschluss- und Eckprofile, Fensterbänke, Laibungen" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="80" />
@@ -908,6 +1402,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="WDVS-Sockelbereich inkl. Perimeterdämmung und Sockelputz" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="30" />
@@ -950,6 +1485,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Brandriegel / Brandbarrieren gemäß Detailplanung" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="40" />
@@ -992,6 +1568,47 @@
               </td>
               <td>
                 <input type="text" class="pos-text" value="Schlussanstrich / Fassadenfarbe auf WDVS" />
+                <button type="button" class="aufmass-toggle">
+                  <span class="icon">📐</span> Aufmaß öffnen
+                </button>
+                <div class="aufmass-panel" style="display:none">
+                  <div class="aufmass-grid">
+                    <div class="aufmass-facade">
+                      <div class="aufmass-facade-wall"></div>
+                      <div class="aufmass-facade-content">
+                        <div class="aufmass-corner"></div>
+                        <div class="aufmass-facade-windows"></div>
+                        <div class="aufmass-corner"></div>
+                      </div>
+                    </div>
+                    <div class="aufmass-inputs">
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Fenster</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterbreite (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-width" value="1,24" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Fensterhöhe (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-win-height" value="1,79" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Anzahl Eckschienen</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-count" value="0" />
+                      </div>
+                      <div class="aufmass-row-input">
+                        <label>Länge Eckschiene (m)</label>
+                        <input type="text" class="input-number js-aufmass-input aufmass-corner-length" value="2,50" />
+                      </div>
+                      <div class="aufmass-summary">
+                        Fensterfläche gesamt: <strong><span class="aufmass-window-area">0,00</span> m²</strong><br />
+                        Eckschienen gesamt: <strong><span class="aufmass-corner-total">0,00</span> m</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
@@ -1045,14 +1662,76 @@
 
       <div class="footer-bar">
         <div>
-          <strong>Hinweis:</strong> Dies ist ein Prototyp. Du kannst später noch Export (CSV/GAEB), Kostenarten und mehr ergänzen.
+          <strong>Hinweis:</strong> Dies ist ein Prototyp. Du kannst später noch Export (CSV/GAEB), BKI-Preislogik,
+          Lohn-/Material-Split und mehr ergänzen.
         </div>
         <div class="footer-right">
-          <div class="pill">Stand: <strong>Prototyp v0.5</strong></div>
+          <div class="pill">Stand: <strong>Prototyp v0.7</strong></div>
           <div class="pill">Layout: GAEB-ähnliche LV-Tabelle (BEDOX)</div>
         </div>
       </div>
     </main>
+
+    <!-- BKI-Helfer (Zeitwert-basiert, vorerst nur zur Kontrolle) -->
+    <section class="panel bki-panel">
+      <div class="panel-header">
+        <div class="panel-header-title">
+          BKI-Helfer – EP aus Zeitwert (Kontrolle)
+        </div>
+        <div class="panel-header-meta">
+          Nur zur Kontrolle gedacht: Du gibst BKI-Zeitwert und Lohnsatz ein, Material und Gewinn –
+          und siehst, ob das in die gleiche Richtung geht wie dein BKI-Preis.
+        </div>
+      </div>
+
+      <div class="bki-grid">
+        <div class="bki-inputs">
+          <div class="bki-row">
+            <label for="bki-zeitwert">BKI-Zeitwert <small>(Stunden je Einheit, z.&nbsp;B. je m²)</small></label>
+            <input id="bki-zeitwert" type="text" class="input-number js-bki-input" value="0,50" />
+          </div>
+          <div class="bki-row">
+            <label for="bki-lohnsatz">Lohnsatz / Sub <small>(€/h, z.&nbsp;B. 36,00)</small></label>
+            <input id="bki-lohnsatz" type="text" class="input-number js-bki-input" value="36,00" />
+          </div>
+          <div class="bki-row">
+            <label for="bki-material-ep">Material-EP laut BKI / Händler <small>(€/Einheit, z.&nbsp;B. 8,50)</small></label>
+            <input id="bki-material-ep" type="text" class="input-number js-bki-input" value="0,00" />
+          </div>
+          <div class="bki-row">
+            <label for="bki-gewinn-prozent">Gewinn-Zuschlag auf Selbstkosten <small>(%, z.&nbsp;B. 15)</small></label>
+            <input id="bki-gewinn-prozent" type="text" class="input-number js-bki-input" value="15" />
+          </div>
+        </div>
+
+        <div class="bki-results">
+          <div class="bki-results-title">BKI-EP-Vorschlag (für 1 Einheit)</div>
+
+          <div class="bki-result-row">
+            <span class="label">EP Lohn / Sub:</span>
+            <span class="value"><span id="bki-ep-lohn">0,00</span> €</span>
+          </div>
+          <div class="bki-result-row">
+            <span class="label">EP Material:</span>
+            <span class="value"><span id="bki-ep-mat">0,00</span> €</span>
+          </div>
+          <div class="bki-result-row">
+            <span class="label">EP Gewinn:</span>
+            <span class="value"><span id="bki-ep-gewinn">0,00</span> €</span>
+          </div>
+          <div class="bki-result-row">
+            <span class="label">EP gesamt (Lohn + Material + Gewinn):</span>
+            <span class="value"><strong><span id="bki-ep-gesamt">0,00</span> €</strong></span>
+          </div>
+
+          <div class="bki-note">
+            Anwendung: Zeitwert aus BKI ablesen → hier eintragen → Lohnsatz / Material / Gewinn anpassen →
+            Werte mit dem BKI-Preis (zwischen niedrig und mittel) vergleichen. Später können wir das noch
+            enger an deine BKI-Preislogik anbinden.
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- Schwebendes BEDOX-Logo -->
@@ -1193,7 +1872,7 @@
       const rowsContainer = matDetails.querySelector(".material-rows");
       if (!rowsContainer) return;
       const rows = rowsContainer.querySelectorAll(".material-detail-row");
-      if (rows.length <= 1) return; // mindestens 1 behalten
+      if (rows.length <= 1) return;
       rows[rows.length - 1].remove();
       recalcAll();
     }
@@ -1228,7 +1907,7 @@
       if (materialInput) materialInput.value = "";
       if (gewinnInput) gewinnInput.value = "";
 
-      // Material-Blöcke neu aufsetzen (nur 1 Zeile, "Material 1")
+      // Material-Blöcke neu aufsetzen
       const matDetailsBlocks = newRow.querySelectorAll(".material-details");
       matDetailsBlocks.forEach(function (md) {
         md.dataset.nextIndex = "2";
@@ -1245,6 +1924,29 @@
             r.remove();
           }
         });
+      });
+
+      // Aufmaß-Felder zurücksetzen
+      const aufmassPanels = newRow.querySelectorAll(".aufmass-panel");
+      aufmassPanels.forEach(function (panel) {
+        const winCount = panel.querySelector(".aufmass-win-count");
+        const winWidth = panel.querySelector(".aufmass-win-width");
+        const winHeight = panel.querySelector(".aufmass-win-height");
+        const cCount = panel.querySelector(".aufmass-corner-count");
+        const cLen = panel.querySelector(".aufmass-corner-length");
+        const areaSpan = panel.querySelector(".aufmass-window-area");
+        const cornerSpan = panel.querySelector(".aufmass-corner-total");
+        const winContainer = panel.querySelector(".aufmass-facade-windows");
+
+        if (winCount) winCount.value = "0";
+        if (winWidth) winWidth.value = "1,00";
+        if (winHeight) winHeight.value = "1,00";
+        if (cCount) cCount.value = "0";
+        if (cLen) cLen.value = "2,50";
+        if (areaSpan) areaSpan.textContent = "0,00";
+        if (cornerSpan) cornerSpan.textContent = "0,00";
+        if (winContainer) winContainer.innerHTML = "";
+        panel.style.display = "none";
       });
 
       const epCell = newRow.querySelector(".cell-ep-gesamt");
@@ -1315,7 +2017,6 @@
         if (index < htmlRows.length) {
           row = htmlRows[index];
         } else {
-          // zusätzliche Tabellenzeilen erzeugen
           addRow();
           htmlRows = Array.from(tbody.querySelectorAll("tr"));
           row = htmlRows[htmlRows.length - 1];
@@ -1340,6 +2041,29 @@
           });
         });
 
+        // Aufmaß-Panel zurücksetzen
+        const aufmassPanels = row.querySelectorAll(".aufmass-panel");
+        aufmassPanels.forEach(function (panel) {
+          const winCount = panel.querySelector(".aufmass-win-count");
+          const winWidth = panel.querySelector(".aufmass-win-width");
+          const winHeight = panel.querySelector(".aufmass-win-height");
+          const cCount = panel.querySelector(".aufmass-corner-count");
+          const cLen = panel.querySelector(".aufmass-corner-length");
+          const areaSpan = panel.querySelector(".aufmass-window-area");
+          const cornerSpan = panel.querySelector(".aufmass-corner-total");
+          const winContainer = panel.querySelector(".aufmass-facade-windows");
+
+          if (winCount) winCount.value = "0";
+          if (winWidth) winWidth.value = "1,00";
+          if (winHeight) winHeight.value = "1,00";
+          if (cCount) cCount.value = "0";
+          if (cLen) cLen.value = "2,50";
+          if (areaSpan) areaSpan.textContent = "0,00";
+          if (cornerSpan) cornerSpan.textContent = "0,00";
+          if (winContainer) winContainer.innerHTML = "";
+          panel.style.display = "none";
+        });
+
         fillRowFromExcel(row, rec);
         index++;
       });
@@ -1357,7 +2081,6 @@
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
 
-        // sheet_to_json als 2D-Array (erste Zeile Header)
         const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
         if (rows.length < 2) {
           alert("Excel enthält keine Daten.");
@@ -1403,8 +2126,96 @@
       reader.readAsArrayBuffer(file);
     }
 
+    // -------------------------------
+    // BKI-Helfer: EP-Vorschlag box
+    // -------------------------------
+    function recalcBKIBox() {
+      const zeitwertInput = document.getElementById("bki-zeitwert");
+      const lohnsatzInput = document.getElementById("bki-lohnsatz");
+      const matEpInput    = document.getElementById("bki-material-ep");
+      const gwPctInput    = document.getElementById("bki-gewinn-prozent");
+
+      if (!zeitwertInput || !lohnsatzInput || !matEpInput || !gwPctInput) return;
+
+      const zeitwert = parseNumber(zeitwertInput.value);
+      const lohnsatz = parseNumber(lohnsatzInput.value);
+      const matEP    = parseNumber(matEpInput.value);
+      const gwPct    = parseNumber(gwPctInput.value);
+
+      const epLohn   = zeitwert * lohnsatz;
+      const epMat    = matEP;
+      const epSelbst = epLohn + epMat;
+      const epGewinn = epSelbst * (gwPct / 100);
+      const epGesamt = epSelbst + epGewinn;
+
+      const epLohnSpan   = document.getElementById("bki-ep-lohn");
+      const epMatSpan    = document.getElementById("bki-ep-mat");
+      const epGewinnSpan = document.getElementById("bki-ep-gewinn");
+      const epGesamtSpan = document.getElementById("bki-ep-gesamt");
+
+      if (epLohnSpan)   epLohnSpan.textContent   = formatMoney(epLohn);
+      if (epMatSpan)    epMatSpan.textContent    = formatMoney(epMat);
+      if (epGewinnSpan) epGewinnSpan.textContent = formatMoney(epGewinn);
+      if (epGesamtSpan) epGesamtSpan.textContent = formatMoney(epGesamt);
+    }
+
+    // -------------------------------
+    // Aufmaß neu berechnen
+    // -------------------------------
+    function recalcAufmass(panel) {
+      const winCountInput   = panel.querySelector(".aufmass-win-count");
+      const winWidthInput   = panel.querySelector(".aufmass-win-width");
+      const winHeightInput  = panel.querySelector(".aufmass-win-height");
+      const cornerCountInput = panel.querySelector(".aufmass-corner-count");
+      const cornerLengthInput = panel.querySelector(".aufmass-corner-length");
+
+      if (!winCountInput || !winWidthInput || !winHeightInput || !cornerCountInput || !cornerLengthInput) return;
+
+      const count   = parseNumber(winCountInput.value);
+      const width   = parseNumber(winWidthInput.value);
+      const height  = parseNumber(winHeightInput.value);
+      const cCount  = parseNumber(cornerCountInput.value);
+      const cLength = parseNumber(cornerLengthInput.value);
+
+      const area = count * width * height;
+      const cornerTotal = cCount * cLength;
+
+      const areaSpan   = panel.querySelector(".aufmass-window-area");
+      const cornerSpan = panel.querySelector(".aufmass-corner-total");
+
+      if (areaSpan)   areaSpan.textContent   = formatMoney(area);
+      if (cornerSpan) cornerSpan.textContent = formatMoney(cornerTotal);
+
+      const winContainer = panel.querySelector(".aufmass-facade-windows");
+      if (winContainer) {
+        winContainer.innerHTML = "";
+        const safeCount = Math.max(0, Math.min(8, Math.round(count)));
+        for (let i = 0; i < safeCount; i++) {
+          const wDiv = document.createElement("div");
+          wDiv.className = "aufmass-window";
+          const span = document.createElement("span");
+          if (width > 0 && height > 0) {
+            span.textContent = width.toFixed(2) + " × " + height.toFixed(2);
+          } else {
+            span.textContent = "Fenster";
+          }
+          wDiv.appendChild(span);
+          winContainer.appendChild(wDiv);
+        }
+      }
+
+      // Menge aus Fensterfläche übernehmen
+      const row = panel.closest("tr");
+      if (row) {
+        const mengeInput = row.querySelector(".input-menge");
+        if (mengeInput) {
+          mengeInput.value = area.toFixed(2).replace(".", ",");
+        }
+      }
+      recalcAll();
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
-      // Grund-Listener
       attachInputListeners(document);
       recalcAll();
 
@@ -1430,7 +2241,7 @@
         });
       }
 
-      // Delegation für + / − Buttons bei Material
+      // Delegation für + / − Buttons bei Material und Aufmaß-Toggle
       document.addEventListener("click", function (e) {
         const addBtn = e.target.closest(".btn-mat-add");
         if (addBtn) {
@@ -1442,7 +2253,32 @@
           const md = removeBtn.closest(".material-details");
           if (md) removeMaterialDetailRow(md);
         }
+
+        const aufmassBtn = e.target.closest(".aufmass-toggle");
+        if (aufmassBtn) {
+          const cell = aufmassBtn.closest("td");
+          const panel = cell ? cell.querySelector(".aufmass-panel") : null;
+          if (panel) {
+            const isHidden = panel.style.display === "none" || panel.style.display === "";
+            panel.style.display = isHidden ? "block" : "none";
+          }
+        }
       });
+
+      // Aufmaß-Eingaben
+      document.addEventListener("input", function (e) {
+        if (e.target.classList.contains("js-aufmass-input")) {
+          const panel = e.target.closest(".aufmass-panel");
+          if (panel) recalcAufmass(panel);
+        }
+      });
+
+      // BKI-Eingaben
+      const bkiInputs = document.querySelectorAll(".js-bki-input");
+      bkiInputs.forEach(function (inp) {
+        inp.addEventListener("input", recalcBKIBox);
+      });
+      recalcBKIBox();
     });
   </script>
 </body>
