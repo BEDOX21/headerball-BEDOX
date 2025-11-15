@@ -15,7 +15,6 @@
       --primary-soft: #e2e8ff;
       --text: #1f2933;
       --text-soft: #6b7280;
-      --danger: #b91c1c;
     }
 
     * {
@@ -37,9 +36,9 @@
     }
 
     .app-header {
-      background: linear-gradient(135deg, #1f2937, #0f172a);
+      background: linear-gradient(135deg, #0b1120, #111827);
       color: #fff;
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 16px 16px 12px;
       margin-bottom: 16px;
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
@@ -53,39 +52,60 @@
     .app-header-main {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
-    .logo-chip {
+    .brand-logo {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      position: relative;
+      padding: 4px 20px 4px 8px;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      font-size: 12px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
     }
 
-    .logo-chip span:first-child {
-      font-weight: 700;
-      font-size: 13px;
+    .brand-logo::before,
+    .brand-logo::after {
+      content: "";
+      position: absolute;
+      height: 2px;
+      width: 20px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38bdf8, #a855f7);
+      right: -2px;
+    }
+
+    .brand-logo::before {
+      top: 6px;
+    }
+
+    .brand-logo::after {
+      bottom: 6px;
+    }
+
+    .brand-tagline {
+      font-size: 11px;
+      color: #cbd5f5;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 2px;
     }
 
     .app-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       letter-spacing: 0.02em;
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
       gap: 8px;
+      margin-top: 4px;
     }
 
     .app-title small {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 400;
       color: #cbd5f5;
     }
@@ -93,7 +113,7 @@
     .app-subtitle {
       font-size: 12px;
       color: #cbd5f5;
-      max-width: 600px;
+      max-width: 620px;
     }
 
     .app-header-meta {
@@ -223,6 +243,24 @@
       color: var(--primary);
     }
 
+    .badge-small {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #e5edff;
+      border: 1px solid #c7d2fe;
+      font-size: 10px;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    .badge-small span.icon {
+      font-size: 13px;
+      line-height: 1;
+    }
+
     .table-wrapper {
       width: 100%;
       overflow-x: auto;
@@ -234,7 +272,7 @@
     table {
       border-collapse: collapse;
       width: 100%;
-      min-width: 960px;
+      min-width: 1000px;
       font-size: 12px;
     }
 
@@ -268,7 +306,7 @@
       border-top: 1px solid var(--border-soft);
       border-right: 1px solid var(--border-soft);
       padding: 4px 6px;
-      vertical-align: middle;
+      vertical-align: top;
     }
 
     tbody td:last-child {
@@ -346,22 +384,35 @@
       background: #f1f5f9;
     }
 
-    .badge-small {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #e5edff;
-      border: 1px solid #c7d2fe;
-      font-size: 10px;
-      color: #1e293b;
-      font-weight: 500;
+    /* Material-Details pro Position */
+    .material-details {
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px dashed #cbd5f5;
     }
 
-    .badge-small span.icon {
-      font-size: 13px;
-      line-height: 1;
+    .material-detail-caption {
+      font-size: 10px;
+      color: var(--text-soft);
+      margin-bottom: 2px;
+    }
+
+    .material-detail-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 4px;
+      margin-bottom: 3px;
+    }
+
+    .material-detail-label {
+      font-size: 10px;
+      text-align: left;
+    }
+
+    .material-detail-ep {
+      font-size: 10px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
     }
 
     .footer-bar {
@@ -399,8 +450,13 @@
         padding: 12px;
       }
 
+      .brand-logo {
+        font-size: 20px;
+        letter-spacing: 0.22em;
+      }
+
       .app-title {
-        font-size: 16px;
+        font-size: 15px;
       }
 
       .app-subtitle {
@@ -413,7 +469,7 @@
 
       table {
         font-size: 11px;
-        min-width: 880px;
+        min-width: 920px;
       }
 
       thead th {
@@ -428,6 +484,15 @@
         font-size: 10px;
         padding: 3px 4px;
       }
+
+      .material-detail-caption {
+        font-size: 9px;
+      }
+
+      .material-detail-label,
+      .material-detail-ep {
+        font-size: 9px;
+      }
     }
   </style>
 </head>
@@ -435,18 +500,15 @@
   <div class="app-shell">
     <header class="app-header">
       <div class="app-header-main">
-        <div class="logo-chip">
-          <span>BEDOX</span>
-          <span>GAEB / WDVS</span>
-        </div>
+        <div class="brand-logo">BEDOX</div>
+        <div class="brand-tagline">GAEB / WDVS – Fix &amp; Flip Kalkulation</div>
         <div class="app-title">
           WDVS GAEB-EP Rechner
-          <small>Prototyp – Material / Lohn / Gewinn je Position</small>
+          <small>Material / Lohn / Sub / Gewinn je Position</small>
         </div>
         <div class="app-subtitle">
-          Schneller EP-Rechner im GAEB-Stil: Du erfasst Positionen (z. B. WDVS-System),
-          trägst EP-Lohn, EP-Material und EP-Gewinn ein – der Rechner bildet automatisch EP gesamt
-          und GP je Position sowie Summen.
+          Prototyp im GAEB-Stil: Du erfasst WDVS-Positionen, trägst EP Lohn / Sub, EP Material (inkl. Material-Details)
+          und EP Gewinn ein – der Rechner bildet automatisch EP gesamt, GP je Position und Summen.
         </div>
       </div>
       <div class="app-header-meta">
@@ -455,7 +517,7 @@
           <span>WDVS – Prototyp</span>
         </div>
         <div class="hint-text">
-          💡 Eingabe: Komma <strong>oder</strong> Punkt möglich (z. B. 12,50 / 12.50).
+          💡 Eingabe: Komma <strong>oder</strong> Punkt möglich (z.&nbsp;B. 12,50 / 12.50).
         </div>
       </div>
     </header>
@@ -466,9 +528,13 @@
           LV-Tabelle (WDVS – Beispielpositionen)
         </div>
         <div class="panel-header-meta">
-          Pos.-Weise Erfassung ähnlich GAEB / Avaplan – EP-Anteile frei anpassbar.
+          Pos.-Weise Erfassung ähnlich GAEB / Avaplan – EP-Anteile frei anpassbar, Material in Komponenten aufteilbar.
         </div>
         <div class="panel-actions">
+          <button id="reset-prices" class="btn" type="button">
+            <span class="icon">⟳</span>
+            <span>Preise zurücksetzen</span>
+          </button>
           <button id="add-row" class="btn btn-primary" type="button">
             <span class="icon">＋</span>
             <span>Zeile hinzufügen</span>
@@ -479,10 +545,10 @@
       <div class="note">
         <span class="badge-small">
           <span class="icon">ℹ️</span>
-          <span>Struktur</span>
+          <span>WDVS-Material-Details</span>
         </span>
-        &nbsp; Die Beispielpositionen sind für ein WDVS-System gedacht (Gerüst, Kleben, Dübel,
-        Armierung, Oberputz etc.). Du kannst Texte, Mengen und EP-Anteile jederzeit überschreiben.
+        &nbsp; In jeder Position kannst du unter „EP Material“ bis zu drei Materialien mit Bezeichnung und EP hinterlegen
+        (z.&nbsp;B. Armierung, Gewebe, Oberputz). Die Summe wird automatisch in das Feld „EP Material“ übernommen.
       </div>
 
       <div class="table-wrapper">
@@ -493,14 +559,30 @@
               <th>Kurztext</th>
               <th>Menge</th>
               <th>Einheit</th>
-              <th class="cell-ep-header">EP Lohn<br><span class="cell-label">€/Einheit</span></th>
-              <th class="cell-ep-header">EP Material<br><span class="cell-label">€/Einheit</span></th>
-              <th class="cell-ep-header">EP Gewinn<br><span class="cell-label">€/Einheit</span></th>
-              <th class="cell-ep-header">EP gesamt<br><span class="cell-label">€/Einheit</span></th>
-              <th class="cell-ep-header">GP gesamt<br><span class="cell-label">€</span></th>
+              <th class="cell-ep-header">
+                EP Lohn / Sub<br />
+                <span class="cell-label">€/Einheit</span>
+              </th>
+              <th class="cell-ep-header">
+                EP Material<br />
+                <span class="cell-label">€/Einheit (mit Details)</span>
+              </th>
+              <th class="cell-ep-header">
+                EP Gewinn<br />
+                <span class="cell-label">€/Einheit</span>
+              </th>
+              <th class="cell-ep-header">
+                EP gesamt<br />
+                <span class="cell-label">€/Einheit</span>
+              </th>
+              <th class="cell-ep-header">
+                GP gesamt<br />
+                <span class="cell-label">€</span>
+              </th>
             </tr>
           </thead>
           <tbody id="positions-body">
+            <!-- 010 Gerüst -->
             <tr>
               <td>
                 <input type="text" class="pos-nummer input-number" value="010" />
@@ -519,6 +601,21 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="4,00" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Material 1" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Material 2" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Material 3 (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-gewinn js-input" value="2,00" />
@@ -527,6 +624,7 @@
               <td class="cell-money cell-gp-gesamt">0,00</td>
             </tr>
 
+            <!-- 020 Untergrund -->
             <tr>
               <td>
                 <input type="text" class="pos-nummer input-number" value="020" />
@@ -545,6 +643,21 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="1,80" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Haftgrund / Tiefgrund" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Weiteres Material" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Material 3 (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-gewinn js-input" value="1,20" />
@@ -553,6 +666,7 @@
               <td class="cell-money cell-gp-gesamt">0,00</td>
             </tr>
 
+            <!-- 030 Platten kleben -->
             <tr>
               <td>
                 <input type="text" class="pos-nummer input-number" value="030" />
@@ -571,6 +685,21 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="14,00" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Dämmplatte" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Dämmung" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Klebe-/Armierungsmörtel (Kleben)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Kleber" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-gewinn js-input" value="4,00" />
@@ -579,6 +708,7 @@
               <td class="cell-money cell-gp-gesamt">0,00</td>
             </tr>
 
+            <!-- 040 Dübel -->
             <tr>
               <td>
                 <input type="text" class="pos-nummer input-number" value="040" />
@@ -597,6 +727,21 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="3,80" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Dübel / Tellerdübel" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Dübel" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Weiteres Material" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Material 3 (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-gewinn js-input" value="1,50" />
@@ -605,6 +750,7 @@
               <td class="cell-money cell-gp-gesamt">0,00</td>
             </tr>
 
+            <!-- 050 Armierung -->
             <tr>
               <td>
                 <input type="text" class="pos-nummer input-number" value="050" />
@@ -623,6 +769,21 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="4,50" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Armierungsmörtel" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Mörtel" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Glasfasergewebe" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Gewebe" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Eckprofile / Zubehör" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-gewinn js-input" value="2,20" />
@@ -631,6 +792,7 @@
               <td class="cell-money cell-gp-gesamt">0,00</td>
             </tr>
 
+            <!-- 060 Oberputz -->
             <tr>
               <td>
                 <input type="text" class="pos-nummer input-number" value="060" />
@@ -649,6 +811,21 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="6,20" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Oberputz" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Putz" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Grundierung" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Grundierung" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-gewinn js-input" value="2,30" />
@@ -657,6 +834,7 @@
               <td class="cell-money cell-gp-gesamt">0,00</td>
             </tr>
 
+            <!-- 070 Anschluss-/Eckprofile -->
             <tr>
               <td>
                 <input type="text" class="pos-nummer input-number" value="070" />
@@ -675,6 +853,21 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="7,50" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Eckschutzschienen" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Schienen" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Anputzleisten / Anschlussprofile" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Profile" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-gewinn js-input" value="2,50" />
@@ -682,7 +875,134 @@
               <td class="cell-money cell-ep-gesamt">0,00</td>
               <td class="cell-money cell-gp-gesamt">0,00</td>
             </tr>
+
+            <!-- 080 Sockelbereich -->
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="080" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="WDVS-Sockelbereich inkl. Perimeterdämmung und Sockelputz" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="30" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m²" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="9,50" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="12,00" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Perimeterdämmung" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Dämmung" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Sockelputz / Dichtschlämme" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Putz" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="3,50" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+
+            <!-- 090 Brandriegel -->
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="090" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Brandriegel / Brandbarrieren gemäß Detailplanung" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="40" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="8,00" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="10,50" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Mineralische Brandriegel" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Riegel" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Befestigungsmittel" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="3,00" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+
+            <!-- 100 Schlussanstrich -->
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="100" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Schlussanstrich / Fassadenfarbe auf WDVS" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="100" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m²" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="3,80" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="3,20" />
+                <div class="material-details">
+                  <div class="material-detail-caption">Material-Details (optional):</div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" value="Fassadenfarbe" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Farbe" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Grundierung / Hydrophobierung" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Grundierung" />
+                  </div>
+                  <div class="material-detail-row">
+                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
+                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  </div>
+                </div>
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="1,80" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
           </tbody>
+
           <tfoot>
             <tr>
               <td colspan="2">Summen</td>
@@ -700,29 +1020,27 @@
 
       <div class="footer-bar">
         <div>
-          <strong>Hinweis:</strong> Dies ist ein Prototyp. Du kannst die Struktur später erweitern
-          (z. B. zusätzliche Spalten für Kostenarten, LV-Import/Export, GAEB-Schnittstelle etc.).
+          <strong>Hinweis:</strong> Dies ist ein Prototyp. Du kannst später noch Export (CSV/GAEB), zusätzliche
+          Kostenarten und eigene Layout-Anpassungen ergänzen.
         </div>
         <div class="footer-right">
-          <div class="pill">Stand: <strong>Prototyp v0.1</strong></div>
-          <div class="pill">Layout: GAEB-ähnliche LV-Tabelle</div>
+          <div class="pill">Stand: <strong>Prototyp v0.2</strong></div>
+          <div class="pill">Layout: GAEB-ähnliche LV-Tabelle (BEDOX)</div>
         </div>
       </div>
     </main>
   </div>
 
   <script>
-    // Hilfsfunktion: Text -> Zahl (unterstützt "1.234,56" und "1234.56" usw.)
+    // Hilfsfunktion: Text -> Zahl (unterstützt "1.234,56" und "1234.56")
     function parseNumber(value) {
       if (value === null || value === undefined) return 0;
       let v = String(value).trim();
       if (v === "") return 0;
 
-      // Fall: "1.234,56" -> "." = Tausender, "," = Dezimal
       if (v.includes(".") && v.includes(",")) {
         v = v.replace(/\./g, "").replace(",", ".");
       } else if (v.includes(",")) {
-        // Einfaches deutsches Format "1234,56"
         v = v.replace(",", ".");
       }
       const n = parseFloat(v);
@@ -787,12 +1105,40 @@
       document.getElementById("sum-gp-gesamt").textContent = formatMoney(sumGpGesamt);
     }
 
+    // Material-Details: Summe der Material-Komponenten -> EP Material
+    function recalcMaterialFromDetails(event) {
+      const input = event.target;
+      const row = input.closest("tr");
+      if (!row) return;
+
+      const detailInputs = row.querySelectorAll(".js-material-detail");
+      let sum = 0;
+      detailInputs.forEach(function (inp) {
+        sum += parseNumber(inp.value);
+      });
+
+      if (sum > 0) {
+        const materialInput = row.querySelector(".input-material");
+        if (materialInput) {
+          materialInput.value = sum.toFixed(2).replace(".", ",");
+        }
+      }
+      recalcAll();
+    }
+
     function attachInputListeners(scope) {
       const root = scope || document;
+
       const inputs = root.querySelectorAll(".js-input");
       inputs.forEach(function (input) {
-        input.removeEventListener("input", recalcAll); // doppelte Listener vermeiden
+        input.removeEventListener("input", recalcAll);
         input.addEventListener("input", recalcAll);
+      });
+
+      const matDetailInputs = root.querySelectorAll(".js-material-detail");
+      matDetailInputs.forEach(function (input) {
+        input.removeEventListener("input", recalcMaterialFromDetails);
+        input.addEventListener("input", recalcMaterialFromDetails);
       });
     }
 
@@ -803,7 +1149,6 @@
 
       const newRow = lastRow.cloneNode(true);
 
-      // Felder zurücksetzen / sinnvoll anpassen
       const posInput = newRow.querySelector(".pos-nummer");
       if (posInput) {
         const raw = posInput.value.trim();
@@ -811,8 +1156,6 @@
         if (!isNaN(n)) {
           const next = n + 10;
           posInput.value = String(next).padStart(raw.length || 3, "0");
-        } else {
-          posInput.value = raw;
         }
       }
 
@@ -834,6 +1177,19 @@
       if (materialInput) materialInput.value = "";
       if (gewinnInput) gewinnInput.value = "";
 
+      const matLabels = newRow.querySelectorAll(".material-detail-label");
+      matLabels.forEach(function (lab, index) {
+        lab.value = "";
+        if (index === 0) lab.placeholder = "Material 1";
+        if (index === 1) lab.placeholder = "Material 2";
+        if (index === 2) lab.placeholder = "Material 3 (optional)";
+      });
+
+      const matDetailEps = newRow.querySelectorAll(".material-detail-ep");
+      matDetailEps.forEach(function (inp) {
+        inp.value = "";
+      });
+
       const epCell = newRow.querySelector(".cell-ep-gesamt");
       const gpCell = newRow.querySelector(".cell-gp-gesamt");
       if (epCell) epCell.textContent = "0,00";
@@ -844,6 +1200,33 @@
       recalcAll();
     }
 
+    function resetPrices() {
+      const tbody = document.getElementById("positions-body");
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+
+      rows.forEach(function (row) {
+        const lohnInput = row.querySelector(".input-lohn");
+        const materialInput = row.querySelector(".input-material");
+        const gewinnInput = row.querySelector(".input-gewinn");
+        const matDetailEps = row.querySelectorAll(".material-detail-ep");
+        const epCell = row.querySelector(".cell-ep-gesamt");
+        const gpCell = row.querySelector(".cell-gp-gesamt");
+
+        if (lohnInput) lohnInput.value = "0";
+        if (materialInput) materialInput.value = "0";
+        if (gewinnInput) gewinnInput.value = "0";
+
+        matDetailEps.forEach(function (inp) {
+          inp.value = "";
+        });
+
+        if (epCell) epCell.textContent = "0,00";
+        if (gpCell) gpCell.textContent = "0,00";
+      });
+
+      recalcAll();
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
       attachInputListeners(document);
       recalcAll();
@@ -851,6 +1234,11 @@
       const addRowBtn = document.getElementById("add-row");
       if (addRowBtn) {
         addRowBtn.addEventListener("click", addRow);
+      }
+
+      const resetBtn = document.getElementById("reset-prices");
+      if (resetBtn) {
+        resetBtn.addEventListener("click", resetPrices);
       }
     });
   </script>
