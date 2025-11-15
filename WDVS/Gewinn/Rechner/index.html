@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>BEDOX – WDVS GAEB-EP Rechner (Prototyp)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --bg-panel: #ffffff;
+      --border: #d0d4dc;
+      --border-soft: #e1e4eb;
+      --primary: #2549a8;
+      --primary-soft: #e2e8ff;
+      --text: #1f2933;
+      --text-soft: #6b7280;
+      --danger: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #e5edff, #f4f5f7 50%, #e8eef5 100%);
+      color: var(--text);
+    }
+
+    .app-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #1f2937, #0f172a);
+      color: #fff;
+      border-radius: 12px;
+      padding: 16px 16px 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 12px 24px;
+      justify-content: space-between;
+    }
+
+    .app-header-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .logo-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .logo-chip span:first-child {
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .app-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .app-title small {
+      font-size: 12px;
+      font-weight: 400;
+      color: #cbd5f5;
+    }
+
+    .app-subtitle {
+      font-size: 12px;
+      color: #cbd5f5;
+      max-width: 600px;
+    }
+
+    .app-header-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+      font-size: 11px;
+      color: #cbd5f5;
+    }
+
+    .header-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-badge strong {
+      font-size: 11px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .header-badge span {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hint-text {
+      font-size: 11px;
+      opacity: 0.9;
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+      padding: 12px;
+    }
+
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 16px;
+      margin-bottom: 8px;
+    }
+
+    .panel-header-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-header-title::before {
+      content: "";
+      width: 4px;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--primary), #7c3aed);
+    }
+
+    .panel-header-meta {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .panel-actions {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .btn:hover {
+      box-shadow: 0 3px 10px rgba(148, 163, 184, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn span.icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .note {
+      font-size: 11px;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+
+    .note strong {
+      color: var(--primary);
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 960px;
+      font-size: 12px;
+    }
+
+    thead {
+      background: linear-gradient(180deg, #e5edff, #d5ddf5);
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      padding: 6px 8px;
+      text-align: left;
+      font-weight: 600;
+      color: #111827;
+      border-right: 1px solid var(--border-soft);
+      white-space: nowrap;
+    }
+
+    thead th:last-child {
+      border-right: none;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f5f7fb;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #ffffff;
+    }
+
+    tbody td {
+      border-top: 1px solid var(--border-soft);
+      border-right: 1px solid var(--border-soft);
+      padding: 4px 6px;
+      vertical-align: middle;
+    }
+
+    tbody td:last-child {
+      border-right: none;
+    }
+
+    tfoot {
+      background: #111827;
+      color: #f9fafb;
+      font-weight: 600;
+    }
+
+    tfoot td {
+      border-top: 1px solid #1f2937;
+      padding: 6px 8px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .cell-label {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 4px 6px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      outline: none;
+      background: #ffffff;
+      transition: border 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary-soft);
+      background: #fdfdff;
+    }
+
+    .input-number {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cell-money {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    .cell-money-total {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .cell-ep-header {
+      text-align: center;
+    }
+
+    .cell-ep-group {
+      border-left: 2px solid #c7d2fe;
+      border-right: 2px solid #c7d2fe;
+      background: #eef2ff;
+    }
+
+    .cell-ep-group input[type="text"] {
+      background: #fefeff;
+    }
+
+    .cell-ep-gesamt,
+    .cell-gp-gesamt {
+      background: #f1f5f9;
+    }
+
+    .badge-small {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #e5edff;
+      border: 1px solid #c7d2fe;
+      font-size: 10px;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    .badge-small span.icon {
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .footer-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .footer-right .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: #f9fafb;
+      font-size: 11px;
+    }
+
+    @media (max-width: 768px) {
+      .app-shell {
+        padding: 10px;
+      }
+
+      .app-header {
+        padding: 12px;
+      }
+
+      .app-title {
+        font-size: 16px;
+      }
+
+      .app-subtitle {
+        font-size: 11px;
+      }
+
+      .panel {
+        padding: 10px;
+      }
+
+      table {
+        font-size: 11px;
+        min-width: 880px;
+      }
+
+      thead th {
+        padding: 4px 6px;
+      }
+
+      tbody td {
+        padding: 3px 4px;
+      }
+
+      input[type="text"] {
+        font-size: 10px;
+        padding: 3px 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-header-main">
+        <div class="logo-chip">
+          <span>BEDOX</span>
+          <span>GAEB / WDVS</span>
+        </div>
+        <div class="app-title">
+          WDVS GAEB-EP Rechner
+          <small>Prototyp – Material / Lohn / Gewinn je Position</small>
+        </div>
+        <div class="app-subtitle">
+          Schneller EP-Rechner im GAEB-Stil: Du erfasst Positionen (z. B. WDVS-System),
+          trägst EP-Lohn, EP-Material und EP-Gewinn ein – der Rechner bildet automatisch EP gesamt
+          und GP je Position sowie Summen.
+        </div>
+      </div>
+      <div class="app-header-meta">
+        <div class="header-badge">
+          <strong>Projekt:</strong>
+          <span>WDVS – Prototyp</span>
+        </div>
+        <div class="hint-text">
+          💡 Eingabe: Komma <strong>oder</strong> Punkt möglich (z. B. 12,50 / 12.50).
+        </div>
+      </div>
+    </header>
+
+    <main class="panel">
+      <div class="panel-header">
+        <div class="panel-header-title">
+          LV-Tabelle (WDVS – Beispielpositionen)
+        </div>
+        <div class="panel-header-meta">
+          Pos.-Weise Erfassung ähnlich GAEB / Avaplan – EP-Anteile frei anpassbar.
+        </div>
+        <div class="panel-actions">
+          <button id="add-row" class="btn btn-primary" type="button">
+            <span class="icon">＋</span>
+            <span>Zeile hinzufügen</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="badge-small">
+          <span class="icon">ℹ️</span>
+          <span>Struktur</span>
+        </span>
+        &nbsp; Die Beispielpositionen sind für ein WDVS-System gedacht (Gerüst, Kleben, Dübel,
+        Armierung, Oberputz etc.). Du kannst Texte, Mengen und EP-Anteile jederzeit überschreiben.
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Pos.-Nr.</th>
+              <th>Kurztext</th>
+              <th>Menge</th>
+              <th>Einheit</th>
+              <th class="cell-ep-header">EP Lohn<br><span class="cell-label">€/Einheit</span></th>
+              <th class="cell-ep-header">EP Material<br><span class="cell-label">€/Einheit</span></th>
+              <th class="cell-ep-header">EP Gewinn<br><span class="cell-label">€/Einheit</span></th>
+              <th class="cell-ep-header">EP gesamt<br><span class="cell-label">€/Einheit</span></th>
+              <th class="cell-ep-header">GP gesamt<br><span class="cell-label">€</span></th>
+            </tr>
+          </thead>
+          <tbody id="positions-body">
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="010" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Gerüst stellen für WDVS-Fassade, bis 3. OG" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="100" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m²" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="6,50" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="4,00" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="2,00" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="020" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Untergrundvorbereitung, Reinigung und Haftgrund" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="100" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m²" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="4,50" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="1,80" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="1,20" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="030" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Wärmedämmplatten kleben und ansetzen (EPS / Mineralwolle)" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="100" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m²" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="10,00" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="14,00" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="4,00" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="040" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Dübel setzen für WDVS inkl. Bohren" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="100" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m²" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="3,20" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="3,80" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="1,50" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="050" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Armierungslage mit Gewebe, vollflächig" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="100" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m²" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="6,80" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="4,50" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="2,20" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="060" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Oberputz (z. B. Silikonharzputz) inkl. Strukturierung" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="100" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m²" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="5,50" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="6,20" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="2,30" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+
+            <tr>
+              <td>
+                <input type="text" class="pos-nummer input-number" value="070" />
+              </td>
+              <td>
+                <input type="text" class="pos-text" value="Anschluss- und Eckprofile, Fensterbänke, Laibungen" />
+              </td>
+              <td>
+                <input type="text" class="input-number input-menge js-input" value="80" />
+              </td>
+              <td>
+                <input type="text" class="input-einheit" value="m" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-lohn js-input" value="5,00" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-material js-input" value="7,50" />
+              </td>
+              <td class="cell-ep-group">
+                <input type="text" class="input-number input-gewinn js-input" value="2,50" />
+              </td>
+              <td class="cell-money cell-ep-gesamt">0,00</td>
+              <td class="cell-money cell-gp-gesamt">0,00</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2">Summen</td>
+              <td class="cell-money-total" id="sum-menge">0,00</td>
+              <td></td>
+              <td class="cell-money-total" id="sum-lohn-gp">0,00</td>
+              <td class="cell-money-total" id="sum-material-gp">0,00</td>
+              <td class="cell-money-total" id="sum-gewinn-gp">0,00</td>
+              <td></td>
+              <td class="cell-money-total" id="sum-gp-gesamt">0,00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="footer-bar">
+        <div>
+          <strong>Hinweis:</strong> Dies ist ein Prototyp. Du kannst die Struktur später erweitern
+          (z. B. zusätzliche Spalten für Kostenarten, LV-Import/Export, GAEB-Schnittstelle etc.).
+        </div>
+        <div class="footer-right">
+          <div class="pill">Stand: <strong>Prototyp v0.1</strong></div>
+          <div class="pill">Layout: GAEB-ähnliche LV-Tabelle</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Hilfsfunktion: Text -> Zahl (unterstützt "1.234,56" und "1234.56" usw.)
+    function parseNumber(value) {
+      if (value === null || value === undefined) return 0;
+      let v = String(value).trim();
+      if (v === "") return 0;
+
+      // Fall: "1.234,56" -> "." = Tausender, "," = Dezimal
+      if (v.includes(".") && v.includes(",")) {
+        v = v.replace(/\./g, "").replace(",", ".");
+      } else if (v.includes(",")) {
+        // Einfaches deutsches Format "1234,56"
+        v = v.replace(",", ".");
+      }
+      const n = parseFloat(v);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function formatMoney(value) {
+      const n = Number(value) || 0;
+      return n.toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function recalcAll() {
+      const tbody = document.getElementById("positions-body");
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+
+      let sumMenge = 0;
+      let sumLohnGP = 0;
+      let sumMaterialGP = 0;
+      let sumGewinnGP = 0;
+      let sumGpGesamt = 0;
+
+      rows.forEach(function (row) {
+        const mengeInput = row.querySelector(".input-menge");
+        const lohnInput = row.querySelector(".input-lohn");
+        const materialInput = row.querySelector(".input-material");
+        const gewinnInput = row.querySelector(".input-gewinn");
+        const epCell = row.querySelector(".cell-ep-gesamt");
+        const gpCell = row.querySelector(".cell-gp-gesamt");
+
+        if (!mengeInput || !lohnInput || !materialInput || !gewinnInput || !epCell || !gpCell) {
+          return;
+        }
+
+        const menge = parseNumber(mengeInput.value);
+        const epLohn = parseNumber(lohnInput.value);
+        const epMaterial = parseNumber(materialInput.value);
+        const epGewinn = parseNumber(gewinnInput.value);
+
+        const epGesamt = epLohn + epMaterial + epGewinn;
+        const gpGesamt = menge * epGesamt;
+        const gpLohn = menge * epLohn;
+        const gpMaterial = menge * epMaterial;
+        const gpGewinn = menge * epGewinn;
+
+        epCell.textContent = formatMoney(epGesamt);
+        gpCell.textContent = formatMoney(gpGesamt);
+
+        sumMenge += menge;
+        sumLohnGP += gpLohn;
+        sumMaterialGP += gpMaterial;
+        sumGewinnGP += gpGewinn;
+        sumGpGesamt += gpGesamt;
+      });
+
+      document.getElementById("sum-menge").textContent = formatMoney(sumMenge);
+      document.getElementById("sum-lohn-gp").textContent = formatMoney(sumLohnGP);
+      document.getElementById("sum-material-gp").textContent = formatMoney(sumMaterialGP);
+      document.getElementById("sum-gewinn-gp").textContent = formatMoney(sumGewinnGP);
+      document.getElementById("sum-gp-gesamt").textContent = formatMoney(sumGpGesamt);
+    }
+
+    function attachInputListeners(scope) {
+      const root = scope || document;
+      const inputs = root.querySelectorAll(".js-input");
+      inputs.forEach(function (input) {
+        input.removeEventListener("input", recalcAll); // doppelte Listener vermeiden
+        input.addEventListener("input", recalcAll);
+      });
+    }
+
+    function addRow() {
+      const tbody = document.getElementById("positions-body");
+      const lastRow = tbody.querySelector("tr:last-child");
+      if (!lastRow) return;
+
+      const newRow = lastRow.cloneNode(true);
+
+      // Felder zurücksetzen / sinnvoll anpassen
+      const posInput = newRow.querySelector(".pos-nummer");
+      if (posInput) {
+        const raw = posInput.value.trim();
+        const n = parseInt(raw, 10);
+        if (!isNaN(n)) {
+          const next = n + 10;
+          posInput.value = String(next).padStart(raw.length || 3, "0");
+        } else {
+          posInput.value = raw;
+        }
+      }
+
+      const textInput = newRow.querySelector(".pos-text");
+      if (textInput) {
+        textInput.value = "";
+      }
+
+      const mengeInput = newRow.querySelector(".input-menge");
+      if (mengeInput) {
+        mengeInput.value = "";
+      }
+
+      const lohnInput = newRow.querySelector(".input-lohn");
+      const materialInput = newRow.querySelector(".input-material");
+      const gewinnInput = newRow.querySelector(".input-gewinn");
+
+      if (lohnInput) lohnInput.value = "";
+      if (materialInput) materialInput.value = "";
+      if (gewinnInput) gewinnInput.value = "";
+
+      const epCell = newRow.querySelector(".cell-ep-gesamt");
+      const gpCell = newRow.querySelector(".cell-gp-gesamt");
+      if (epCell) epCell.textContent = "0,00";
+      if (gpCell) gpCell.textContent = "0,00";
+
+      tbody.appendChild(newRow);
+      attachInputListeners(newRow);
+      recalcAll();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      attachInputListeners(document);
+      recalcAll();
+
+      const addRowBtn = document.getElementById("add-row");
+      if (addRowBtn) {
+        addRowBtn.addEventListener("click", addRow);
+      }
+    });
+  </script>
+</body>
+</html>
