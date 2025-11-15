@@ -17,9 +17,7 @@
       --text-soft: #6b7280;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -65,7 +63,6 @@
       display: inline-flex;
       align-items: center;
     }
-
     .brand-logo::before,
     .brand-logo::after {
       content: "";
@@ -76,14 +73,8 @@
       background: linear-gradient(90deg, #38bdf8, #a855f7);
       right: -2px;
     }
-
-    .brand-logo::before {
-      top: 6px;
-    }
-
-    .brand-logo::after {
-      bottom: 6px;
-    }
+    .brand-logo::before { top: 6px; }
+    .brand-logo::after { bottom: 6px; }
 
     .brand-tagline {
       font-size: 11px;
@@ -103,7 +94,6 @@
       gap: 8px;
       margin-top: 4px;
     }
-
     .app-title small {
       font-size: 11px;
       font-weight: 400;
@@ -134,23 +124,18 @@
       align-items: center;
       gap: 6px;
     }
-
     .header-badge strong {
       font-size: 11px;
       font-weight: 600;
       color: #e5e7eb;
     }
-
     .header-badge span {
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
 
-    .hint-text {
-      font-size: 11px;
-      opacity: 0.9;
-    }
+    .hint-text { font-size: 11px; opacity: 0.9; }
 
     .panel {
       background: var(--bg-panel);
@@ -167,7 +152,6 @@
       gap: 8px 16px;
       margin-bottom: 8px;
     }
-
     .panel-header-title {
       font-size: 14px;
       font-weight: 600;
@@ -175,7 +159,6 @@
       align-items: center;
       gap: 8px;
     }
-
     .panel-header-title::before {
       content: "";
       width: 4px;
@@ -183,12 +166,10 @@
       border-radius: 999px;
       background: linear-gradient(180deg, var(--primary), #7c3aed);
     }
-
     .panel-header-meta {
       font-size: 11px;
       color: var(--text-soft);
     }
-
     .panel-actions {
       margin-left: auto;
       display: flex;
@@ -211,37 +192,24 @@
       transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
       user-select: none;
     }
-
     .btn-primary {
       background: var(--primary);
       border-color: var(--primary);
       color: #fff;
     }
-
     .btn:hover {
       box-shadow: 0 3px 10px rgba(148, 163, 184, 0.4);
       transform: translateY(-1px);
     }
-
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-
-    .btn span.icon {
-      font-size: 14px;
-      line-height: 1;
-    }
+    .btn:active { transform: translateY(0); box-shadow: none; }
+    .btn span.icon { font-size: 14px; line-height: 1; }
 
     .note {
       font-size: 11px;
       color: var(--text-soft);
       margin-bottom: 8px;
     }
-
-    .note strong {
-      color: var(--primary);
-    }
+    .note strong { color: var(--primary); }
 
     .badge-small {
       display: inline-flex;
@@ -255,7 +223,6 @@
       color: #1e293b;
       font-weight: 500;
     }
-
     .badge-small span.icon {
       font-size: 13px;
       line-height: 1;
@@ -280,7 +247,6 @@
       background: linear-gradient(180deg, #e5edff, #d5ddf5);
       border-bottom: 1px solid var(--border);
     }
-
     thead th {
       padding: 6px 8px;
       text-align: left;
@@ -289,18 +255,10 @@
       border-right: 1px solid var(--border-soft);
       white-space: nowrap;
     }
+    thead th:last-child { border-right: none; }
 
-    thead th:last-child {
-      border-right: none;
-    }
-
-    tbody tr:nth-child(even) {
-      background: #f5f7fb;
-    }
-
-    tbody tr:nth-child(odd) {
-      background: #ffffff;
-    }
+    tbody tr:nth-child(even) { background: #f5f7fb; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
 
     tbody td {
       border-top: 1px solid var(--border-soft);
@@ -308,17 +266,13 @@
       padding: 4px 6px;
       vertical-align: top;
     }
-
-    tbody td:last-child {
-      border-right: none;
-    }
+    tbody td:last-child { border-right: none; }
 
     tfoot {
       background: #111827;
       color: #f9fafb;
       font-weight: 600;
     }
-
     tfoot td {
       border-top: 1px solid #1f2937;
       padding: 6px 8px;
@@ -341,7 +295,6 @@
       background: #ffffff;
       transition: border 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
     }
-
     input[type="text"]:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 1px var(--primary-soft);
@@ -352,7 +305,6 @@
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
-
     .pos-nummer {
       text-align: center;
       font-variant-numeric: tabular-nums;
@@ -364,26 +316,20 @@
       font-variant-numeric: tabular-nums;
       font-weight: 500;
     }
-
     .cell-money-total {
       text-align: right;
       font-variant-numeric: tabular-nums;
       font-weight: 700;
     }
 
-    .cell-ep-header {
-      text-align: center;
-    }
+    .cell-ep-header { text-align: center; }
 
     .cell-ep-group {
       border-left: 2px solid #c7d2fe;
       border-right: 2px solid #c7d2fe;
       background: #eef2ff;
     }
-
-    .cell-ep-group input[type="text"] {
-      background: #fefeff;
-    }
+    .cell-ep-group input[type="text"] { background: #fefeff; }
 
     .cell-ep-gesamt,
     .cell-gp-gesamt {
@@ -391,71 +337,74 @@
     }
 
     /* Spaltenbreiten */
-    th.col-pos,
-    td.col-pos {
-      width: 72px;
-      min-width: 72px;
-      max-width: 72px;
+    th.col-pos, td.col-pos {
+      width: 72px; min-width: 72px; max-width: 72px;
+    }
+    th.col-menge, td.col-menge {
+      width: 78px; min-width: 78px; max-width: 78px;
+    }
+    th.col-einheit, td.col-einheit {
+      width: 64px; min-width: 64px; max-width: 64px;
+    }
+    th.col-lohn, td.col-lohn {
+      width: 96px; min-width: 96px; max-width: 96px;
+    }
+    th.col-gewinn, td.col-gewinn {
+      width: 96px; min-width: 96px; max-width: 96px;
     }
 
-    th.col-menge,
-    td.col-menge {
-      width: 78px;
-      min-width: 78px;
-      max-width: 78px;
-    }
-
-    th.col-einheit,
-    td.col-einheit {
-      width: 64px;
-      min-width: 64px;
-      max-width: 64px;
-    }
-
-    th.col-lohn,
-    td.col-lohn {
-      width: 96px;
-      min-width: 96px;
-      max-width: 96px;
-    }
-
-    th.col-gewinn,
-    td.col-gewinn {
-      width: 96px;
-      min-width: 96px;
-      max-width: 96px;
-    }
-
-    /* Material-Details pro Position */
+    /* Material-Details */
     .material-details {
       margin-top: 4px;
       padding-top: 4px;
       border-top: 1px dashed #cbd5f5;
     }
-
     .material-detail-caption {
       font-size: 10px;
       color: var(--text-soft);
       margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
     }
+    .material-detail-caption span.label {
+      flex: 1 1 auto;
+    }
+    .material-detail-buttons {
+      display: inline-flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .material-rows { display: flex; flex-direction: column; gap: 3px; }
 
     .material-detail-row {
       display: grid;
       grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
       gap: 4px;
-      margin-bottom: 3px;
     }
-
     .material-detail-label {
       font-size: 10px;
       text-align: left;
     }
-
     .material-detail-ep {
       font-size: 10px;
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
+
+    .btn-mat {
+      border: none;
+      border-radius: 999px;
+      padding: 1px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      line-height: 1.3;
+      color: #fff;
+    }
+    .btn-mat-add { background: #16a34a; }  /* grün */
+    .btn-mat-remove { background: #b91c1c; } /* rot */
 
     .footer-bar {
       display: flex;
@@ -467,14 +416,12 @@
       font-size: 11px;
       color: var(--text-soft);
     }
-
     .footer-right {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       align-items: center;
     }
-
     .footer-right .pill {
       padding: 3px 8px;
       border-radius: 999px;
@@ -483,21 +430,19 @@
       font-size: 11px;
     }
 
-    /* Summen-Einheiten unten */
+    /* Summen-Einheiten */
     .tfoot-qty::after {
       content: " m²";
       font-size: 10px;
       margin-left: 4px;
       opacity: 0.9;
     }
-
     .tfoot-amount::after {
       content: " €";
       font-size: 10px;
       margin-left: 4px;
       opacity: 0.9;
     }
-
     .tfoot-unit-label {
       font-size: 10px;
       text-align: left;
@@ -526,7 +471,6 @@
       justify-content: center;
       backdrop-filter: blur(6px);
     }
-
     .floating-logo::before,
     .floating-logo::after {
       content: "";
@@ -537,67 +481,29 @@
       background: linear-gradient(90deg, #38bdf8, #a855f7);
       left: 8px;
     }
-
-    .floating-logo::before {
-      top: 6px;
-    }
-
-    .floating-logo::after {
-      bottom: 6px;
-    }
+    .floating-logo::before { top: 6px; }
+    .floating-logo::after { bottom: 6px; }
 
     @media (max-width: 768px) {
-      .app-shell {
-        padding: 10px;
-      }
-
-      .app-header {
-        padding: 12px;
-      }
-
+      .app-shell { padding: 10px; }
+      .app-header { padding: 12px; }
       .brand-logo {
         font-size: 20px;
         letter-spacing: 0.22em;
       }
-
-      .app-title {
-        font-size: 15px;
-      }
-
-      .app-subtitle {
-        font-size: 11px;
-      }
-
-      .panel {
-        padding: 10px;
-      }
-
-      table {
-        font-size: 11px;
-        min-width: 920px;
-      }
-
-      thead th {
-        padding: 4px 6px;
-      }
-
-      tbody td {
-        padding: 3px 4px;
-      }
-
+      .app-title { font-size: 15px; }
+      .app-subtitle { font-size: 11px; }
+      .panel { padding: 10px; }
+      table { font-size: 11px; min-width: 920px; }
+      thead th { padding: 4px 6px; }
+      tbody td { padding: 3px 4px; }
       input[type="text"] {
         font-size: 10px;
         padding: 3px 4px;
       }
-
-      .material-detail-caption {
-        font-size: 9px;
-      }
-
+      .material-detail-caption { font-size: 9px; }
       .material-detail-label,
-      .material-detail-ep {
-        font-size: 9px;
-      }
+      .material-detail-ep { font-size: 9px; }
 
       .floating-logo {
         font-size: 11px;
@@ -660,8 +566,8 @@
           <span class="icon">ℹ️</span>
           <span>WDVS-Material-Details</span>
         </span>
-        &nbsp; In jeder Position kannst du unter „EP Material“ bis zu drei Materialien mit Bezeichnung und EP hinterlegen
-        (z.&nbsp;B. Armierung, Gewebe, Oberputz). Die Summe wird automatisch in das Feld „EP Material“ übernommen.
+        &nbsp; Unter „EP Material“ kannst du pro Position beliebig viele Materialien anlegen (Material 1, 2, 3 ...).
+        Über <strong>+</strong>/<strong>−</strong> fügst du Zeilen hinzu oder entfernst sie. Die Summe läuft automatisch in „EP Material“.
       </div>
 
       <div class="table-wrapper">
@@ -673,28 +579,26 @@
               <th class="col-menge">Menge</th>
               <th class="col-einheit">Einheit</th>
               <th class="cell-ep-header col-lohn">
-                EP Lohn / Sub<br />
-                <span class="cell-label">€/Einheit</span>
+                EP Lohn / Sub<br /><span class="cell-label">€/Einheit</span>
               </th>
               <th class="cell-ep-header">
-                EP Material<br />
-                <span class="cell-label">€/Einheit (mit Details)</span>
+                EP Material<br /><span class="cell-label">€/Einheit (mit Details)</span>
               </th>
               <th class="cell-ep-header col-gewinn">
-                EP Gewinn<br />
-                <span class="cell-label">€/Einheit</span>
+                EP Gewinn<br /><span class="cell-label">€/Einheit</span>
               </th>
               <th class="cell-ep-header">
-                EP gesamt<br />
-                <span class="cell-label">€/Einheit</span>
+                EP gesamt<br /><span class="cell-label">€/Einheit</span>
               </th>
               <th class="cell-ep-header">
-                GP gesamt<br />
-                <span class="cell-label">€</span>
+                GP gesamt<br /><span class="cell-label">€</span>
               </th>
             </tr>
           </thead>
+
           <tbody id="positions-body">
+            <!-- jede Material-Zelle mit dynamischen Zeilen (Start: Material 1) -->
+
             <!-- 010 Gerüst -->
             <tr>
               <td class="col-pos">
@@ -714,19 +618,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="4,00" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Material 1" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Material 2" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Material 3 (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -756,19 +660,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="1,80" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Haftgrund / Tiefgrund" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Weiteres Material" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Material 3 (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -798,19 +702,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="14,00" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Dämmplatte" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Dämmung" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Klebe-/Armierungsmörtel (Kleben)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Kleber" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -840,19 +744,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="3,80" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Dübel / Tellerdübel" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Dübel" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Weiteres Material" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Material 3 (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -882,19 +786,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="4,50" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Armierungsmörtel" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Mörtel" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Glasfasergewebe" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Gewebe" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Eckprofile / Zubehör" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -924,19 +828,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="6,20" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Oberputz" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Putz" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Grundierung" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Grundierung" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -966,19 +870,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="7,50" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Eckschutzschienen" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Schienen" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Anputzleisten / Anschlussprofile" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Profile" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -1008,19 +912,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="12,00" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Perimeterdämmung" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Dämmung" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Sockelputz / Dichtschlämme" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Putz" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -1050,19 +954,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="10,50" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Mineralische Brandriegel" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Riegel" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Befestigungsmittel" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -1092,19 +996,19 @@
               </td>
               <td class="cell-ep-group">
                 <input type="text" class="input-number input-material js-input" value="3,20" />
-                <div class="material-details">
-                  <div class="material-detail-caption">Material-Details (optional):</div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" value="Fassadenfarbe" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Farbe" />
+                <div class="material-details" data-next-index="2">
+                  <div class="material-detail-caption">
+                    <span class="label">Material-Details (optional):</span>
+                    <span class="material-detail-buttons">
+                      <button type="button" class="btn-mat btn-mat-add">＋</button>
+                      <button type="button" class="btn-mat btn-mat-remove">−</button>
+                    </span>
                   </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Grundierung / Hydrophobierung" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP Grundierung" />
-                  </div>
-                  <div class="material-detail-row">
-                    <input type="text" class="material-detail-label" placeholder="Weiteres Material (optional)" />
-                    <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                  <div class="material-rows">
+                    <div class="material-detail-row">
+                      <input type="text" class="material-detail-label" placeholder="Material 1" />
+                      <input type="text" class="material-detail-ep js-material-detail" placeholder="EP" />
+                    </div>
                   </div>
                 </div>
               </td>
@@ -1133,27 +1037,24 @@
 
       <div class="footer-bar">
         <div>
-          <strong>Hinweis:</strong> Dies ist ein Prototyp. Du kannst später noch Export (CSV/GAEB), zusätzliche
-          Kostenarten und eigene Layout-Anpassungen ergänzen.
+          <strong>Hinweis:</strong> Dies ist ein Prototyp. Du kannst später noch Export (CSV/GAEB), Kostenarten und mehr ergänzen.
         </div>
         <div class="footer-right">
-          <div class="pill">Stand: <strong>Prototyp v0.3</strong></div>
+          <div class="pill">Stand: <strong>Prototyp v0.4</strong></div>
           <div class="pill">Layout: GAEB-ähnliche LV-Tabelle (BEDOX)</div>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Schwebendes BEDOX-Logo (immer sichtbar) -->
+  <!-- Schwebendes BEDOX-Logo -->
   <div class="floating-logo">BEDOX</div>
 
   <script>
-    // Hilfsfunktion: Text -> Zahl (unterstützt "1.234,56" und "1234.56")
     function parseNumber(value) {
       if (value === null || value === undefined) return 0;
       let v = String(value).trim();
       if (v === "") return 0;
-
       if (v.includes(".") && v.includes(",")) {
         v = v.replace(/\./g, "").replace(",", ".");
       } else if (v.includes(",")) {
@@ -1189,9 +1090,7 @@
         const epCell = row.querySelector(".cell-ep-gesamt");
         const gpCell = row.querySelector(".cell-gp-gesamt");
 
-        if (!mengeInput || !lohnInput || !materialInput || !gewinnInput || !epCell || !gpCell) {
-          return;
-        }
+        if (!mengeInput || !lohnInput || !materialInput || !gewinnInput || !epCell || !gpCell) return;
 
         const menge = parseNumber(mengeInput.value);
         const epLohn = parseNumber(lohnInput.value);
@@ -1221,23 +1120,17 @@
       document.getElementById("sum-gp-gesamt").textContent = formatMoney(sumGpGesamt);
     }
 
-    // Material-Details: Summe der Material-Komponenten -> EP Material
+    // Summe der Material-Komponenten einer Position -> EP Material
     function recalcMaterialFromDetails(event) {
       const input = event.target;
       const row = input.closest("tr");
       if (!row) return;
-
       const detailInputs = row.querySelectorAll(".js-material-detail");
       let sum = 0;
-      detailInputs.forEach(function (inp) {
-        sum += parseNumber(inp.value);
-      });
-
+      detailInputs.forEach(inp => { sum += parseNumber(inp.value); });
       if (sum > 0) {
         const materialInput = row.querySelector(".input-material");
-        if (materialInput) {
-          materialInput.value = sum.toFixed(2).replace(".", ",");
-        }
+        if (materialInput) materialInput.value = sum.toFixed(2).replace(".", ",");
       }
       recalcAll();
     }
@@ -1246,16 +1139,50 @@
       const root = scope || document;
 
       const inputs = root.querySelectorAll(".js-input");
-      inputs.forEach(function (input) {
+      inputs.forEach(input => {
         input.removeEventListener("input", recalcAll);
         input.addEventListener("input", recalcAll);
       });
 
       const matDetailInputs = root.querySelectorAll(".js-material-detail");
-      matDetailInputs.forEach(function (input) {
+      matDetailInputs.forEach(input => {
         input.removeEventListener("input", recalcMaterialFromDetails);
         input.addEventListener("input", recalcMaterialFromDetails);
       });
+    }
+
+    function addMaterialDetailRow(matDetails) {
+      const rowsContainer = matDetails.querySelector(".material-rows");
+      if (!rowsContainer) return;
+      const template = rowsContainer.querySelector(".material-detail-row");
+      if (!template) return;
+
+      const clone = template.cloneNode(true);
+      const index = parseInt(matDetails.dataset.nextIndex || "2", 10);
+
+      const label = clone.querySelector(".material-detail-label");
+      const ep = clone.querySelector(".material-detail-ep");
+      if (label) {
+        label.value = "";
+        label.placeholder = "Material " + index;
+      }
+      if (ep) {
+        ep.value = "";
+        ep.placeholder = "EP";
+      }
+
+      rowsContainer.appendChild(clone);
+      matDetails.dataset.nextIndex = String(index + 1);
+      attachInputListeners(matDetails);
+    }
+
+    function removeMaterialDetailRow(matDetails) {
+      const rowsContainer = matDetails.querySelector(".material-rows");
+      if (!rowsContainer) return;
+      const rows = rowsContainer.querySelectorAll(".material-detail-row");
+      if (rows.length <= 1) return; // mindestens 1 behalten
+      rows[rows.length - 1].remove();
+      recalcAll();
     }
 
     function addRow() {
@@ -1276,34 +1203,35 @@
       }
 
       const textInput = newRow.querySelector(".pos-text");
-      if (textInput) {
-        textInput.value = "";
-      }
+      if (textInput) textInput.value = "";
 
       const mengeInput = newRow.querySelector(".input-menge");
-      if (mengeInput) {
-        mengeInput.value = "";
-      }
+      if (mengeInput) mengeInput.value = "";
 
       const lohnInput = newRow.querySelector(".input-lohn");
       const materialInput = newRow.querySelector(".input-material");
       const gewinnInput = newRow.querySelector(".input-gewinn");
-
       if (lohnInput) lohnInput.value = "";
       if (materialInput) materialInput.value = "";
       if (gewinnInput) gewinnInput.value = "";
 
-      const matLabels = newRow.querySelectorAll(".material-detail-label");
-      matLabels.forEach(function (lab, index) {
-        lab.value = "";
-        if (index === 0) lab.placeholder = "Material 1";
-        if (index === 1) lab.placeholder = "Material 2";
-        if (index === 2) lab.placeholder = "Material 3 (optional)";
-      });
-
-      const matDetailEps = newRow.querySelectorAll(".material-detail-ep");
-      matDetailEps.forEach(function (inp) {
-        inp.value = "";
+      // Material-Blöcke neu aufsetzen (nur 1 Zeile, "Material 1")
+      const matDetailsBlocks = newRow.querySelectorAll(".material-details");
+      matDetailsBlocks.forEach(md => {
+        md.dataset.nextIndex = "2";
+        const rowsContainer = md.querySelector(".material-rows");
+        if (!rowsContainer) return;
+        const rows = rowsContainer.querySelectorAll(".material-detail-row");
+        rows.forEach((r, idx) => {
+          const label = r.querySelector(".material-detail-label");
+          const ep = r.querySelector(".material-detail-ep");
+          if (idx === 0) {
+            if (label) { label.value = ""; label.placeholder = "Material 1"; }
+            if (ep) { ep.value = ""; ep.placeholder = "EP"; }
+          } else {
+            r.remove();
+          }
+        });
       });
 
       const epCell = newRow.querySelector(".cell-ep-gesamt");
@@ -1320,7 +1248,7 @@
       const tbody = document.getElementById("positions-body");
       const rows = Array.from(tbody.querySelectorAll("tr"));
 
-      rows.forEach(function (row) {
+      rows.forEach(row => {
         const lohnInput = row.querySelector(".input-lohn");
         const materialInput = row.querySelector(".input-material");
         const gewinnInput = row.querySelector(".input-gewinn");
@@ -1332,9 +1260,7 @@
         if (materialInput) materialInput.value = "0";
         if (gewinnInput) gewinnInput.value = "0";
 
-        matDetailEps.forEach(function (inp) {
-          inp.value = "";
-        });
+        matDetailEps.forEach(inp => { inp.value = ""; });
 
         if (epCell) epCell.textContent = "0,00";
         if (gpCell) gpCell.textContent = "0,00";
@@ -1344,18 +1270,29 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
+      // Grund-Listener
       attachInputListeners(document);
       recalcAll();
 
       const addRowBtn = document.getElementById("add-row");
-      if (addRowBtn) {
-        addRowBtn.addEventListener("click", addRow);
-      }
+      if (addRowBtn) addRowBtn.addEventListener("click", addRow);
 
       const resetBtn = document.getElementById("reset-prices");
-      if (resetBtn) {
-        resetBtn.addEventListener("click", resetPrices);
-      }
+      if (resetBtn) resetBtn.addEventListener("click", resetPrices);
+
+      // Delegation für + / - Buttons bei Material
+      document.addEventListener("click", function (e) {
+        const addBtn = e.target.closest(".btn-mat-add");
+        if (addBtn) {
+          const md = addBtn.closest(".material-details");
+          if (md) addMaterialDetailRow(md);
+        }
+        const removeBtn = e.target.closest(".btn-mat-remove");
+        if (removeBtn) {
+          const md = removeBtn.closest(".material-details");
+          if (md) removeMaterialDetailRow(md);
+        }
+      });
     });
   </script>
 </body>
