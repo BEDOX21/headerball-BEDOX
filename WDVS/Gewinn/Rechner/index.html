@@ -353,6 +353,12 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .pos-nummer {
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.05em;
+    }
+
     .cell-money {
       text-align: right;
       font-variant-numeric: tabular-nums;
@@ -382,6 +388,42 @@
     .cell-ep-gesamt,
     .cell-gp-gesamt {
       background: #f1f5f9;
+    }
+
+    /* Spaltenbreiten */
+    th.col-pos,
+    td.col-pos {
+      width: 72px;
+      min-width: 72px;
+      max-width: 72px;
+    }
+
+    th.col-menge,
+    td.col-menge {
+      width: 78px;
+      min-width: 78px;
+      max-width: 78px;
+    }
+
+    th.col-einheit,
+    td.col-einheit {
+      width: 64px;
+      min-width: 64px;
+      max-width: 64px;
+    }
+
+    th.col-lohn,
+    td.col-lohn {
+      width: 96px;
+      min-width: 96px;
+      max-width: 96px;
+    }
+
+    th.col-gewinn,
+    td.col-gewinn {
+      width: 96px;
+      min-width: 96px;
+      max-width: 96px;
     }
 
     /* Material-Details pro Position */
@@ -441,6 +483,69 @@
       font-size: 11px;
     }
 
+    /* Summen-Einheiten unten */
+    .tfoot-qty::after {
+      content: " m²";
+      font-size: 10px;
+      margin-left: 4px;
+      opacity: 0.9;
+    }
+
+    .tfoot-amount::after {
+      content: " €";
+      font-size: 10px;
+      margin-left: 4px;
+      opacity: 0.9;
+    }
+
+    .tfoot-unit-label {
+      font-size: 10px;
+      text-align: left;
+      color: #e5e7eb;
+      opacity: 0.9;
+    }
+
+    /* Schwebendes BEDOX-Logo */
+    .floating-logo {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      z-index: 60;
+      background: linear-gradient(135deg, #020617, #111827);
+      color: #e5e7eb;
+      padding: 6px 16px 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+
+    .floating-logo::before,
+    .floating-logo::after {
+      content: "";
+      position: absolute;
+      height: 2px;
+      width: 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38bdf8, #a855f7);
+      left: 8px;
+    }
+
+    .floating-logo::before {
+      top: 6px;
+    }
+
+    .floating-logo::after {
+      bottom: 6px;
+    }
+
     @media (max-width: 768px) {
       .app-shell {
         padding: 10px;
@@ -492,6 +597,14 @@
       .material-detail-label,
       .material-detail-ep {
         font-size: 9px;
+      }
+
+      .floating-logo {
+        font-size: 11px;
+        padding: 5px 14px 5px 12px;
+        right: 8px;
+        bottom: 8px;
+        letter-spacing: 0.24em;
       }
     }
   </style>
@@ -555,11 +668,11 @@
         <table>
           <thead>
             <tr>
-              <th>Pos.-Nr.</th>
+              <th class="col-pos">Pos.-Nr.</th>
               <th>Kurztext</th>
-              <th>Menge</th>
-              <th>Einheit</th>
-              <th class="cell-ep-header">
+              <th class="col-menge">Menge</th>
+              <th class="col-einheit">Einheit</th>
+              <th class="cell-ep-header col-lohn">
                 EP Lohn / Sub<br />
                 <span class="cell-label">€/Einheit</span>
               </th>
@@ -567,7 +680,7 @@
                 EP Material<br />
                 <span class="cell-label">€/Einheit (mit Details)</span>
               </th>
-              <th class="cell-ep-header">
+              <th class="cell-ep-header col-gewinn">
                 EP Gewinn<br />
                 <span class="cell-label">€/Einheit</span>
               </th>
@@ -584,19 +697,19 @@
           <tbody id="positions-body">
             <!-- 010 Gerüst -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="010" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="010" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Gerüst stellen für WDVS-Fassade, bis 3. OG" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m²" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="6,50" />
               </td>
               <td class="cell-ep-group">
@@ -617,7 +730,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="2,00" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -626,19 +739,19 @@
 
             <!-- 020 Untergrund -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="020" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="020" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Untergrundvorbereitung, Reinigung und Haftgrund" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m²" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="4,50" />
               </td>
               <td class="cell-ep-group">
@@ -659,7 +772,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="1,20" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -668,19 +781,19 @@
 
             <!-- 030 Platten kleben -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="030" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="030" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Wärmedämmplatten kleben und ansetzen (EPS / Mineralwolle)" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m²" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="10,00" />
               </td>
               <td class="cell-ep-group">
@@ -701,7 +814,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="4,00" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -710,19 +823,19 @@
 
             <!-- 040 Dübel -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="040" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="040" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Dübel setzen für WDVS inkl. Bohren" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m²" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="3,20" />
               </td>
               <td class="cell-ep-group">
@@ -743,7 +856,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="1,50" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -752,19 +865,19 @@
 
             <!-- 050 Armierung -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="050" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="050" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Armierungslage mit Gewebe, vollflächig" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m²" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="6,80" />
               </td>
               <td class="cell-ep-group">
@@ -785,7 +898,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="2,20" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -794,19 +907,19 @@
 
             <!-- 060 Oberputz -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="060" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="060" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Oberputz (z. B. Silikonharzputz) inkl. Strukturierung" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m²" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="5,50" />
               </td>
               <td class="cell-ep-group">
@@ -827,7 +940,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="2,30" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -836,19 +949,19 @@
 
             <!-- 070 Anschluss-/Eckprofile -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="070" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="070" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Anschluss- und Eckprofile, Fensterbänke, Laibungen" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="80" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="5,00" />
               </td>
               <td class="cell-ep-group">
@@ -869,28 +982,28 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="2,50" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
               <td class="cell-money cell-gp-gesamt">0,00</td>
             </tr>
 
-            <!-- 080 Sockelbereich -->
+            <!-- 080 Sockel -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="080" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="080" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="WDVS-Sockelbereich inkl. Perimeterdämmung und Sockelputz" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="30" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m²" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="9,50" />
               </td>
               <td class="cell-ep-group">
@@ -911,7 +1024,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="3,50" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -920,19 +1033,19 @@
 
             <!-- 090 Brandriegel -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="090" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="090" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Brandriegel / Brandbarrieren gemäß Detailplanung" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="40" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="8,00" />
               </td>
               <td class="cell-ep-group">
@@ -953,7 +1066,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="3,00" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -962,19 +1075,19 @@
 
             <!-- 100 Schlussanstrich -->
             <tr>
-              <td>
-                <input type="text" class="pos-nummer input-number" value="100" />
+              <td class="col-pos">
+                <input type="text" class="pos-nummer" value="100" />
               </td>
               <td>
                 <input type="text" class="pos-text" value="Schlussanstrich / Fassadenfarbe auf WDVS" />
               </td>
-              <td>
+              <td class="col-menge">
                 <input type="text" class="input-number input-menge js-input" value="100" />
               </td>
-              <td>
+              <td class="col-einheit">
                 <input type="text" class="input-einheit" value="m²" />
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-lohn">
                 <input type="text" class="input-number input-lohn js-input" value="3,80" />
               </td>
               <td class="cell-ep-group">
@@ -995,7 +1108,7 @@
                   </div>
                 </div>
               </td>
-              <td class="cell-ep-group">
+              <td class="cell-ep-group col-gewinn">
                 <input type="text" class="input-number input-gewinn js-input" value="1,80" />
               </td>
               <td class="cell-money cell-ep-gesamt">0,00</td>
@@ -1005,14 +1118,14 @@
 
           <tfoot>
             <tr>
-              <td colspan="2">Summen</td>
-              <td class="cell-money-total" id="sum-menge">0,00</td>
-              <td></td>
-              <td class="cell-money-total" id="sum-lohn-gp">0,00</td>
-              <td class="cell-money-total" id="sum-material-gp">0,00</td>
-              <td class="cell-money-total" id="sum-gewinn-gp">0,00</td>
-              <td></td>
-              <td class="cell-money-total" id="sum-gp-gesamt">0,00</td>
+              <td colspan="2">Summen (gesamt)</td>
+              <td class="cell-money-total tfoot-qty" id="sum-menge">0,00</td>
+              <td class="tfoot-unit-label">Menge (≈ m² / m)</td>
+              <td class="cell-money-total tfoot-amount" id="sum-lohn-gp">0,00</td>
+              <td class="cell-money-total tfoot-amount" id="sum-material-gp">0,00</td>
+              <td class="cell-money-total tfoot-amount" id="sum-gewinn-gp">0,00</td>
+              <td class="tfoot-unit-label">Gewinn gesamt</td>
+              <td class="cell-money-total tfoot-amount" id="sum-gp-gesamt">0,00</td>
             </tr>
           </tfoot>
         </table>
@@ -1024,12 +1137,15 @@
           Kostenarten und eigene Layout-Anpassungen ergänzen.
         </div>
         <div class="footer-right">
-          <div class="pill">Stand: <strong>Prototyp v0.2</strong></div>
+          <div class="pill">Stand: <strong>Prototyp v0.3</strong></div>
           <div class="pill">Layout: GAEB-ähnliche LV-Tabelle (BEDOX)</div>
         </div>
       </div>
     </main>
   </div>
+
+  <!-- Schwebendes BEDOX-Logo (immer sichtbar) -->
+  <div class="floating-logo">BEDOX</div>
 
   <script>
     // Hilfsfunktion: Text -> Zahl (unterstützt "1.234,56" und "1234.56")
