@@ -554,6 +554,14 @@
             <span class="icon">⟳</span>
             <span>Preise zurücksetzen</span>
           </button>
+
+          <!-- LV aus Excel laden -->
+          <button id="import-excel" class="btn" type="button">
+            <span class="icon">📄</span>
+            <span>LV aus Excel laden</span>
+          </button>
+          <input type="file" id="excel-file" accept=".xlsx,.xls,.csv" style="display:none" />
+
           <button id="add-row" class="btn btn-primary" type="button">
             <span class="icon">＋</span>
             <span>Zeile hinzufügen</span>
@@ -597,7 +605,7 @@
           </thead>
 
           <tbody id="positions-body">
-            <!-- jede Material-Zelle mit dynamischen Zeilen (Start: Material 1) -->
+            <!-- Jede Position wird mit dynamischen Material-Details initialisiert -->
 
             <!-- 010 Gerüst -->
             <tr>
@@ -1040,7 +1048,7 @@
           <strong>Hinweis:</strong> Dies ist ein Prototyp. Du kannst später noch Export (CSV/GAEB), Kostenarten und mehr ergänzen.
         </div>
         <div class="footer-right">
-          <div class="pill">Stand: <strong>Prototyp v0.4</strong></div>
+          <div class="pill">Stand: <strong>Prototyp v0.5</strong></div>
           <div class="pill">Layout: GAEB-ähnliche LV-Tabelle (BEDOX)</div>
         </div>
       </div>
@@ -1049,6 +1057,9 @@
 
   <!-- Schwebendes BEDOX-Logo -->
   <div class="floating-logo">BEDOX</div>
+
+  <!-- Excel-Library für LV-Import -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script>
     function parseNumber(value) {
@@ -1127,7 +1138,9 @@
       if (!row) return;
       const detailInputs = row.querySelectorAll(".js-material-detail");
       let sum = 0;
-      detailInputs.forEach(inp => { sum += parseNumber(inp.value); });
+      detailInputs.forEach(function (inp) {
+        sum += parseNumber(inp.value);
+      });
       if (sum > 0) {
         const materialInput = row.querySelector(".input-material");
         if (materialInput) materialInput.value = sum.toFixed(2).replace(".", ",");
@@ -1139,13 +1152,13 @@
       const root = scope || document;
 
       const inputs = root.querySelectorAll(".js-input");
-      inputs.forEach(input => {
+      inputs.forEach(function (input) {
         input.removeEventListener("input", recalcAll);
         input.addEventListener("input", recalcAll);
       });
 
       const matDetailInputs = root.querySelectorAll(".js-material-detail");
-      matDetailInputs.forEach(input => {
+      matDetailInputs.forEach(function (input) {
         input.removeEventListener("input", recalcMaterialFromDetails);
         input.addEventListener("input", recalcMaterialFromDetails);
       });
@@ -1217,17 +1230,17 @@
 
       // Material-Blöcke neu aufsetzen (nur 1 Zeile, "Material 1")
       const matDetailsBlocks = newRow.querySelectorAll(".material-details");
-      matDetailsBlocks.forEach(md => {
+      matDetailsBlocks.forEach(function (md) {
         md.dataset.nextIndex = "2";
         const rowsContainer = md.querySelector(".material-rows");
         if (!rowsContainer) return;
         const rows = rowsContainer.querySelectorAll(".material-detail-row");
-        rows.forEach((r, idx) => {
+        rows.forEach(function (r, idx) {
           const label = r.querySelector(".material-detail-label");
           const ep = r.querySelector(".material-detail-ep");
           if (idx === 0) {
             if (label) { label.value = ""; label.placeholder = "Material 1"; }
-            if (ep) { ep.value = ""; ep.placeholder = "EP"; }
+            if (ep)    { ep.value = "";    ep.placeholder = "EP"; }
           } else {
             r.remove();
           }
@@ -1248,7 +1261,7 @@
       const tbody = document.getElementById("positions-body");
       const rows = Array.from(tbody.querySelectorAll("tr"));
 
-      rows.forEach(row => {
+      rows.forEach(function (row) {
         const lohnInput = row.querySelector(".input-lohn");
         const materialInput = row.querySelector(".input-material");
         const gewinnInput = row.querySelector(".input-gewinn");
@@ -1260,13 +1273,134 @@
         if (materialInput) materialInput.value = "0";
         if (gewinnInput) gewinnInput.value = "0";
 
-        matDetailEps.forEach(inp => { inp.value = ""; });
+        matDetailEps.forEach(function (inp) {
+          inp.value = "";
+        });
 
         if (epCell) epCell.textContent = "0,00";
         if (gpCell) gpCell.textContent = "0,00";
       });
 
       recalcAll();
+    }
+
+    // -------------------------------
+    // Excel-Import: LV aus Datei laden
+    // -------------------------------
+    function fillRowFromExcel(row, data) {
+      const posInput      = row.querySelector(".pos-nummer");
+      const textInput     = row.querySelector(".pos-text");
+      const mengeInput    = row.querySelector(".input-menge");
+      const einheitInput  = row.querySelector(".input-einheit");
+      const lohnInput     = row.querySelector(".input-lohn");
+      const materialInput = row.querySelector(".input-material");
+      const gewinnInput   = row.querySelector(".input-gewinn");
+
+      if (posInput)      posInput.value      = (data.pos      != null ? data.pos      : "");
+      if (textInput)     textInput.value     = (data.text     != null ? data.text     : "");
+      if (mengeInput)    mengeInput.value    = (data.menge    != null ? data.menge    : "");
+      if (einheitInput)  einheitInput.value  = (data.einheit  != null ? data.einheit  : "");
+      if (lohnInput)     lohnInput.value     = (data.epLohn   != null ? data.epLohn   : "");
+      if (materialInput) materialInput.value = (data.epMat    != null ? data.epMat    : "");
+      if (gewinnInput)   gewinnInput.value   = (data.epGewinn != null ? data.epGewinn : "");
+    }
+
+    function importExcelRecords(records) {
+      const tbody = document.getElementById("positions-body");
+      let htmlRows = Array.from(tbody.querySelectorAll("tr"));
+
+      let index = 0;
+      records.forEach(function (rec) {
+        let row;
+        if (index < htmlRows.length) {
+          row = htmlRows[index];
+        } else {
+          // zusätzliche Tabellenzeilen erzeugen
+          addRow();
+          htmlRows = Array.from(tbody.querySelectorAll("tr"));
+          row = htmlRows[htmlRows.length - 1];
+        }
+
+        // Material-Details in der Zeile zurücksetzen
+        const matDetailsBlocks = row.querySelectorAll(".material-details");
+        matDetailsBlocks.forEach(function (md) {
+          md.dataset.nextIndex = "2";
+          const rowsContainer = md.querySelector(".material-rows");
+          if (!rowsContainer) return;
+          const rows = rowsContainer.querySelectorAll(".material-detail-row");
+          rows.forEach(function (r, idx) {
+            const label = r.querySelector(".material-detail-label");
+            const ep = r.querySelector(".material-detail-ep");
+            if (idx === 0) {
+              if (label) { label.value = ""; label.placeholder = "Material 1"; }
+              if (ep)    { ep.value = "";    ep.placeholder = "EP"; }
+            } else {
+              r.remove();
+            }
+          });
+        });
+
+        fillRowFromExcel(row, rec);
+        index++;
+      });
+
+      recalcAll();
+    }
+
+    function handleExcelFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // sheet_to_json als 2D-Array (erste Zeile Header)
+        const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+        if (rows.length < 2) {
+          alert("Excel enthält keine Daten.");
+          return;
+        }
+
+        const header = rows[0].map(function (h) { return String(h).trim().toLowerCase(); });
+        function idx(name) {
+          const i = header.indexOf(name.toLowerCase());
+          return i === -1 ? null : i;
+        }
+
+        const posIdx      = idx("pos")         ?? idx("posnr") ?? idx("pos.-nr.");
+        const textIdx     = idx("kurztext");
+        const mengeIdx    = idx("menge");
+        const einheitIdx  = idx("einheit");
+        const epLohnIdx   = idx("ep_lohn");
+        const epMatIdx    = idx("ep_material");
+        const epGewinnIdx = idx("ep_gewinn");
+
+        const records = rows.slice(1).map(function (r) {
+          return {
+            pos:      posIdx      != null ? r[posIdx]      : "",
+            text:     textIdx     != null ? r[textIdx]     : "",
+            menge:    mengeIdx    != null ? r[mengeIdx]    : "",
+            einheit:  einheitIdx  != null ? r[einheitIdx]  : "",
+            epLohn:   epLohnIdx   != null ? r[epLohnIdx]   : "",
+            epMat:    epMatIdx    != null ? r[epMatIdx]    : "",
+            epGewinn: epGewinnIdx != null ? r[epGewinnIdx] : ""
+          };
+        }).filter(function (r) {
+          return (r.pos || r.text || r.menge);
+        });
+
+        if (!records.length) {
+          alert("Keine passenden LV-Daten gefunden (prüfe Überschriften).");
+          return;
+        }
+
+        importExcelRecords(records);
+      };
+
+      reader.readAsArrayBuffer(file);
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -1280,7 +1414,23 @@
       const resetBtn = document.getElementById("reset-prices");
       if (resetBtn) resetBtn.addEventListener("click", resetPrices);
 
-      // Delegation für + / - Buttons bei Material
+      // Excel-Import
+      const importBtn = document.getElementById("import-excel");
+      const fileInput = document.getElementById("excel-file");
+
+      if (importBtn && fileInput) {
+        importBtn.addEventListener("click", function () {
+          fileInput.value = "";
+          fileInput.click();
+        });
+
+        fileInput.addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) handleExcelFile(file);
+        });
+      }
+
+      // Delegation für + / − Buttons bei Material
       document.addEventListener("click", function (e) {
         const addBtn = e.target.closest(".btn-mat-add");
         if (addBtn) {
